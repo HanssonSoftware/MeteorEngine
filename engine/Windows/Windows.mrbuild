@@ -1,0 +1,13 @@
+Module "Windows" : "Meteor"
+{
+	IncludePath:
+	{
+		"$(SolutionDir)\engine\Windows",
+	}
+
+	Dependencies:
+	{
+		"Core",
+		"Platform"
+	}
+}

@@ -1,0 +1,22 @@
+Module "Vulkan" : "Meteor"
+{
+	Dependencies:
+	{
+		"Core",
+		"Renderer"
+	}
+
+	IncludePaths:
+	{
+		"$(SolutionDir)engine",
+		"$(SolutionDir)engine\Core",
+		"$(VULKAN_SDK)\Include\",
+		"$(SolutionDir)\engine\Core\Common",
+		"$(SolutionDir)\engine\Core\Layers",
+		"$(SolutionDir)\engine\Core\Logging",
+		"$(SolutionDir)\engine\Core\Module",
+		"$(SolutionDir)\engine\Core\Object",
+		"$(SolutionDir)\engine\Core\Platform",
+		"$(SolutionDir)\engine\Core"
+	}
+}

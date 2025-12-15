@@ -1,0 +1,12 @@
+Module "Platform" : "Meteor"
+{
+	IncludePath:
+	{
+		"$(SolutionDir)\engine\Platform",
+	}
+
+	Dependencies:
+	{
+		"Core"
+	}
+}

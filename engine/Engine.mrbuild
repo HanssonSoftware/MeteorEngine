@@ -1,0 +1,12 @@
+Project "Meteor"
+{
+	Executable:
+	{
+		"Launch.cpp"
+	}
+
+	GlobalDefines:
+	{
+		"MR_PLATFORM_WINDOWS"
+	}
+}

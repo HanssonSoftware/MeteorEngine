@@ -1,0 +1,13 @@
+Module "WindowManager" : "Meteor"
+{
+	IncludePath:
+	{
+		"$(SolutionDir)\engine\WindowManager",
+	}
+
+	Dependencies:
+	{
+		"Core",
+		"Platform"
+	}
+}

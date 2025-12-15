@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Shipping|x64">
+      <Configuration>Shipping</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{709b7964-f338-40b8-b8e2-a2898b438a1c}</ProjectGuid>
+    <RootNamespace>Meteor</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Meteor</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <EnableASAN>false</EnableASAN>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <EnableUnitySupport>false</EnableUnitySupport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v145</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <EnableUnitySupport>false</EnableUnitySupport>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)Product\</OutDir>
+    <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)-engine</TargetName>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
+    <OutDir>$(SolutionDir)Product\</OutDir>
+    <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
+    <TargetName>$(ProjectName)-engine</TargetName>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)Product\</OutDir>
+    <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
+    <TargetName>MeteorEngine-Core</TargetName>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
+    <OutDir>$(SolutionDir)Product\</OutDir>
+    <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
+    <TargetName>MeteorEngine-Core</TargetName>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)engine\;$(SolutionDir)engine\ThirdParty\ImGUI\;$(SolutionDir)engine\ThirdParty\FreeType\;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\Platform;$(SolutionDir)engine\Editor;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;$(VULKAN_SDK)\Lib\;$(SolutionDir)engine\ThirdParty\assimp;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);vulkan-1.lib</AdditionalDependencies>
+      <Name>
+      </Name>
+      <SubSystem>
+      </SubSystem>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Lib>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)Scripts\IncrementVer.bat</Command>
+    </PreBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(VULKAN_SDK)\Include;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)engine\Core;$(SolutionDir)engine\;$(SolutionDir)engine\ThirdParty\ImGUI\;$(SolutionDir)engine\ThirdParty\FreeType\;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\Platform;$(SolutionDir)editor;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(VULKAN_SDK)\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);vulkan-1.lib</AdditionalDependencies>
+      <Name>
+      </Name>
+      <SubSystem>
+      </SubSystem>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Lib>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)Scripts\IncrementVer.bat</Command>
+    </PreBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;MR_CORE_ENABLED;MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <UseFullPaths>false</UseFullPaths>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary />
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(ProjectDir)engine\ThirdParty</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);d3d11.lib</AdditionalDependencies>
+      <Name>
+      </Name>
+      <SubSystem>
+      </SubSystem>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Lib>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
+    </PreBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_CORE_ENABLED;MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <UseFullPaths>false</UseFullPaths>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary />
+    </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(ProjectDir)engine\ThirdParty</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%(AdditionalDependencies);d3d11.lib</AdditionalDependencies>
+      <Name>
+      </Name>
+      <SubSystem>
+      </SubSystem>
+      <SuppressStartupBanner>false</SuppressStartupBanner>
+    </Lib>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+      <Message>
+      </Message>
+    </PreBuildEvent>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="engine\Core\Logging\Log.cpp" />
+    <ClCompile Include="engine\Core\Logging\LogAssertion.cpp" />
+    <ClCompile Include="engine\Core\Object\Object.cpp" />
+    <ClCompile Include="engine\Core\Application.cpp" />
+    <ClCompile Include="engine\Core\Commandlet.cpp" />
+    <ClCompile Include="engine\Core\Layers\Layer.cpp" />
+    <ClCompile Include="engine\Core\Layers\LayerManager.cpp" />
+    <ClCompile Include="engine\Core\Types\String.cpp" />
+    <ClCompile Include="engine\Core\Types\Vector.cpp" />
+    <ClCompile Include="engine\Core\Layers\ThreadPool.cpp" />
+    <ClCompile Include="engine\Core\MemoryManager.cpp" />
+    <ClCompile Include="engine\Core\Module\ModuleManager.cpp" />
+    <ClCompile Include="engine\Core\Module\Module.cpp" />
+    <ClCompile Include="engine\Launch.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="engine\Core\Common\Maths.h" />
+    <ClInclude Include="engine\Core\Logging\Log.h" />
+    <ClInclude Include="engine\Core\Logging\LogMacros.h" />
+    <ClInclude Include="engine\Core\Common\Conversions.h" />
+    <ClInclude Include="engine\Core\Object\Object.h" />
+    <ClInclude Include="engine\Core\Application.h" />
+    <ClInclude Include="engine\Core\Commandlet.h" />
+    <ClInclude Include="engine\Core\Layers\Layer.h" />
+    <ClInclude Include="engine\Core\Layers\LayerManager.h" />
+    <ClInclude Include="engine\Core\Types\Array.h" />
+    <ClInclude Include="engine\Core\Types\Delegate.h" />
+    <ClInclude Include="engine\Core\Types\Cast.h" />
+    <ClInclude Include="engine\Core\Types\String.h" />
+    <ClInclude Include="engine\Core\Types\Traits.h" />
+    <ClInclude Include="engine\Core\Types\Vector.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\aabb.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\ai_assert.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\anim.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Base64.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\BaseImporter.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Bitmap.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\BlobIOSystem.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\ByteSwapper.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\camera.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\cexport.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\cfileio.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\cimport.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\ColladaMetaData.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\color4.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\commonMetaData.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Compiler\poppack1.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Compiler\pstdint.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Compiler\pushpack1.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\config.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\CreateAnimMesh.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\DefaultIOStream.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\DefaultIOSystem.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\DefaultLogger.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\defs.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Exceptional.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Exporter.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\fast_atof.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\GenericProperty.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\GltfMaterial.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Hash.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Importer.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\importerdesc.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\IOStream.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\IOStreamBuffer.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\IOSystem.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\light.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\LineSplitter.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\LogAux.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Logger.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\LogStream.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\material.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\MathFunctions.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\matrix3x3.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\matrix4x4.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\MemoryIOWrapper.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\mesh.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\metadata.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\NullLogger.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\ObjMaterial.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\ParsingUtils.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\pbrmaterial.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\port\AndroidJNI\AndroidJNIIOSystem.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\port\AndroidJNI\BundledAssetIOSystem.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\postprocess.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Profiler.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\ProgressHandler.hpp" />
+    <ClInclude Include="engine\ThirdParty\assimp\qnan.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\quaternion.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\RemoveComments.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\scene.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\SceneCombiner.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\SGSpatialSort.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\SkeletonMeshBuilder.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\SmallVector.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\SmoothingGroups.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\SpatialSort.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\StandardShapes.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\StreamReader.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\StreamWriter.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\StringComparison.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\StringUtils.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Subdivision.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\texture.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\TinyFormatter.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\types.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\vector2.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\vector3.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\version.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\Vertex.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\XmlParser.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\XMLTools.h" />
+    <ClInclude Include="engine\ThirdParty\assimp\ZipArchiveIOSystem.h" />
+    <ClInclude Include="engine\Version.h" />
+    <ClInclude Include="engine\Core\Types\Pointers.h" />
+    <ClInclude Include="engine\Core\Logging\LogAssertion.h" />
+    <ClInclude Include="engine\Core\MemoryManager.h" />
+    <ClInclude Include="engine\Core\Module\ModuleManager.h" />
+    <ClInclude Include="engine\Core\Types\Iterator.h" />
+    <ClInclude Include="engine\Core\Module\Module.h" />
+    <ClInclude Include="resources\DefaultDll.h" />
+    <ClInclude Include="resources\assertbox.h" />
+    <ClInclude Include="resources\resource.h" />
+    <ClInclude Include="engine\Core\Layers\ThreadPool.h" />
+    <ClInclude Include="engine\Platform\WindowManager\WindowMenu.h" />
+    <ClInclude Include="engine\Platform\WindowManager\WindowExtender.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="engine\Engine.mrbuild" />
+    <None Include="engine\ThirdParty\assimp\color4.inl" />
+    <None Include="engine\ThirdParty\assimp\material.inl" />
+    <None Include="engine\ThirdParty\assimp\matrix3x3.inl" />
+    <None Include="engine\ThirdParty\assimp\matrix4x4.inl" />
+    <None Include="engine\ThirdParty\assimp\quaternion.inl" />
+    <None Include="engine\ThirdParty\assimp\SmoothingGroups.inl" />
+    <None Include="engine\ThirdParty\assimp\vector2.inl" />
+    <None Include="engine\ThirdParty\assimp\vector3.inl" />
+    <None Include="Resources\d1.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\DefaultDll.rc" />
+    <ResourceCompile Include="resources\assertbox.rc" />
+    <ResourceCompile Include="resources\sampleapp.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\mr1.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
