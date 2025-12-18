@@ -8,7 +8,7 @@
 
 LOG_ADDCATEGORY(Application);
 
-struct Application
+struct __declspec(dllexport) Application
 {
 	enum class ECurrentApplicationState { NONE, STARTUP, RUNNING, RESTARTING, SHUTDOWN, DEAD };
 
@@ -64,7 +64,7 @@ static T* GetApplication()
 }
 
 #define IMPLEMENT_APPLICATION(ApplicationClass) \
-	/*extern "C" __declspec(dllexport)*/ int LaunchApplication(int ArgumentCount, char* Arguments[]) \
+	extern "C" __declspec(dllexport) int LaunchApplication(int ArgumentCount, char* Arguments[]) \
 	{	\
 		static ApplicationClass instance; \
 		Commandlet::Initialize(); \
