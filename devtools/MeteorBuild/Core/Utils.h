@@ -6,4 +6,6 @@
 struct Utils
 {
 	static void ListDirectory(String* name, Array<String>& container);
+
+	static String GetLastError();
 };

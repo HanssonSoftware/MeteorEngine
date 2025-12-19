@@ -47,7 +47,7 @@ Module* Parser::ParseModuleScript(String* moduleName)
 			PathCchRemoveFileSpec(moduleName->Data(), moduleName->Length());
 			moduleName->Refresh();
 
-			MR_LOG(LogParser, Verbose, "Opening %ls as ModuleScript!", *module->GetName());
+			MR_LOG(LogParser, Log, "Opening %ls as ModuleScript!", *module->GetName());
 			Module* newModule = new Module();
 			if (!newModule)
 				return nullptr;
@@ -84,7 +84,7 @@ Module* Parser::ParseModuleScript(String* moduleName)
 										if (value)
 										{
 											if (AddVerbDetail(newModule, flagWord, value))
-												MR_LOG(LogParser, Verbose, "Added %ls property to %ls", *value, *flagWord);
+												MR_LOG(LogParser, Log, "Added %ls property to %ls", *value, *flagWord);
 										}
 
 										if (GetCharacterType(buffer) == Comma)
@@ -118,7 +118,7 @@ Module* Parser::ParseModuleScript(String* moduleName)
 							}
 
 							newModule->identification = buffer;
-							MR_LOG(LogParser, Verbose, "Successfully generated GUID, for module %ls!", *newModule->moduleName);
+							MR_LOG(LogParser, Log, "Successfully generated GUID, for module %ls!", *newModule->moduleName);
 						}
 					}
 
@@ -172,7 +172,7 @@ Project* Parser::ParseProjectScript(String* projectPath)
 			if (!newProject)
 				return nullptr;
 
-			MR_LOG(LogParser, Verbose, "Opening %ls as ProjectScript!", *module->GetName());
+			MR_LOG(LogParser, Log, "Opening %ls as ProjectScript!", *module->GetName());
 
 			newProject->projectName = GetWord(buffer, true);
 
@@ -201,7 +201,7 @@ Project* Parser::ParseProjectScript(String* projectPath)
 										if (!bHasBeenParsedOneWordAtLeast) bHasBeenParsedOneWordAtLeast = true;
 
 										AddVerbDetail(newProject, flagWord, value);
-										MR_LOG(LogParser, Verbose, "Adding %ls property to %ls", *value, *flagWord);
+										MR_LOG(LogParser, Log, "Adding %ls property to %ls", *value, *flagWord);
 									}
 
 									if (GetCharacterType(buffer) == Comma)

@@ -4,6 +4,7 @@
 
 #include <basetsd.h>
 #include <vector>
+#include <TEMPIMPORT.h>
 
 //
 #include <Windows/Windows.h>
@@ -14,7 +15,7 @@
 //	----------------------------------------------
 
 
-struct MemoryManager
+struct CORE_API MemoryManager
 {
 	static MemoryManager& Get();
 
@@ -79,7 +80,7 @@ protected:
 
 	char* end = nullptr;
 
-	static inline std::vector<MemoryData> block;
+	//static inline std::vector<MemoryData> block;
 
 	MemoryManager* object;
 };

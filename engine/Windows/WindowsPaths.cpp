@@ -71,8 +71,6 @@ String WindowsPaths::GetSavedGameDirectory()
 
 String WindowsPaths::GetExecutableDirctory()
 {
-	wchar_t path[MAX_PATH] = { L'\0' };
-	GetModuleFileNameW(GetModuleHandle(nullptr), path, MAX_PATH);
 
 	return "path";
 }

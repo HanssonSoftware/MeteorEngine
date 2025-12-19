@@ -5,10 +5,10 @@
 
 #include "Commandlet.h"
 #include <cstdint>
-
+#include <TEMPIMPORT.h>
 LOG_ADDCATEGORY(Application);
 
-struct __declspec(dllexport) Application
+struct CORE_API Application
 {
 	enum class ECurrentApplicationState { NONE, STARTUP, RUNNING, RESTARTING, SHUTDOWN, DEAD };
 

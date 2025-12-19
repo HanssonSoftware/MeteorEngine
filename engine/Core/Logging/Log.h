@@ -2,7 +2,7 @@
 
 #pragma once
 #include <Types/Delegate.h>
-
+#include <TEMPIMPORT.h>
 #ifdef MR_DEBUG
 constexpr inline const bool bIsRunningDebugMode = true;
 #else
@@ -18,10 +18,13 @@ CREATE_DELEGATE(LoggerInitialize);
 
 struct LogEntry {};
 
-class Logger
+class CORE_API Logger
 {
 public:
-	static Logger* Get();
+	static Logger* Get()
+	{
+		return instance;
+	};
 
 	Logger();
 
@@ -45,6 +48,9 @@ protected:
 	//DelLoggerInitialize loggerInitialized;
 
 	bool bIsInitialized = false;
+
+private:
+	static inline Logger* instance;
 };
 
 #include "LogMacros.h"

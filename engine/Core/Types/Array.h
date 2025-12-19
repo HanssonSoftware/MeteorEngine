@@ -6,10 +6,10 @@
 #include <stdint.h>
 
 #include <Logging/Log.h>
-//#include <vector>
+#include <TEMPIMPORT.h>
 
 template <typename T>
-class Array
+class CORE_API Array
 {
 public:
 	Array()

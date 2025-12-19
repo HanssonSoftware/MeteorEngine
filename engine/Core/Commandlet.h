@@ -4,12 +4,12 @@
 #include <Logging/Log.h>
 #include <Types/Array.h>
 #include <Types/String.h>
-
+#include <TEMPIMPORT.h>
 class String;
 
 LOG_ADDCATEGORY(Commandlet);
 
-struct Commandlet
+struct CORE_API Commandlet
 {
 	static void Initialize();
 

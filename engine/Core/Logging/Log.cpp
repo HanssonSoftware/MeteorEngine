@@ -6,16 +6,9 @@
 
 LOG_ADDCATEGORY(Standard);
 
-static Logger* instanceOfLogger = new Logger();
-
 Logger::Logger()
 {
     Initialize();
-}
-
-Logger* Logger::Get()
-{
-    return instanceOfLogger;
 }
 
 void Logger::Shutdown()
