@@ -16,7 +16,8 @@
 #include <Application.h>
 #include "Parser.h"
 
-#include "Windows/WindowsPaths.h"
+#include <Shlobj.h>
+#pragma comment(lib, "Shell32.lib")
 
 LOG_ADDCATEGORY(BuildSystemFramework);
 LOG_ADDCATEGORY(Assembler);
@@ -40,7 +41,7 @@ bool BuildSystem::InitFramework()
 				if (FileManager::IsEndingWith(pathToDiscoveredItemsIndexed, "mrbuild"))
 				{
 					scriptsFound.Add(pathToDiscoveredItemsIndexed);
-					MR_LOG(LogBuildSystemFramework, Verbose, "Found script: %ls", *pathToDiscoveredItemsIndexed);
+					MR_LOG(LogBuildSystemFramework, Log, "Found script: %ls", *pathToDiscoveredItemsIndexed);
 				}
 			}
 
@@ -60,7 +61,7 @@ bool BuildSystem::InitFramework()
 					for (auto& temp : sd)
 					{
 						mdl->files.Add(*temp);
-						MR_LOG(LogBuildSystemFramework, Verbose, "%ls module, new file added to include list: %ls", *mdl->moduleName, *temp);
+						MR_LOG(LogBuildSystemFramework, Log, "%ls module, new file added to include list: %ls", *mdl->moduleName, *temp);
 					}
 
 					loadedModules.Add(*mdl);
@@ -155,23 +156,39 @@ bool BuildSystem::BuildProjectFiles()
 	{
 		if (FileManager::IsPathRelative(&intermediateLocation))
 		{
-			String exeDir = Paths::GetExecutableDirctory();
+			wchar_t exePathRaw[MAX_PATH] = { L'\0' };
+			GetModuleFileNameW(GetModuleHandle(nullptr), exePathRaw, MAX_PATH);
 
-			PathCchRemoveFileSpec(exeDir.Data(), exeDir.Length());
-			exeDir.Refresh();
+			PathCchRemoveFileSpec(exePathRaw, wcslen(exePathRaw));
 
 			PWSTR combinedPathNonCanonicalized;
-			PathAllocCombine(exeDir, intermediateLocation, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
+			PathAllocCombine(exePathRaw, intermediateLocation, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
 
 			intermediateLocation = combinedPathNonCanonicalized;
 			LocalFree(combinedPathNonCanonicalized);
 		}
 
 		intermediateLocation = String::Format("%ls\\%ls", *intermediateLocation, *GetApplication()->GetApplicationCodeName()); // C:\\Meteor-Engine\\Intermediate\\Apollo
-		FileManager::CreateDirectory(&intermediateLocation);
-		if (GetLastError() == ERROR_ALREADY_EXISTS)
+		if (SHCreateDirectoryExW(nullptr, intermediateLocation, nullptr) == ERROR_ALREADY_EXISTS)
 		{
-			FileManager::DeleteDirectory(intermediateLocation, true);
+			SHFILEOPSTRUCTW sh = {};
+			sh.hwnd = nullptr;
+			sh.wFunc = FO_DELETE;
+			//sh.pFrom = doubleTerminated;
+			sh.pTo = nullptr;
+			sh.fFlags = FOF_MULTIDESTFILES | FOF_NO_UI;
+			sh.fAnyOperationsAborted = false;
+			sh.hNameMappings = nullptr;
+			sh.lpszProgressTitle = nullptr;
+
+			SHFileOperationW(&sh);
+
+			if (sh.fAnyOperationsAborted != 0)
+			{
+				MR_LOG(LogFileManager, Error, "RemoveDirectoryW returned: %ls", *Platform::GetError());
+				return false;
+			}
+
 			FileManager::CreateDirectory(&intermediateLocation);
 		}
 

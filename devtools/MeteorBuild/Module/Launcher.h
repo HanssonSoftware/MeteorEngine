@@ -1,8 +1,8 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
-int main(char* argv[], int argc)
-{
-	BuildSystemInstace
+#pragma once
 
-	return 0;
-}
+class Launcher
+{
+};
+

@@ -53,7 +53,7 @@ bool ModuleManager::LoadModule(const String& moduleName)
 #ifdef MR_PLATFORM_WINDOWS
     String libraryName = String::Format("%ls-%ls.dll", *GetApplication()->GetApplicationName(), moduleName.Chr());
 
-    HMODULE module = LoadLibraryW(/*libraryName*/L"");
+    HMODULE module = LoadLibraryW(libraryName);
     if (module != nullptr)
     {
         fv moduleInstantiation = (fv)GetProcAddress(module, "InitialiseModule");
@@ -74,7 +74,7 @@ bool ModuleManager::LoadModule(const String& moduleName)
     {
         libraryName = String::Format("%ls-%ls.dll", defaultEngineName, moduleName.Chr());
 
-        module = LoadLibraryW(/*libraryName*/L"");
+        module = LoadLibraryW(libraryName);
         if (module != nullptr)
         {
             fv moduleInstantiation = (fv)GetProcAddress(module, "InitialiseModule");

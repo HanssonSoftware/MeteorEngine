@@ -36,6 +36,9 @@
     <ClCompile Include="engine\Core\Object\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\Core\Layers\ThreadPool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="engine\Core\MemoryManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -344,6 +347,9 @@
     <ClInclude Include="engine\Core\Object\Object.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="engine\Core\Layers\ThreadPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="engine\Core\Logging\LogAssertion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -377,13 +383,13 @@
     <ClInclude Include="resources\DefaultDll.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="engine\Windows\Windows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="engine\Core\Logging\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Logging\LogMacros.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\TEMPIMPORT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -432,5 +438,8 @@
     <Image Include="resources\mr1.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="engine\Core\Default.natvis" />
   </ItemGroup>
 </Project>

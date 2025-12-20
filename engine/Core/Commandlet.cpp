@@ -21,11 +21,11 @@ void Commandlet::Initialize()
 	commandLine = GetCommandLineW();
 #endif // MR_PLATFORM_WINDOWS
 	
-	char* token = strtok(commandLine.Data(), " ");
+	wchar_t* token = wcstok(commandLine.Data(), L" ");
 	while (token != nullptr)
 	{
 		parsedWords.Add(String(token));
-		token = strtok(nullptr, " ");
+		token = wcstok(nullptr, L" ");
 	}
 
 	bIsInited = true;
