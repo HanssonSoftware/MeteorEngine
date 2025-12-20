@@ -12,10 +12,10 @@ Layer::Layer(const String& Name) noexcept
 
 void Layer::Attached()
 {
-	MR_LOG(LogLayers, Verbose, "%ls has been attached to the engine!", name.IsEmpty() ? L"Unnamed Layer" : name.Chr());
+	MR_LOG(LogLayers, Verbose, "%s has been attached to the engine!", name.IsEmpty() ? "Unnamed Layer" : name.Chr());
 }
 
 void Layer::Removed()
 {
-	MR_LOG(LogLayers, Verbose, "%ls has been removed from the engine!", name.IsEmpty() ? L"Unnamed Layer" : name.Chr());
+	MR_LOG(LogLayers, Verbose, "%s has been removed from the engine!", name.IsEmpty() ? "Unnamed Layer" : name.Chr());
 }

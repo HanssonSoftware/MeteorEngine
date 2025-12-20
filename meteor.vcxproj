@@ -246,7 +246,6 @@
     <ClCompile Include="engine\Core\Layers\LayerManager.cpp" />
     <ClCompile Include="engine\Core\Types\String.cpp" />
     <ClCompile Include="engine\Core\Types\Vector.cpp" />
-    <ClCompile Include="engine\Core\Layers\ThreadPool.cpp" />
     <ClCompile Include="engine\Core\MemoryManager.cpp" />
     <ClCompile Include="engine\Core\Module\ModuleManager.cpp" />
     <ClCompile Include="engine\Core\Module\Module.cpp" />
@@ -361,7 +360,6 @@
     <ClInclude Include="resources\DefaultDll.h" />
     <ClInclude Include="resources\assertbox.h" />
     <ClInclude Include="resources\resource.h" />
-    <ClInclude Include="engine\Core\Layers\ThreadPool.h" />
     <ClInclude Include="engine\Platform\WindowManager\WindowMenu.h" />
     <ClInclude Include="engine\Platform\WindowManager\WindowExtender.h" />
   </ItemGroup>
