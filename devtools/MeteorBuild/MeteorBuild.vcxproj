@@ -181,23 +181,23 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Core\BuildSystem.cpp" />
-    <ClCompile Include="Core\Application.cpp" />
-    <ClCompile Include="Module\Launcher.cpp" />
-    <ClCompile Include="Module\Module.cpp" />
-    <ClCompile Include="Core\Utils.cpp" />
-    <ClCompile Include="Module\Project.cpp" />
-    <ClCompile Include="Core\Parser.cpp" />
+    <ClCompile Include="Source\Core\BuildSystem.cpp" />
+    <ClCompile Include="Source\Core\Application.cpp" />
+    <ClCompile Include="Source\Module\Launcher.cpp" />
+    <ClCompile Include="Source\Module\Module.cpp" />
+    <ClCompile Include="Source\Core\Utils.cpp" />
+    <ClCompile Include="Source\Module\Project.cpp" />
+    <ClCompile Include="Source\Core\Parser.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\BuildSystem.h" />
-    <ClInclude Include="Core\Application.h" />
-    <ClInclude Include="Module\Launcher.h" />
-    <ClInclude Include="Module\Module.h" />
-    <ClInclude Include="Module\Project.h" />
-    <ClInclude Include="Core\Parser.h" />
+    <ClInclude Include="Source\Core\BuildSystem.h" />
+    <ClInclude Include="Source\Core\Application.h" />
+    <ClInclude Include="Source\Module\Launcher.h" />
+    <ClInclude Include="Source\Module\Module.h" />
+    <ClInclude Include="Source\Module\Project.h" />
+    <ClInclude Include="Source\Core\Parser.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Core\Utils.h" />
+    <ClInclude Include="Source\Core\Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MeteorBuild.aps" />

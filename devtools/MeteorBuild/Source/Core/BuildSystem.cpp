@@ -24,129 +24,129 @@ LOG_ADDCATEGORY(Assembler);
 
 bool BuildSystem::InitFramework()
 {
-	if (ReadArguments())
+	if (!ReadArguments())
 	{
-		bool bHasProject = false, bAtLeastOneScriptParsed = false;
-		String sourceDirectoryFromLaunchParameter;
+		MR_LOG(LogBuildSystemFramework, Error, "Failed to read arguments!");
+		return false;
+	}
 
-		if (Commandlet::Parse("-source", &sourceDirectoryFromLaunchParameter))
+	bool bHasProject = false, bAtLeastOneScriptParsed = false;
+	String sourceDirectoryFromLaunchParameter;
+
+	if (Commandlet::Parse("-source", &sourceDirectoryFromLaunchParameter))
+	{
+		Array<String> filesFoundInSources;
+		Array<String> scriptsFound;
+
+		Utils::ListDirectory(&sourceDirectoryFromLaunchParameter, filesFoundInSources);
+		for (auto& pathToDiscoveredItemsIndexed : filesFoundInSources)
 		{
-			Array<String> filesFoundInSources;
-			Array<String> scriptsFound;
-
-			Utils::ListDirectory(&sourceDirectoryFromLaunchParameter, filesFoundInSources);
-			for (auto& pathToDiscoveredItemsIndexed : filesFoundInSources)
+			//const String combined = String::Format("%ls\\%ls", *pathToDiscoveredItemsIndexed.path, *pathToDiscoveredItemsIndexed.name);
+			if (FileManager::IsEndingWith(pathToDiscoveredItemsIndexed, "mrbuild"))
 			{
-				//const String combined = String::Format("%ls\\%ls", *pathToDiscoveredItemsIndexed.path, *pathToDiscoveredItemsIndexed.name);
-				if (FileManager::IsEndingWith(pathToDiscoveredItemsIndexed, "mrbuild"))
-				{
-					scriptsFound.Add(pathToDiscoveredItemsIndexed);
-					MR_LOG(LogBuildSystemFramework, Log, "Found script: %ls", *pathToDiscoveredItemsIndexed);
-				}
-			}
-
-			const uint32_t max = scriptsFound.GetSize() /* Be aware! The last one is always should be the project script!*/;
-			for (uint32_t i = 0; i < max; i++)
-			{
-				String indexed = scriptsFound[i];
-
-				Module* mdl = Parser::ParseModuleScript(&indexed);
-				if (mdl != nullptr)
-				{
-					if (!bAtLeastOneScriptParsed) bAtLeastOneScriptParsed = true;
-
-					Array<String> sd;
-					Utils::ListDirectory(&indexed, sd);
-
-					for (auto& temp : sd)
-					{
-						mdl->files.Add(*temp);
-						MR_LOG(LogBuildSystemFramework, Log, "%ls module, new file added to include list: %ls", *mdl->moduleName, *temp);
-					}
-
-					loadedModules.Add(*mdl);
-				}
-				else
-				{
-					ps = Parser::ParseProjectScript(&indexed);
-					if (ps != nullptr)
-					{
-						bHasProject = true;
-					}
-				}
+				scriptsFound.Add(pathToDiscoveredItemsIndexed);
+				MR_LOG(LogBuildSystemFramework, Log, "Found script: %ls", *pathToDiscoveredItemsIndexed);
 			}
 		}
 
-		return bHasProject && bAtLeastOneScriptParsed;
+		const uint32_t max = scriptsFound.GetSize() /* Be aware! The last one is always should be the project script!*/;
+		for (uint32_t i = 0; i < max; i++)
+		{
+			String indexed = scriptsFound[i];
+
+			Module* mdl = Parser::ParseModuleScript(&indexed);
+			if (mdl != nullptr)
+			{
+				if (!bAtLeastOneScriptParsed) bAtLeastOneScriptParsed = true;
+
+				Array<String> sd;
+				Utils::ListDirectory(&indexed, sd);
+
+				for (auto& temp : sd)
+				{
+					mdl->files.Add(*temp);
+					MR_LOG(LogBuildSystemFramework, Log, "%ls module, new file added to include list: %ls", *mdl->moduleName, *temp);
+				}
+
+				loadedModules.Add(*mdl);
+			}
+			else
+			{
+				ps = Parser::ParseProjectScript(&indexed);
+				if (ps != nullptr)
+				{
+					bHasProject = true;
+				}
+			}
+		}
 	}
 
-
-	return false;
+	return bHasProject && bAtLeastOneScriptParsed;
 }
 
 /** WARNING! This function uses, C++ standard. */
 void BuildSystem::OrderModules()
 {
-	std::unordered_map<std::wstring, uint32_t> ordering;
-	const uint32_t size = loadedModules.GetSize();
+	//std::unordered_map<std::string, uint32_t> ordering;
+	//const uint32_t size = loadedModules.GetSize();
 
-	for (auto& module : loadedModules)
-	{
-		for (auto& dependency : module.requires)
-		{
-			std::wstring depName = *dependency;
-			ordering[depName]++;
-		}
-	}
+	//for (auto& module : loadedModules)
+	//{
+	//	for (auto& dependency : module.requires)
+	//	{
+	//		std::string depName = *dependency;
+	//		ordering[depName]++;
+	//	}
+	//}
 
-	struct Pair
-	{
-		uint32_t score;
-		uint32_t index;
-	};
+	//struct Pair
+	//{
+	//	uint32_t score;
+	//	uint32_t index;
+	//};
 
-	Array<Pair> scores;
-	scores.Resize(size);
+	//Array<Pair> scores;
+	//scores.Resize(size);
 
-	for (uint32_t i = 0; i < size; ++i)
-	{
-		auto& m = loadedModules[i];
-		auto it = ordering.find(*m.moduleName);
-		uint32_t score = (it != ordering.end()) ? it->second : 0;
-		scores[i].score = score;
-		scores[i].index = i;
-	}
+	//for (uint32_t i = 0; i < size; ++i)
+	//{
+	//	auto& m = loadedModules[i];
+	//	auto it = ordering.find(*m.moduleName);
+	//	uint32_t score = (it != ordering.end()) ? it->second : 0;
+	//	scores[i].score = score;
+	//	scores[i].index = i;
+	//}
 
-	for (uint32_t i = 0; i < size; ++i)
-	{
-		for (uint32_t j = i + 1; j < size; ++j)
-		{
-			if (scores[j].score > scores[i].score)
-			{
-				auto tmp = scores[i];
-				scores[i] = scores[j];
-				scores[j] = tmp;
-			}
-		}
-	}
+	//for (uint32_t i = 0; i < size; ++i)
+	//{
+	//	for (uint32_t j = i + 1; j < size; ++j)
+	//	{
+	//		if (scores[j].score > scores[i].score)
+	//		{
+	//			auto tmp = scores[i];
+	//			scores[i] = scores[j];
+	//			scores[j] = tmp;
+	//		}
+	//	}
+	//}
 
-	Array<Module> sorted;
-	sorted.Resize(size);
+	//Array<Module> sorted;
+	//sorted.Resize(size);
 
-	for (uint32_t k = 0; k < size; ++k)
-	{
-		sorted[k] = loadedModules[scores[k].index];
-	}
+	//for (uint32_t k = 0; k < size; ++k)
+	//{
+	//	sorted[k] = loadedModules[scores[k].index];
+	//}
 
-	loadedModules = std::move(sorted);
+	//loadedModules = std::move(sorted);
 
-	for (uint32_t i = 0; i < size; ++i)
-	{
-		auto& m = loadedModules[i];
-		auto it = ordering.find(*m.moduleName);
-		uint32_t score = (it != ordering.end()) ? it->second : 0;
-		MR_LOG(LogBuildSystemFramework, Log, "%ls (score %u)", *m.moduleName, score);
-	}
+	//for (uint32_t i = 0; i < size; ++i)
+	//{
+	//	auto& m = loadedModules[i];
+	//	auto it = ordering.find(*m.moduleName);
+	//	uint32_t score = (it != ordering.end()) ? it->second : 0;
+	//	MR_LOG(LogBuildSystemFramework, Log, "%ls (score %u)", *m.moduleName, score);
+	//}
 }
 
 bool BuildSystem::BuildProjectFiles()

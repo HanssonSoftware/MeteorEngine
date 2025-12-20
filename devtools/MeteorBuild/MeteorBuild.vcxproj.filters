@@ -15,51 +15,51 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Core\Application.cpp">
+    <ClCompile Include="Source\Core\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\BuildSystem.cpp">
+    <ClCompile Include="Source\Core\BuildSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Module\Module.cpp">
+    <ClCompile Include="Source\Module\Module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Utils.cpp">
+    <ClCompile Include="Source\Core\Utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Module\Project.cpp">
+    <ClCompile Include="Source\Module\Project.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Parser.cpp">
+    <ClCompile Include="Source\Core\Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Module\Launcher.cpp">
+    <ClCompile Include="Source\Module\Launcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Core\Application.h">
+    <ClInclude Include="Source\Core\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\BuildSystem.h">
+    <ClInclude Include="Source\Core\BuildSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Module\Module.h">
+    <ClInclude Include="Source\Module\Module.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Utils.h">
+    <ClInclude Include="Source\Core\Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Module\Project.h">
+    <ClInclude Include="Source\Module\Project.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Parser.h">
+    <ClInclude Include="Source\Core\Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Module\Launcher.h">
+    <ClInclude Include="Source\Module\Launcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

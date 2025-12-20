@@ -20,32 +20,22 @@ BuildSystemApplication::BuildSystemApplication()
 
 void BuildSystemApplication::Init()
 {
-	Application::Init();
-}
-
-	//if (Commandlet::Parse("-build", temp))
-	//{
-	//	verb = Build;
-	//}
-	//else if (Commandlet::Parse("-rebuild", temp))
-	//{
-	//	verb = Rebuild;
-	//}
-	//else if (Commandlet::Parse("-gen", temp) || Commandlet::Parse("-generate", temp))
-	//{
-	//	verb = GenerateProjects;
-
-void BuildSystemApplication::Run()
-{
-	// Application::RequestExit(0); should be added somewhere, if not the app will loop over this function
-
 	if (!GetBuildSystem().InitFramework())
 	{
 		MR_LOG(LogBuildSystemApplication, Fatal, "Build system error!");
 	}
 
+	Application::Init();
+}
+
+void BuildSystemApplication::Run()
+{
+	// Application::RequestExit(0); should be added somewhere, if not the app will loop over this function
+
+
+
 	GetBuildSystem().OrderModules();
-	if (!GetBuildSystem().BuildProjectFiles())
+	//if (!GetBuildSystem().BuildProjectFiles())
 	{
 		MR_LOG(LogBuildSystemApplication, Fatal, "Failed to create project files!");
 	}
