@@ -7,11 +7,11 @@
 #include <Logging/Log.h>
 #include <Types/Pointers.h>
 
-//#include "Platform.proxy.h"
+#include "PlatformProxy.h"
 
 LOG_ADDCATEGORY(FileSystem);
 
-class /*PLATFORM_API*/ IFile
+class PLATFORM_API IFile
 {
 public:
 	IFile() = default;

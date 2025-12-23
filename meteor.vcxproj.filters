@@ -36,9 +36,6 @@
     <ClCompile Include="engine\Core\Object\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Layers\ThreadPool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\MemoryManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -48,7 +45,7 @@
     <ClCompile Include="engine\Core\Module\Module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Launch.cpp">
+    <ClCompile Include="engine\Spec\LaunchMeteorSuite.h">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Logging\Log.cpp">
@@ -86,7 +83,7 @@
     <ClInclude Include="engine\Core\Types\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Version.h">
+    <ClInclude Include="engine\Spec\Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\ThirdParty\assimp\Compiler\poppack1.h">
@@ -338,9 +335,6 @@
     <ClInclude Include="engine\Core\Types\Pointers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resources\resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Common\Conversions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -351,9 +345,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Logging\LogAssertion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="resources\assertbox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\MemoryManager.h">
@@ -380,16 +371,13 @@
     <ClInclude Include="engine\Core\Common\Maths.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="resources\DefaultDll.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Windows\Windows.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Logging\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Logging\LogMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\TEMPIMPORT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -422,24 +410,5 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="engine\Engine.mrbuild" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="resources\sampleapp.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-    <ResourceCompile Include="resources\assertbox.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-    <ResourceCompile Include="resources\DefaultDll.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="resources\mr1.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="engine\Core\Default.natvis" />
   </ItemGroup>
 </Project>

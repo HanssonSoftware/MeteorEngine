@@ -2,9 +2,7 @@
 
 #include "Log.h"
 #include <Commandlet.h>
-#include <MemoryManager.h>
-
-LOG_ADDCATEGORY(Standard);
+//#include <MemoryManager.h>
 
 Logger::Logger()
 {
@@ -95,23 +93,4 @@ void Logger::TransmitAssertion(const LogAssertion* Info)
 void Logger::SendToOutputBuffer(const String* Buffer)
 {
     // purposely leaved on empty
-}
-
-static constexpr const char* FormatSeverity(LogSeverity Severity) noexcept
-{
-    switch (Severity)
-    {
-    case Log:
-        return "Log";
-    case Warn:
-        return "Warning";
-    case Error:
-        return "Error";
-    case Fatal:
-        return "Fatal";
-    case Verbose:
-        return "Verbose";
-    }
-
-    return "???";
 }

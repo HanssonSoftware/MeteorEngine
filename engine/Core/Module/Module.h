@@ -5,7 +5,14 @@
 #include <type_traits>
 
 #include <Windows/Windows.h>
-#include <TEMPIMPORT.h>
+// #include <CoreProxy.h>
+
+#ifdef MR_CORE_EXPORTS
+#define CORE_API __declspec(dllexport)
+#else
+#define CORE_API __declspec(dllimport)
+#endif // MR_CORE_EXPORTS
+
 enum class ELoadState
 {
 	NONE,

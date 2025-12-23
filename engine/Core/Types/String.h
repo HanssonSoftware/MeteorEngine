@@ -4,7 +4,12 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <string>
 #include <stdint.h>
-#include <TEMPIMPORT.h>
+
+#ifdef MR_CORE_EXPORTS
+#define CORE_API __declspec(dllexport)
+#else
+#define CORE_API __declspec(dllimport)
+#endif // MR_CORE_EXPORTS
 
 /** Human readable piece of text. */
 class CORE_API String

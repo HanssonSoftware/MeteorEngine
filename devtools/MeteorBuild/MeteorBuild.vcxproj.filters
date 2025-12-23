@@ -67,14 +67,6 @@
     <None Include="MeteorBuild.aps" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="MeteorBuild.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-    <ResourceCompile Include="..\..\resources\assertbox.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="MeteorBuild.txt" />
   </ItemGroup>
 </Project>

@@ -1,10 +1,10 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <TEMPIMPORT.h>
+// #include <CoreProxy.h>
 
 template<typename T>
-class CORE_API Iterator
+class /*CORE_API*/ Iterator
 {
 public:
 

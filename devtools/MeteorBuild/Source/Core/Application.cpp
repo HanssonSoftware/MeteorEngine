@@ -5,6 +5,7 @@
 #include <MemoryManager.h>
 #include <Platform/FileManager.h>
 
+#include <Spec/LaunchMeteorSuite.h>
 #include <Platform/Platform.h>
 
 //#pragma comment(lib, "Shell32.lib")
@@ -35,7 +36,7 @@ void BuildSystemApplication::Run()
 
 
 	GetBuildSystem().OrderModules();
-	//if (!GetBuildSystem().BuildProjectFiles())
+	if (!GetBuildSystem().BuildProjectFiles())
 	{
 		MR_LOG(LogBuildSystemApplication, Fatal, "Failed to create project files!");
 	}
@@ -49,3 +50,5 @@ void BuildSystemApplication::Shutdown()
 }
 
 IMPLEMENT_APPLICATION(BuildSystemApplication);
+IMPLEMENT_WINDOWS_STARTUP("MeteorEngine-Core.dll");
+

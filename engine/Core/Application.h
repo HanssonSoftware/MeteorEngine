@@ -5,7 +5,14 @@
 
 #include "Commandlet.h"
 #include <cstdint>
-#include <TEMPIMPORT.h>
+// #include <CoreProxy.h>
+
+#ifdef MR_CORE_EXPORTS
+#define CORE_API __declspec(dllexport)
+#else
+#define CORE_API __declspec(dllimport)
+#endif // MR_CORE_EXPORTS
+
 LOG_ADDCATEGORY(Application);
 
 struct CORE_API Application
@@ -30,9 +37,9 @@ struct CORE_API Application
 
 	const String GetApplicationNameNoSpaces() const { return appNameNoSpaces; };
 
-	static void RequestExit(int32_t Code);
+	static void RequestExit(int Code);
 
-	int32_t GetRequestExitCode() const { return appFramework->exitCode; };
+	int GetRequestExitCode() const { return appFramework->exitCode; };
 
 	ECurrentApplicationState GetAppState() const { return state; };
 
@@ -64,7 +71,7 @@ static T* GetApplication()
 }
 
 #define IMPLEMENT_APPLICATION(ApplicationClass) \
-	extern "C" __declspec(dllexport) int LaunchApplication(int ArgumentCount, char* Arguments[]) \
+	extern "C" CORE_API int LaunchApplication(int ArgumentCount, char** Arguments) \
 	{	\
 		static ApplicationClass instance; \
 		Commandlet::Initialize(); \

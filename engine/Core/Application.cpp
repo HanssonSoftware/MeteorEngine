@@ -6,15 +6,14 @@
 
 #include <MemoryManager.h>
 #include <Layers/LayerManager.h>
-//#include <GraphicsEngine/SceneGraph.h>
-#include <mutex>
 #include "Commandlet.h"
+
 #ifdef MR_DEBUG
 #include <crtdbg.h>
 #endif // MR_DEBUG
+
 #include <Platform/PerformanceTimer.h>
 #include <Module/ModuleManager.h>
-//#include <Renderer/Renderer.h>
 
 Application::Application()
 {
@@ -24,7 +23,7 @@ Application::Application()
 }
 
 
-void Application::RequestExit(int32_t Code)
+void Application::RequestExit(int Code)
 {
     appFramework->exitCode = Code;
     appFramework->SetAppState(ECurrentApplicationState::SHUTDOWN);
@@ -39,7 +38,6 @@ void Application::Init()
     Logger::Get()->Initialize();
 
     MR_LOG(LogApplication, Log, "Initializing application.");
-
 
     SetAppState(ECurrentApplicationState::RUNNING);
 }
@@ -71,3 +69,5 @@ void Application::Shutdown()
         MemoryManager::Get().Shutdown();
     }
 }
+
+IMPLEMENT_APPLICATION(Application);

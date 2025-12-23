@@ -3,9 +3,6 @@
 #pragma once
 #include <Application.h>
 #include <Logging/LogMacros.h> 
-#include <WindowManager/WindowManager.h>
-#include <Commandlet.h>
-#include <Types/Delegate.h>
 
 #include "BuildSystem.h"
 

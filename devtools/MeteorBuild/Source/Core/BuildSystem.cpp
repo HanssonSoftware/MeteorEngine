@@ -4,7 +4,6 @@
 
 #include <Commandlet.h>
 #include <Platform/FileManager.h>
-#include <Module/Project.h>
 
 #include "Utils.h"
 #include <Platform/Paths.h>
@@ -18,6 +17,7 @@
 
 #include <Shlobj.h>
 #pragma comment(lib, "Shell32.lib")
+#pragma comment(lib, "Pathcch.lib")
 
 LOG_ADDCATEGORY(BuildSystemFramework);
 LOG_ADDCATEGORY(Assembler);
@@ -35,18 +35,29 @@ bool BuildSystem::InitFramework()
 
 	if (Commandlet::Parse("-source", &sourceDirectoryFromLaunchParameter))
 	{
-		Array<String> filesFoundInSources;
-		Array<String> scriptsFound;
+		Array<String> filesFoundInSources, scriptsFound;
 
 		Utils::ListDirectory(&sourceDirectoryFromLaunchParameter, filesFoundInSources);
 		for (auto& pathToDiscoveredItemsIndexed : filesFoundInSources)
 		{
-			//const String combined = String::Format("%ls\\%ls", *pathToDiscoveredItemsIndexed.path, *pathToDiscoveredItemsIndexed.name);
-			if (FileManager::IsEndingWith(pathToDiscoveredItemsIndexed, "mrbuild"))
+			wchar_t* base = (wchar_t*)LocalAlloc(LMEM_FIXED | LMEM_ZEROINIT, pathToDiscoveredItemsIndexed.Length());
+			if (MultiByteToWideChar(CP_UTF8, 0, pathToDiscoveredItemsIndexed, -1, base, pathToDiscoveredItemsIndexed.Length()) > 0)
 			{
-				scriptsFound.Add(pathToDiscoveredItemsIndexed);
-				MR_LOG(LogBuildSystemFramework, Log, "Found script: %ls", *pathToDiscoveredItemsIndexed);
+				wchar_t* ptr = base;
+				if (PathCchFindExtension(base, pathToDiscoveredItemsIndexed.Length(), &ptr))
+				{
+					scriptsFound.Add(pathToDiscoveredItemsIndexed);
+					MR_LOG(LogBuildSystemFramework, Log, "Found script: %ls", *pathToDiscoveredItemsIndexed);
+				}
 			}
+			else
+			{
+				MR_LOG(LogBuildSystemFramework, Error, "Failed to convert String to wchar_t!");
+				LocalFree(base);
+				return false;
+			}
+
+			LocalFree(base);
 		}
 
 		const uint32_t max = scriptsFound.GetSize() /* Be aware! The last one is always should be the project script!*/;
@@ -62,11 +73,11 @@ bool BuildSystem::InitFramework()
 				Array<String> sd;
 				Utils::ListDirectory(&indexed, sd);
 
-				for (auto& temp : sd)
-				{
-					mdl->files.Add(*temp);
-					MR_LOG(LogBuildSystemFramework, Log, "%ls module, new file added to include list: %ls", *mdl->moduleName, *temp);
-				}
+				//for (auto& temp : sd)
+				//{
+				//	mdl->files.Add(*temp);
+				//	MR_LOG(LogBuildSystemFramework, Log, "%ls module, new file added to include list: %ls", *mdl->moduleName, *temp);
+				//}
 
 				loadedModules.Add(*mdl);
 			}
@@ -151,188 +162,188 @@ void BuildSystem::OrderModules()
 
 bool BuildSystem::BuildProjectFiles()
 {
-	String intermediateLocation;
-	if (loadedModules.GetSize() > 0 && Commandlet::Parse("-int", &intermediateLocation))
-	{
-		if (FileManager::IsPathRelative(&intermediateLocation))
-		{
-			wchar_t exePathRaw[MAX_PATH] = { L'\0' };
-			GetModuleFileNameW(GetModuleHandle(nullptr), exePathRaw, MAX_PATH);
+	//String intermediateLocation;
+	//if (loadedModules.GetSize() > 0 && Commandlet::Parse("-int", &intermediateLocation))
+	//{
+	//	if (FileManager::IsPathRelative(&intermediateLocation))
+	//	{
+	//		wchar_t exePathRaw[MAX_PATH] = { L'\0' };
+	//		GetModuleFileNameW(GetModuleHandle(nullptr), exePathRaw, MAX_PATH);
 
-			PathCchRemoveFileSpec(exePathRaw, wcslen(exePathRaw));
+	//		PathCchRemoveFileSpec(exePathRaw, wcslen(exePathRaw));
 
-			PWSTR combinedPathNonCanonicalized;
-			PathAllocCombine(exePathRaw, intermediateLocation, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
+	//		PWSTR combinedPathNonCanonicalized;
+	//		PathAllocCombine(exePathRaw, intermediateLocation, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
 
-			intermediateLocation = combinedPathNonCanonicalized;
-			LocalFree(combinedPathNonCanonicalized);
-		}
+	//		intermediateLocation = combinedPathNonCanonicalized;
+	//		LocalFree(combinedPathNonCanonicalized);
+	//	}
 
-		intermediateLocation = String::Format("%ls\\%ls", *intermediateLocation, *GetApplication()->GetApplicationCodeName()); // C:\\Meteor-Engine\\Intermediate\\Apollo
-		if (SHCreateDirectoryExW(nullptr, intermediateLocation, nullptr) == ERROR_ALREADY_EXISTS)
-		{
-			SHFILEOPSTRUCTW sh = {};
-			sh.hwnd = nullptr;
-			sh.wFunc = FO_DELETE;
-			//sh.pFrom = doubleTerminated;
-			sh.pTo = nullptr;
-			sh.fFlags = FOF_MULTIDESTFILES | FOF_NO_UI;
-			sh.fAnyOperationsAborted = false;
-			sh.hNameMappings = nullptr;
-			sh.lpszProgressTitle = nullptr;
+	//	intermediateLocation = String::Format("%ls\\%ls", *intermediateLocation, *GetApplication()->GetApplicationCodeName()); // C:\\Meteor-Engine\\Intermediate\\Apollo
+	//	if (SHCreateDirectoryExW(nullptr, intermediateLocation, nullptr) == ERROR_ALREADY_EXISTS)
+	//	{
+	//		SHFILEOPSTRUCTW sh = {};
+	//		sh.hwnd = nullptr;
+	//		sh.wFunc = FO_DELETE;
+	//		//sh.pFrom = doubleTerminated;
+	//		sh.pTo = nullptr;
+	//		sh.fFlags = FOF_MULTIDESTFILES | FOF_NO_UI;
+	//		sh.fAnyOperationsAborted = false;
+	//		sh.hNameMappings = nullptr;
+	//		sh.lpszProgressTitle = nullptr;
 
-			SHFileOperationW(&sh);
+	//		SHFileOperationW(&sh);
 
-			if (sh.fAnyOperationsAborted != 0)
-			{
-				MR_LOG(LogFileManager, Error, "RemoveDirectoryW returned: %ls", *Platform::GetError());
-				return false;
-			}
+	//		if (sh.fAnyOperationsAborted != 0)
+	//		{
+	//			MR_LOG(LogFileManager, Error, "RemoveDirectoryW returned: %ls", *Platform::GetError());
+	//			return false;
+	//		}
 
-			FileManager::CreateDirectory(&intermediateLocation);
-		}
+	//		FileManager::CreateDirectory(&intermediateLocation);
+	//	}
 
-		String generated = String::Format("%ls\\%lsDefs.h", *intermediateLocation, *GetApplication()->GetApplicationCodeName());
-		GenerateImportExportDefinitions(&generated);
+	//	String generated = String::Format("%ls\\%lsDefs.h", *intermediateLocation, *GetApplication()->GetApplicationCodeName());
+	//	GenerateImportExportDefinitions(&generated);
 
-		for (auto& module : loadedModules)
-		{
-			const String directoryToCreateTheFolder = String::Format("%ls\\%ls", *intermediateLocation, *module.moduleName);
-			FileManager::CreateDirectory(&directoryToCreateTheFolder);
+	//	for (auto& module : loadedModules)
+	//	{
+	//		const String directoryToCreateTheFolder = String::Format("%ls\\%ls", *intermediateLocation, *module.moduleName);
+	//		FileManager::CreateDirectory(&directoryToCreateTheFolder);
 
-			module.generatedProjectFile = String::Format("%ls\\%ls.vcxproj", *directoryToCreateTheFolder, *module.moduleName);
+	//		module.generatedProjectFile = String::Format("%ls\\%ls.vcxproj", *directoryToCreateTheFolder, *module.moduleName);
 
-			HANDLE actual = CreateFileW(module.generatedProjectFile, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-			if (actual != INVALID_HANDLE_VALUE)
-			{
-				String final;
-				if (module.ConstructProjectFile(&final))
-				{
-					ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(final);
+	//		HANDLE actual = CreateFileW(module.generatedProjectFile, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	//		if (actual != INVALID_HANDLE_VALUE)
+	//		{
+	//			String final;
+	//			if (module.ConstructProjectFile(&final))
+	//			{
+	//				ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(final);
 
-					DWORD written = 0;
-					if (!WriteFile(actual, skinnyBuffer.Get(), final.Length(), &written, nullptr))
-					{
-						MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
-					}
-				}
+	//				DWORD written = 0;
+	//				if (!WriteFile(actual, skinnyBuffer.Get(), final.Length(), &written, nullptr))
+	//				{
+	//					MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
+	//				}
+	//			}
 
-				CloseHandle(actual);
-			}
-			else
-			{
-				MR_LOG(LogAssembler, Fatal, "Failed to create project file at: %ls", *module.generatedProjectFile);
-			}
+	//			CloseHandle(actual);
+	//		}
+	//		else
+	//		{
+	//			MR_LOG(LogAssembler, Fatal, "Failed to create project file at: %ls", *module.generatedProjectFile);
+	//		}
 
-			HANDLE header = CreateFileW(String::Format("%ls\\%ls.proxy.h", *directoryToCreateTheFolder, *module.moduleName), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-			if (header != INVALID_HANDLE_VALUE)
-			{
-				String final;
-				if (module.GenerateProxyHeader(&final))
-				{
-					ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(final);
+	//		HANDLE header = CreateFileW(String::Format("%ls\\%ls.proxy.h", *directoryToCreateTheFolder, *module.moduleName), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	//		if (header != INVALID_HANDLE_VALUE)
+	//		{
+	//			String final;
+	//			if (module.GenerateProxyHeader(&final))
+	//			{
+	//				ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(final);
 
-					DWORD written = 0;
-					if (!WriteFile(header, skinnyBuffer.Get(), final.Length(), &written, nullptr))
-					{
-						MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
-					}
-				}
+	//				DWORD written = 0;
+	//				if (!WriteFile(header, skinnyBuffer.Get(), final.Length(), &written, nullptr))
+	//				{
+	//					MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
+	//				}
+	//			}
 
-				CloseHandle(header);
-			}
-			else
-			{
-				MR_LOG(LogAssembler, Fatal, "Failed to create proxy header file at: %ls", *directoryToCreateTheFolder);
-			}
+	//			CloseHandle(header);
+	//		}
+	//		else
+	//		{
+	//			MR_LOG(LogAssembler, Fatal, "Failed to create proxy header file at: %ls", *directoryToCreateTheFolder);
+	//		}
 
-			HANDLE bootstrap = CreateFileW(String::Format("%ls\\%ls.bootstrap.cpp", *directoryToCreateTheFolder, *module.moduleName), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-			if (bootstrap != INVALID_HANDLE_VALUE)
-			{
-				String final;
-				if (module.GenerateBootstrapHeader(&final))
-				{
-					ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(final);
+	//		HANDLE bootstrap = CreateFileW(String::Format("%ls\\%ls.bootstrap.cpp", *directoryToCreateTheFolder, *module.moduleName), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	//		if (bootstrap != INVALID_HANDLE_VALUE)
+	//		{
+	//			String final;
+	//			if (module.GenerateBootstrapHeader(&final))
+	//			{
+	//				ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(final);
 
-					DWORD written = 0;
-					if (!WriteFile(bootstrap, skinnyBuffer.Get(), final.Length(), &written, nullptr))
-					{
-						MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
-					}
-				}
+	//				DWORD written = 0;
+	//				if (!WriteFile(bootstrap, skinnyBuffer.Get(), final.Length(), &written, nullptr))
+	//				{
+	//					MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
+	//				}
+	//			}
 
-				CloseHandle(bootstrap);
-			}
-			else
-			{
-				MR_LOG(LogAssembler, Fatal, "Failed to create bootstrap header file at: %ls", *directoryToCreateTheFolder);
-			}
+	//			CloseHandle(bootstrap);
+	//		}
+	//		else
+	//		{
+	//			MR_LOG(LogAssembler, Fatal, "Failed to create bootstrap header file at: %ls", *directoryToCreateTheFolder);
+	//		}
 
 
-		}
+	//	}
 
-		String sourceDir;
-		if (Commandlet::Parse("-source", &sourceDir))
-		{
-			String exeDir = WindowsPaths::GetExecutableDirctory();
-			PathCchRemoveFileSpec(exeDir.Data(), exeDir.Length());
+	//	String sourceDir;
+	//	if (Commandlet::Parse("-source", &sourceDir))
+	//	{
+	//		String exeDir = WindowsPaths::GetExecutableDirctory();
+	//		PathCchRemoveFileSpec(exeDir.Data(), exeDir.Length());
 
-			PWSTR combinedPathNonCanonicalized;
-			PathAllocCombine(exeDir, sourceDir, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
+	//		PWSTR combinedPathNonCanonicalized;
+	//		PathAllocCombine(exeDir, sourceDir, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
 
-			PathCchRemoveFileSpec(combinedPathNonCanonicalized, wcslen(combinedPathNonCanonicalized));
+	//		PathCchRemoveFileSpec(combinedPathNonCanonicalized, wcslen(combinedPathNonCanonicalized));
 
-			sourceDir = combinedPathNonCanonicalized;
-			LocalFree(combinedPathNonCanonicalized);
+	//		sourceDir = combinedPathNonCanonicalized;
+	//		LocalFree(combinedPathNonCanonicalized);
 
-			HANDLE solution = CreateFileW(String::Format("%ls\\%ls.slnx", *sourceDir, *ps->projectName), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-			if (solution != INVALID_HANDLE_VALUE)
-			{
-				String buffer;
-				if (ps->Finalize(&buffer))
-				{
-					ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(buffer);
+	//		HANDLE solution = CreateFileW(String::Format("%ls\\%ls.slnx", *sourceDir, *ps->projectName), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	//		if (solution != INVALID_HANDLE_VALUE)
+	//		{
+	//			String buffer;
+	//			if (ps->Finalize(&buffer))
+	//			{
+	//				ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(buffer);
 
-					DWORD written = 0;
-					if (!WriteFile(solution, skinnyBuffer.Get(), buffer.Length(), &written, nullptr))
-					{
-						MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
-					}
-				}
+	//				DWORD written = 0;
+	//				if (!WriteFile(solution, skinnyBuffer.Get(), buffer.Length(), &written, nullptr))
+	//				{
+	//					MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
+	//				}
+	//			}
 
-				CloseHandle(solution);
-				return true;
-			}
-		}
-	}
+	//			CloseHandle(solution);
+	//			return true;
+	//		}
+	//	}
+	//}
 
 	return false;
 }
 
 bool BuildSystem::GenerateImportExportDefinitions(String* path)
 {
-	HANDLE importExports = CreateFileW(*path, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-	if (importExports != INVALID_HANDLE_VALUE)
-	{
-		static constexpr const wchar_t buffer[] =
-			L"/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */\n\n/* Automatically generated by MeteorBuild(R) */\n"
-			L"\n#pragma once\n"
-			L"#define DLLEXPORT __declspec(dllexport)\n"
-			L"#define DLLIMPORT __declspec(dllimport)\0"
-		;
-		
-		ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(buffer);
+	//HANDLE importExports = CreateFileW(*path, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+	//if (importExports != INVALID_HANDLE_VALUE)
+	//{
+	//	static constexpr const wchar_t buffer[] =
+	//		L"/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */\n\n/* Automatically generated by MeteorBuild(R) */\n"
+	//		L"\n#pragma once\n"
+	//		L"#define DLLEXPORT __declspec(dllexport)\n"
+	//		L"#define DLLIMPORT __declspec(dllimport)\0"
+	//	;
+	//	
+	//	ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(buffer);
 
-		DWORD written = 0;
-		if (!WriteFile(importExports, skinnyBuffer.Get(), sizeof(buffer) / sizeof(wchar_t), &written, nullptr))
-		{
-			MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
-		}
-		
+	//	DWORD written = 0;
+	//	if (!WriteFile(importExports, skinnyBuffer.Get(), sizeof(buffer) / sizeof(wchar_t), &written, nullptr))
+	//	{
+	//		MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
+	//	}
+	//	
 
-		CloseHandle(importExports);
-		return true;
-	}
+	//	CloseHandle(importExports);
+	//	return true;
+	//}
 
 	return false;
 }
@@ -346,13 +357,13 @@ Module* BuildSystem::FindModule(const String* name)
 
 	for (auto& mdl : loadedModules)
 	{
-		if (mdl.moduleName == *name)
-		{
-			lastName = *name;
-			last = &mdl;
+		//if (mdl.moduleName == *name)
+		//{
+		//	lastName = *name;
+		//	last = &mdl;
 
-			return &mdl;
-		}
+		//	return &mdl;
+		//}
 	}
 
 	return nullptr;

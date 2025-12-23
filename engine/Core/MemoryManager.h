@@ -4,7 +4,7 @@
 
 #include <basetsd.h>
 #include <vector>
-#include <TEMPIMPORT.h>
+// #include <CoreProxy.h>
 
 //
 #include <Windows/Windows.h>
@@ -14,6 +14,11 @@
 //	|	OC	| AV |	OC	|						 |
 //	----------------------------------------------
 
+#ifdef MR_CORE_EXPORTS
+#define CORE_API __declspec(dllexport)
+#else
+#define CORE_API __declspec(dllimport)
+#endif // MR_CORE_EXPORTS
 
 struct CORE_API MemoryManager
 {

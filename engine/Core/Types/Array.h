@@ -6,10 +6,16 @@
 #include <stdint.h>
 
 #include <Logging/Log.h>
-#include <TEMPIMPORT.h>
+// #include <CoreProxy.h>
+
+#ifdef MR_CORE_EXPORTS
+#define CORE_API __declspec(dllexport)
+#else
+#define CORE_API __declspec(dllimport)
+#endif // MR_CORE_EXPORTS
 
 template <typename T>
-class CORE_API Array
+class /*CORE_API*/ Array
 {
 public:
 	Array()

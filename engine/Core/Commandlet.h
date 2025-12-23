@@ -4,8 +4,14 @@
 #include <Logging/Log.h>
 #include <Types/Array.h>
 #include <Types/String.h>
-#include <TEMPIMPORT.h>
+// #include <CoreProxy.h>
 class String;
+
+#ifdef MR_CORE_EXPORTS
+#define CORE_API __declspec(dllexport)
+#else
+#define CORE_API __declspec(dllimport)
+#endif // MR_CORE_EXPORTS
 
 LOG_ADDCATEGORY(Commandlet);
 
@@ -17,6 +23,4 @@ struct CORE_API Commandlet
 
 protected:
 	static inline bool bIsInited = false;
-
-	static inline Array<String> parsedWords;
 };

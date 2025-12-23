@@ -14,6 +14,8 @@
 
 #pragma warning(disable : 6031)
 
+static inline Array<String> parsedWords;
+
 void Commandlet::Initialize()
 {
 	String commandLine;

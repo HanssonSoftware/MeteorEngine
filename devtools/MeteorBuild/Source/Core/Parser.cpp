@@ -36,200 +36,200 @@ Module* Parser::ParseModuleScript(String* moduleName)
 {
 	bool bFailed = false;
 
-	ScopedPtr<IFile> module = FileManager::CreateFileOperation(moduleName, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
-	if (module != nullptr)
-	{
-		module->Read();
+	//ScopedPtr<IFile> module = FileManager::CreateFileOperation(moduleName, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
+	//if (module != nullptr)
+	//{
+	//	module->Read();
 
-		const char* buffer = module->GetBuffer();
-		if (GetWord(buffer, false) == "Module")
-		{
-			PathCchRemoveFileSpec(moduleName->Data(), moduleName->Length());
-			moduleName->Refresh();
+	//	const char* buffer = module->GetBuffer();
+	//	if (GetWord(buffer, false) == "Module")
+	//	{
+	//		PathCchRemoveFileSpec(moduleName->Data(), moduleName->Length());
+	//		moduleName->Refresh();
 
-			MR_LOG(LogParser, Log, "Opening %ls as ModuleScript!", *module->GetName());
-			Module* newModule = new Module();
-			if (!newModule)
-				return nullptr;
+	//		MR_LOG(LogParser, Log, "Opening %ls as ModuleScript!", *module->GetName());
+	//		Module* newModule = new Module();
+	//		if (!newModule)
+	//			return nullptr;
 
-			SkipWord(buffer);  // Skip "Module"
+	//		SkipWord(buffer);  // Skip "Module"
 
-			newModule->moduleName = GetWord(buffer, true);
+	//		newModule->moduleName = GetWord(buffer, true);
 
-			if (GetCharacterType(buffer) == Colon)
-			{
-				SkipCharacterType(buffer, Colon);
-				newModule->dependsOn = GetWord(buffer, true);
+	//		if (GetCharacterType(buffer) == Colon)
+	//		{
+	//			SkipCharacterType(buffer, Colon);
+	//			newModule->dependsOn = GetWord(buffer, true);
 
-				if (GetCharacterType(buffer) == OpenBrace)
-				{
-					SkipCharacterType(buffer, OpenBrace);
+	//			if (GetCharacterType(buffer) == OpenBrace)
+	//			{
+	//				SkipCharacterType(buffer, OpenBrace);
 
-					while (*buffer != '\0')
-					{
-						while (GetCharacterType(buffer) != ClosedBrace
-							&& GetCharacterType(buffer) != None)
-						{
-							const String flagWord = GetWord(buffer, true);
-							if (flagWord && GetCharacterType(buffer) == Colon)
-							{
-								SkipCharacterType(buffer, Colon);
+	//				while (*buffer != '\0')
+	//				{
+	//					while (GetCharacterType(buffer) != ClosedBrace
+	//						&& GetCharacterType(buffer) != None)
+	//					{
+	//						const String flagWord = GetWord(buffer, true);
+	//						if (flagWord && GetCharacterType(buffer) == Colon)
+	//						{
+	//							SkipCharacterType(buffer, Colon);
 
-								if (GetCharacterType(buffer) == OpenBrace)
-								{
-									SkipCharacterType(buffer, OpenBrace);
-									while (GetCharacterType(buffer) != ClosedBrace)
-									{
-										const String value = GetWord(buffer, true);
-										if (value)
-										{
-											if (AddVerbDetail(newModule, flagWord, value))
-												MR_LOG(LogParser, Log, "Added %ls property to %ls", *value, *flagWord);
-										}
+	//							if (GetCharacterType(buffer) == OpenBrace)
+	//							{
+	//								SkipCharacterType(buffer, OpenBrace);
+	//								while (GetCharacterType(buffer) != ClosedBrace)
+	//								{
+	//									const String value = GetWord(buffer, true);
+	//									if (value)
+	//									{
+	//										if (AddVerbDetail(newModule, flagWord, value))
+	//											MR_LOG(LogParser, Log, "Added %ls property to %ls", *value, *flagWord);
+	//									}
 
-										if (GetCharacterType(buffer) == Comma)
-											SkipCharacterType(buffer, Comma);
-									}
-								}
-							}
-							else if (GetCharacterType(buffer) != Colon)
-							{
-								MR_LOG(LogParser, Fatal, "Missing colon after word %ls!", flagWord.Chr());
-							}
-							else
-							{
-								MR_LOG(LogParser, Fatal, "Unknown error!");
-							}
-						}
+	//									if (GetCharacterType(buffer) == Comma)
+	//										SkipCharacterType(buffer, Comma);
+	//								}
+	//							}
+	//						}
+	//						else if (GetCharacterType(buffer) != Colon)
+	//						{
+	//							MR_LOG(LogParser, Fatal, "Missing colon after word %ls!", flagWord.Chr());
+	//						}
+	//						else
+	//						{
+	//							MR_LOG(LogParser, Fatal, "Unknown error!");
+	//						}
+	//					}
 
-						SkipCharacterType(buffer, ClosedBrace);
-					}
+	//					SkipCharacterType(buffer, ClosedBrace);
+	//				}
 
-					if (*buffer == '\0')
-					{
-						GUID id;
-						if (SUCCEEDED(CoCreateGuid(&id)))
-						{
-							wchar_t buffer[64];
-							if (!StringFromGUID2(id, buffer, 64))
-							{
-								module->Close();
-								return nullptr;
-							}
+	//				if (*buffer == '\0')
+	//				{
+	//					GUID id;
+	//					if (SUCCEEDED(CoCreateGuid(&id)))
+	//					{
+	//						wchar_t buffer[64];
+	//						if (!StringFromGUID2(id, buffer, 64))
+	//						{
+	//							module->Close();
+	//							return nullptr;
+	//						}
 
-							newModule->identification = buffer;
-							MR_LOG(LogParser, Log, "Successfully generated GUID, for module %ls!", *newModule->moduleName);
-						}
-					}
+	//						newModule->identification = buffer;
+	//						MR_LOG(LogParser, Log, "Successfully generated GUID, for module %ls!", *newModule->moduleName);
+	//					}
+	//				}
 
-					module->Close();
-					newModule->SetIsParsed(true);
+	//				module->Close();
+	//				newModule->SetIsParsed(true);
 
-					newModule->defineName = *newModule->moduleName;
-					for (wchar_t* ptr = newModule->defineName.Data(); *ptr; ptr++)
-						*ptr = towupper(*ptr);
+	//				newModule->defineName = *newModule->moduleName;
+	//				for (wchar_t* ptr = newModule->defineName.Data(); *ptr; ptr++)
+	//					*ptr = towupper(*ptr);
 
-					return newModule;
-				}
-				else
-				{
-					bFailed = true;
-				}
-			}
-			else
-			{
-				bFailed = true;
-			}
-		}
-		else
-		{
-			bFailed = true;
-		}
+	//				return newModule;
+	//			}
+	//			else
+	//			{
+	//				bFailed = true;
+	//			}
+	//		}
+	//		else
+	//		{
+	//			bFailed = true;
+	//		}
+	//	}
+	//	else
+	//	{
+	//		bFailed = true;
+	//	}
 
-		return nullptr;
-	}
+	//	return nullptr;
+	//}
 
 	return nullptr;
 }
 
 Project* Parser::ParseProjectScript(String* projectPath)
 {
-	ScopedPtr<IFile> module = FileManager::CreateFileOperation(projectPath, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
-	if (module != nullptr)
-	{
-		PathCchRemoveFileSpec(projectPath->Data(), projectPath->Length());
-		projectPath->Refresh();
+	//ScopedPtr<IFile> module = FileManager::CreateFileOperation(projectPath, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
+	//if (module != nullptr)
+	//{
+	//	PathCchRemoveFileSpec(projectPath->Data(), projectPath->Length());
+	//	projectPath->Refresh();
 
-		module->Read();
+	//	module->Read();
 
-		const char* buffer = module->GetBuffer();
+	//	const char* buffer = module->GetBuffer();
 
-		bool bHasBeenParsedOneWordAtLeast = false;
-		if (GetWord(buffer, false) == "Project")
-		{
-			SkipWord(buffer);  // Skip "Project"
-			Project* newProject = new Project();
-			if (!newProject)
-				return nullptr;
+	//	bool bHasBeenParsedOneWordAtLeast = false;
+	//	if (GetWord(buffer, false) == "Project")
+	//	{
+	//		SkipWord(buffer);  // Skip "Project"
+	//		Project* newProject = new Project();
+	//		if (!newProject)
+	//			return nullptr;
 
-			MR_LOG(LogParser, Log, "Opening %ls as ProjectScript!", *module->GetName());
+	//		MR_LOG(LogParser, Log, "Opening %ls as ProjectScript!", *module->GetName());
 
-			newProject->projectName = GetWord(buffer, true);
+	//		newProject->projectName = GetWord(buffer, true);
 
-			if (GetCharacterType(buffer) == OpenBrace)
-			{
-				SkipCharacterType(buffer, OpenBrace);
+	//		if (GetCharacterType(buffer) == OpenBrace)
+	//		{
+	//			SkipCharacterType(buffer, OpenBrace);
 
-				while (*buffer != '\0')
-				{
-					while (GetCharacterType(buffer) != ClosedBrace
-						&& GetCharacterType(buffer) != None)
-					{
-						const String flagWord = GetWord(buffer, true);
-						if (flagWord && GetCharacterType(buffer) == Colon)
-						{
-							SkipCharacterType(buffer, Colon);
+	//			while (*buffer != '\0')
+	//			{
+	//				while (GetCharacterType(buffer) != ClosedBrace
+	//					&& GetCharacterType(buffer) != None)
+	//				{
+	//					const String flagWord = GetWord(buffer, true);
+	//					if (flagWord && GetCharacterType(buffer) == Colon)
+	//					{
+	//						SkipCharacterType(buffer, Colon);
 
-							if (GetCharacterType(buffer) == OpenBrace)
-							{
-								SkipCharacterType(buffer, OpenBrace);
-								while (GetCharacterType(buffer) != ClosedBrace)
-								{
-									const String value = GetWord(buffer, true);
-									if (value)
-									{
-										if (!bHasBeenParsedOneWordAtLeast) bHasBeenParsedOneWordAtLeast = true;
+	//						if (GetCharacterType(buffer) == OpenBrace)
+	//						{
+	//							SkipCharacterType(buffer, OpenBrace);
+	//							while (GetCharacterType(buffer) != ClosedBrace)
+	//							{
+	//								const String value = GetWord(buffer, true);
+	//								if (value)
+	//								{
+	//									if (!bHasBeenParsedOneWordAtLeast) bHasBeenParsedOneWordAtLeast = true;
 
-										AddVerbDetail(newProject, flagWord, value);
-										MR_LOG(LogParser, Log, "Adding %ls property to %ls", *value, *flagWord);
-									}
+	//									AddVerbDetail(newProject, flagWord, value);
+	//									MR_LOG(LogParser, Log, "Adding %ls property to %ls", *value, *flagWord);
+	//								}
 
-									if (GetCharacterType(buffer) == Comma)
-										SkipCharacterType(buffer, Comma);
-								}
-							}
-						}
-						else if (GetCharacterType(buffer) != Colon)
-						{
-							MR_LOG(LogParser, Fatal, "Missing colon after word! %ls", flagWord.Chr());
-						}
-						else
-						{
-							MR_LOG(LogParser, Fatal, "Unknown error!");
-						}
-					}
+	//								if (GetCharacterType(buffer) == Comma)
+	//									SkipCharacterType(buffer, Comma);
+	//							}
+	//						}
+	//					}
+	//					else if (GetCharacterType(buffer) != Colon)
+	//					{
+	//						MR_LOG(LogParser, Fatal, "Missing colon after word! %ls", flagWord.Chr());
+	//					}
+	//					else
+	//					{
+	//						MR_LOG(LogParser, Fatal, "Unknown error!");
+	//					}
+	//				}
 
-					SkipCharacterType(buffer, ClosedBrace);
-				}
-			}
+	//				SkipCharacterType(buffer, ClosedBrace);
+	//			}
+	//		}
 
-			module->Close();
-			return newProject;
-		}
+	//		module->Close();
+	//		return newProject;
+	//	}
 
-		module->Close();
-		return nullptr;
-	}
+	//	module->Close();
+	//	return nullptr;
+	//}
 
 	return nullptr;
 }

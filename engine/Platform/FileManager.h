@@ -6,6 +6,7 @@
 #undef CreateDirectory
 
 class String;
+class IFile;
 
 LOG_ADDCATEGORY(FileManager);
 
@@ -29,8 +30,8 @@ private:
 	IFileManager() = default;
 };
 
-#include "PlatformLayout.h"
-
-#ifdef MR_PLATFORM_WINDOWS
-#include <Windows/WindowsFileManager.h>
-#endif // DEBUG
+//#include "PlatformLayout.h"
+//
+//#ifdef MR_PLATFORM_WINDOWS
+//#include <Windows/WindowsFileManager.h>
+//#endif // DEBUG

@@ -20,22 +20,22 @@ bool Module::ConstructProjectFile(String* output)
 
 	for (auto& cl : files)
 	{
-		if (FileManager::IsEndingWith(cl, "h"))
-		{
-			String actual = String::Format("\t\t<ClInclude Include=\"%ls\" />\n", *cl);
+		//if (FileManager::IsEndingWith(cl, "h"))
+		//{
+		//	String actual = String::Format("\t\t<ClInclude Include=\"%ls\" />\n", *cl);
 
-			includeList = String::Format("%ls%ls", *includeList, *actual);
-		}
-		else if (FileManager::IsEndingWith(cl, "cpp"))
-		{
-			String actual = String::Format("\t\t<ClCompile Include=\"%ls\" />\n", *cl);
-			compileList = String::Format("%ls%ls", *compileList, *actual);
-		}
-		else
-		{
-			//String actual = String::Format("\t\t<ClCompile Include=\"%ls\" />\n", *cl);
-			//compileList = String::Format("%ls%ls", *compileList, *actual);
-		}
+		//	includeList = String::Format("%ls%ls", *includeList, *actual);
+		//}
+		//else if (FileManager::IsEndingWith(cl, "cpp"))
+		//{
+		//	String actual = String::Format("\t\t<ClCompile Include=\"%ls\" />\n", *cl);
+		//	compileList = String::Format("%ls%ls", *compileList, *actual);
+		//}
+		//else
+		//{
+		//	//String actual = String::Format("\t\t<ClCompile Include=\"%ls\" />\n", *cl);
+		//	//compileList = String::Format("%ls%ls", *compileList, *actual);
+		//}
 	}
 
 	String defines;

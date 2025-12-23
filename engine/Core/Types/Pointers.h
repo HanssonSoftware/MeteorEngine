@@ -2,13 +2,13 @@
 
 #pragma once
 #include "MemoryManager.h"
-#include <TEMPIMPORT.h>
+// #include <CoreProxy.h>
 /**
  * ScopedPtr owns a pointer, so you don't have to think about deleting it.
  * When this thing goes out of scope, the pointer is gone too.
 */
 template<typename T>
-class CORE_API ScopedPtr
+class /*CORE_API*/ ScopedPtr
 {
 public:
 	ScopedPtr()

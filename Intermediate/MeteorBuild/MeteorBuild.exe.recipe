@@ -2,7 +2,10 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\Meteor-Engine\product\MeteorBuild.exe</FullPath>
+      <FullPath>D:\Meteor-Engine\Product\MeteorEngine-Core.dll</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>D:\Meteor-Engine\product\MeteorBuild.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

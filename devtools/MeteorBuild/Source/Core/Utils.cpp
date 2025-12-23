@@ -50,24 +50,24 @@ String Utils::GetLastError()
 			/* LPBOOL	lpUsedDefaultChar */	nullptr
 		))
 		{
-			switch (GetLastError())
+			switch (::GetLastError())
 			{
-			case ERROR_INSUFFICIENT_BUFFER:
-				MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: ERROR_INSUFFICIENT_BUFFER")
-				break;
-			case ERROR_INVALID_FLAGS:
-				MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: ERROR_INVALID_FLAGS")
-				break;
-			case ERROR_INVALID_PARAMETER:
-				MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: ERROR_INVALID_PARAMETER")
-				break;
-			case ERROR_NO_UNICODE_TRANSLATION:
-				MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: ERROR_NO_UNICODE_TRANSLATION")
-				break;
+				case ERROR_INSUFFICIENT_BUFFER:
+					MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: ERROR_INSUFFICIENT_BUFFER")
+					break;
+				case ERROR_INVALID_FLAGS:
+					MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: ERROR_INVALID_FLAGS")
+					break;
+				case ERROR_INVALID_PARAMETER:
+					MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: ERROR_INVALID_PARAMETER")
+					break;
+				case ERROR_NO_UNICODE_TRANSLATION:
+					MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: ERROR_NO_UNICODE_TRANSLATION")
+					break;
 
-			default:
-				MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: Unknown")
-				break;
+				default:
+					MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: Unknown")
+					break;
 			}
 
 		}
@@ -128,24 +128,24 @@ void Utils::ListDirectory(String* name, Array<String>& container)
 			/* int		cchWideChar */			required
 		))
 		{
-			switch (GetLastError())
+			switch (::GetLastError())
 			{
-			case ERROR_INSUFFICIENT_BUFFER:
-				MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_INSUFFICIENT_BUFFER")
-					break;
-			case ERROR_INVALID_FLAGS:
-				MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_INVALID_FLAGS")
-					break;
-			case ERROR_INVALID_PARAMETER:
-				MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_INVALID_PARAMETER")
-					break;
-			case ERROR_NO_UNICODE_TRANSLATION:
-				MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_NO_UNICODE_TRANSLATION")
-					break;
+				case ERROR_INSUFFICIENT_BUFFER:
+					MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_INSUFFICIENT_BUFFER")
+						break;
+				case ERROR_INVALID_FLAGS:
+					MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_INVALID_FLAGS")
+						break;
+				case ERROR_INVALID_PARAMETER:
+					MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_INVALID_PARAMETER")
+						break;
+				case ERROR_NO_UNICODE_TRANSLATION:
+					MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_NO_UNICODE_TRANSLATION")
+						break;
 
-			default:
-				MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: Unknown")
-					break;
+				default:
+					MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: Unknown")
+						break;
 			}
 
 			return;
