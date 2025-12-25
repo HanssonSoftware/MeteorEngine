@@ -14,6 +14,7 @@
 /** Human readable piece of text. */
 class CORE_API String
 {
+	friend class StringW;
 public:
 	String() noexcept
 	{
@@ -94,8 +95,6 @@ public:
 		return bIsUsingHeap ? (heapBuffer.ptr || heapBuffer.length != 0 ? heapBuffer.ptr : "") :
 			stackBuffer.ptr || stackBuffer.length != 0 ? stackBuffer.ptr : "";
 	}
-
-	String Delim(const String character, bool first);
 
 	bool IsEmpty() const noexcept
 	{

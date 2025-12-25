@@ -13,12 +13,17 @@ constexpr inline const bool bIsRunningDebugMode = false;
 class String;
 struct LogDescriptor;
 struct LogAssertion;
+#ifdef MR_CORE_EXPORTS
+#define CORE_API __declspec(dllexport)
+#else
+#define CORE_API __declspec(dllimport)
+#endif // MR_CORE_EXPORTS
 
 CREATE_DELEGATE(LoggerInitialize);
 
 struct LogEntry {};
 
-class /*CORE_API*/ Logger
+class CORE_API Logger
 {
 public:
 	static Logger* Get()

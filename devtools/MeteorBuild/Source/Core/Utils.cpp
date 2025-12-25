@@ -1,5 +1,6 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
+#define _CRT_SECURE_NO_WARNINGS
 #include "Utils.h"
 //#include "Parser.h"
 #include <Platform/FileManager.h>
@@ -11,6 +12,7 @@
 #include <PathCch.h>
 
 #include <shlwapi.h>
+#include <strsafe.h>
 #pragma comment(lib, "Shlwapi.lib")
 
 
@@ -79,82 +81,14 @@ String Utils::GetLastError()
 	return "";
 }
 
-void Utils::ListDirectory(String* name, Array<String>& container)
+void Utils::ListDirectory(wchar_t* name, Array<String>& container)
 {
 	if (name != nullptr)
 	{
-		const uint32_t required = MultiByteToWideChar(
-			/* UINT		CodePage */				CP_UTF8,
-			/* DWORD	dwFlags */				0,
-			/* LPSTR	lpMultiByteStr */		**name,
-			/* int		cbMultiByte */			-1,
-			/* LPCWCH	lpWideCharStr */		nullptr,
-			/* int		cchWideChar */			0
-		);
-
-		if (required == 0)
+		if (PathIsRelativeW(name))
 		{
-			switch (GetLastError())
-			{
-			case ERROR_INSUFFICIENT_BUFFER:
-				MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_INSUFFICIENT_BUFFER")
-					break;
-			case ERROR_INVALID_FLAGS:
-				MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_INVALID_FLAGS")
-					break;
-			case ERROR_INVALID_PARAMETER:
-				MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_INVALID_PARAMETER")
-					break;
-			case ERROR_NO_UNICODE_TRANSLATION:
-				MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_NO_UNICODE_TRANSLATION")
-					break;
-
-			default:
-				MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: Unknown")
-					break;
-			}
-
-			return;
-		}
-
-		wchar_t* buffer = new wchar_t[required];
-
-		if (!MultiByteToWideChar(
-			/* UINT		CodePage */				CP_UTF8,
-			/* DWORD	dwFlags */				0,
-			/* LPSTR	lpMultiByteStr */		**name,
-			/* int		cbMultiByte */			name->Length() * sizeof(char),
-			/* LPCWCH	lpWideCharStr */		buffer,
-			/* int		cchWideChar */			required
-		))
-		{
-			switch (::GetLastError())
-			{
-				case ERROR_INSUFFICIENT_BUFFER:
-					MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_INSUFFICIENT_BUFFER")
-						break;
-				case ERROR_INVALID_FLAGS:
-					MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_INVALID_FLAGS")
-						break;
-				case ERROR_INVALID_PARAMETER:
-					MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_INVALID_PARAMETER")
-						break;
-				case ERROR_NO_UNICODE_TRANSLATION:
-					MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: ERROR_NO_UNICODE_TRANSLATION")
-						break;
-
-				default:
-					MR_LOG(LogBuildSystemUtils, Error, "MultiByteToWideChar returned: Unknown")
-						break;
-			}
-
-			return;
-		}
-
-		if (PathIsRelativeW(buffer))
-		{
-			wchar_t exeDir[MAX_PATH] = {};
-			if (!GetModuleFileNameW(nullptr,exeDir, MAX_PATH))
+			wchar_t exeDir[512] = {};
+			if (!GetModuleFileNameW(nullptr, exeDir, 512))
 			{
 				MR_LOG(LogBuildSystemUtils, Error, "GetModuleFileNameW returned: %s", *Utils::GetLastError());
 				return;
@@ -163,43 +97,39 @@ void Utils::ListDirectory(String* name, Array<String>& container)
 			DWORD length = wcslen(exeDir);
 			PathCchRemoveFileSpec(exeDir, length);
 
-			wchar_t* tempBuffer = buffer;
+			PWSTR combinedPathNonCanonicalized = nullptr;
+			PathAllocCombine(exeDir, name, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
 
-			PWSTR combinedPathNonCanonicalized;
-			PathAllocCombine(exeDir, buffer, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
-
-			buffer = combinedPathNonCanonicalized;
+			wcscpy(name, combinedPathNonCanonicalized);
 			LocalFree(combinedPathNonCanonicalized);
 		}
 
-		PWSTR pathWithFindable = nullptr;
-		PathAllocCombine(buffer, L"\\*", PATHCCH_ALLOW_LONG_PATHS, &pathWithFindable);
+		wcscat(name, L"\\*");
 
 		WIN32_FIND_DATAW foundFile;
-		HANDLE fileHandle = FindFirstFileW(pathWithFindable, &foundFile);
+		HANDLE fileHandle = FindFirstFileW(name, &foundFile);
 
-		LocalFree(pathWithFindable);
+		PathCchRemoveFileSpec(name, wcslen(name));
 		if (fileHandle != INVALID_HANDLE_VALUE)
 		{
 			do
 			{
-				if (foundFile.cFileName[0] == '.')
+				if (foundFile.cFileName[0] == L'.')
 					continue;
 
-				switch (foundFile.dwFileAttributes)
+				if (foundFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 				{
-				case FILE_ATTRIBUTE_DIRECTORY:
-					{
-						String nextDirectory = String::Format("%s\\%ls", name->Chr(), foundFile.cFileName);
-						ListDirectory(&nextDirectory, container);
-						break;
-					};
+					wchar_t* tempName = new wchar_t[wcslen(name) + wcslen(foundFile.cFileName) + 10]();
+					StringCchPrintfW(tempName, STRSAFE_MAX_CCH, L"%ls\\%ls", name, foundFile.cFileName);
+					ListDirectory(tempName, container);
 
-					case FILE_ATTRIBUTE_ARCHIVE:
-					{
-						container.Add(String::Format("%s\\%ls", **name, foundFile.cFileName));
-						break;
-					}
+					delete[] tempName;
+					break;
+				}
+				else if (foundFile.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
+				{
+					container.Add(String::Format("%ls\\%ls", name, foundFile.cFileName));
+					break;
 				}
 
 			} while (FindNextFileW(fileHandle, &foundFile));

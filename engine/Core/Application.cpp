@@ -70,4 +70,17 @@ void Application::Shutdown()
     }
 }
 
-IMPLEMENT_APPLICATION(Application);
+extern "C" __declspec(dllexport) int LaunchApplication(Application* instance) \
+{	
+    int returnCode = 0xDEADBEEF; 
+    if (instance != nullptr)
+    {
+        Commandlet::Initialize(); 
+        instance->Init(); 
+        instance->Run(); 
+        instance->Shutdown(); 
+        returnCode = instance->GetRequestExitCode(); 
+    }
+
+    return returnCode; 
+}

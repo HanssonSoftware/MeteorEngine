@@ -70,13 +70,4 @@ static T* GetApplication()
 	return (T*)&Application::Get();
 }
 
-#define IMPLEMENT_APPLICATION(ApplicationClass) \
-	extern "C" CORE_API int LaunchApplication(int ArgumentCount, char** Arguments) \
-	{	\
-		static ApplicationClass instance; \
-		Commandlet::Initialize(); \
-        instance.Init(); \
-        instance.Run(); \
-        instance.Shutdown(); \
-        return instance.GetRequestExitCode(); \
-	}
+//#define IMPLEMENT_APPLICATION(ApplicationClass) \

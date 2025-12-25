@@ -33,8 +33,6 @@ void BuildSystemApplication::Run()
 {
 	// Application::RequestExit(0); should be added somewhere, if not the app will loop over this function
 
-
-
 	GetBuildSystem().OrderModules();
 	if (!GetBuildSystem().BuildProjectFiles())
 	{
@@ -49,6 +47,4 @@ void BuildSystemApplication::Shutdown()
 	Application::Shutdown();
 }
 
-IMPLEMENT_APPLICATION(BuildSystemApplication);
-IMPLEMENT_WINDOWS_STARTUP("MeteorEngine-Core.dll");
-
+IMPLEMENT_WINDOWS_STARTUP("MeteorEngine-Core.dll", BuildSystemApplication);

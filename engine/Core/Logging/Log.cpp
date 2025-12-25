@@ -44,7 +44,7 @@ Logger::~Logger() noexcept
 
 void Logger::HandleFatal(LogDescriptor* Descriptor)
 {
-
+    exit(0);
 }
 
 void Logger::TransmitMessage(LogDescriptor* Descriptor)

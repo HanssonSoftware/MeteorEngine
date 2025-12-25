@@ -1,6 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "BuildSystem.h"
+#include <Types/StringW.h>
 
 #include <Commandlet.h>
 #include <Platform/FileManager.h>
@@ -31,16 +32,19 @@ bool BuildSystem::InitFramework()
 	}
 
 	bool bHasProject = false, bAtLeastOneScriptParsed = false;
-	String sourceDirectoryFromLaunchParameter;
+	String sourceDirectoryFromLaunchParameterA;
+	StringW sourceDirectoryFromLaunchParameter;
 
-	if (Commandlet::Parse("-source", &sourceDirectoryFromLaunchParameter))
+	if (Commandlet::Parse("-source", &sourceDirectoryFromLaunchParameterA))
 	{
+		sourceDirectoryFromLaunchParameter = sourceDirectoryFromLaunchParameterA;
+
 		Array<String> filesFoundInSources, scriptsFound;
 
-		Utils::ListDirectory(&sourceDirectoryFromLaunchParameter, filesFoundInSources);
+		Utils::ListDirectory(wideSourceDir, filesFoundInSources);
 		for (auto& pathToDiscoveredItemsIndexed : filesFoundInSources)
 		{
-			wchar_t* base = (wchar_t*)LocalAlloc(LMEM_FIXED | LMEM_ZEROINIT, pathToDiscoveredItemsIndexed.Length());
+			wchar_t* base = (wchar_t*)LocalAlloc(LMEM_FIXED | LMEM_ZEROINIT, pathToDiscoveredItemsIndexed.Length() * sizeof(wchar_t));
 			if (MultiByteToWideChar(CP_UTF8, 0, pathToDiscoveredItemsIndexed, -1, base, pathToDiscoveredItemsIndexed.Length()) > 0)
 			{
 				wchar_t* ptr = base;
@@ -58,7 +62,10 @@ bool BuildSystem::InitFramework()
 			}
 
 			LocalFree(base);
+
 		}
+	
+		delete[] wideSourceDir;
 
 		const uint32_t max = scriptsFound.GetSize() /* Be aware! The last one is always should be the project script!*/;
 		for (uint32_t i = 0; i < max; i++)
@@ -71,7 +78,7 @@ bool BuildSystem::InitFramework()
 				if (!bAtLeastOneScriptParsed) bAtLeastOneScriptParsed = true;
 
 				Array<String> sd;
-				Utils::ListDirectory(&indexed, sd);
+				//Utils::ListDirectory(&indexed, sd);
 
 				//for (auto& temp : sd)
 				//{

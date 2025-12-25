@@ -189,6 +189,7 @@
     <ClCompile Include="Source\Core\Utils.cpp" />
     <ClCompile Include="Source\Module\Project.cpp" />
     <ClCompile Include="Source\Core\Parser.cpp" />
+    <ClCompile Include="Source\Types\StringW.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Core\BuildSystem.h" />
@@ -199,6 +200,7 @@
     <ClInclude Include="Source\Core\Parser.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Source\Core\Utils.h" />
+    <ClInclude Include="Source\Types\StringW.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MeteorBuild.aps" />

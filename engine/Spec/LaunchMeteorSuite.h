@@ -1,8 +1,14 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
+#include <cstdlib>
+
 #ifdef MR_DEBUG
 #include <crtdbg.h>
 #endif // MR_DEBUG
+
+struct Application;
+
+extern "C" __declspec(dllimport) int LaunchApplication(Application* instance);
           
 #ifdef MR_PLATFORM_WINDOWS
 #define	WIN32_LEAN_AND_MEAN
@@ -50,40 +56,40 @@
 #pragma warning (disable : 28251)                                                                                    
 #endif // MR_PLATFORM_WINDOWS                                                                                          
 
-extern "C" __declspec(dllexport) int LaunchApplication(int ArgumentCount, char** Arguments);
-
 #ifdef MR_PLATFORM_WINDOWS
-#define IMPLEMENT_WINDOWS_STARTUP(libName)\
-    int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)                                              \
-    {                                                                                                                                           \
-        wchar_t path[512] = { '\0' };                                                                                                           \
-        DWORD count = GetModuleFileNameW(GetModuleHandleW(nullptr), path, 512);                                                                 \
-        PathCchRemoveFileSpec(path, count);                                                                                                     \
-        \
-        AddDllDirectory(path);                                                                                                                  \
-        HMODULE entryPoint = LoadLibraryExW(L##libName, nullptr, LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_USER_DIRS);          \
-        if (!entryPoint)                                                                                                                        \
-           return -1;                                                                                                                          \
-        \
-        auto a = GetLastError();\
-        using LA = int (*)(int, char**); \
-        LA app = (LA)GetProcAddress(entryPoint, "LaunchApplication");                                             \
-        if (app)                                                                                                                                \
-        {                                                                                                                                       \
-            int Result = app(0, &lpCmdLine);                                                                                                    \
-            \
-            if (!FreeLibrary(entryPoint))                                                                                                       \
-            return -1;                                                                                                                      \
-            \
-            return Result;                                                                                                                      \
-        }                                                                                                                                       \
-        \
-        auto b = GetLastError();                                                                                                                \
-        MessageBoxW(nullptr, L"Unable to reach engine code!", L"Engine Error!", MB_OK);                                                         \
-        return -1;                                                                                                                              \
-    };
+#pragma warning(disable : 6387)
+
+#define IMPLEMENT_WINDOWS_STARTUP(libName, applicationClass)                                                                             \
+    int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)                                       \
+    {                                                                                                                                    \
+        wchar_t path[512] = { '0' };                                                                                                     \
+        DWORD count = GetModuleFileNameW(GetModuleHandleW(nullptr), path, 512);                                                          \
+        PathCchRemoveFileSpec(path, count);                                                                                              \
+                                                                                                                                         \
+        AddDllDirectory(path);                                                                                                           \
+        HMODULE entryPoint = LoadLibraryExW(L##libName, nullptr, LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_USER_DIRS);   \
+        if (entryPoint != INVALID_HANDLE_VALUE)                                                                                          \
+        {                                                                                                                                \
+            typedef int (*ProxyFunction)(Application*);                                                                                  \
+            ProxyFunction externalLinkageFunction = (ProxyFunction)GetProcAddress(entryPoint, "LaunchApplication");                      \
+            if (externalLinkageFunction)                                                                                                 \
+            {                                                                                                                            \
+                applicationClass* application = new applicationClass;                                                                    \
+                int Result = externalLinkageFunction(application);                                                                       \
+                                                                                                                                         \
+                if (!FreeLibrary(entryPoint))                                                                                            \
+                    return -1;                                                                                                           \
+                                                                                                                                         \
+                delete application;                                                                                                      \
+                return Result;                                                                                                           \
+            }                                                                                                                            \
+        }                                                                                                                                \
+                                                                                                                                         \
+        MessageBoxW(nullptr, L"Unable to reach engine code!", L"Engine Error!", MB_OK);                                                  \
+        return -1;                                                                                                                       \
+    };                                                                                                                                     
 #else
-#define IMPLEMENT_WINDOWS_STARTUP(libName)
+#define IMPLEMENT_WINDOWS_STARTUP(libName, applicationClass)
 #endif // MR_PLATFORM_WINDOWS
 
 

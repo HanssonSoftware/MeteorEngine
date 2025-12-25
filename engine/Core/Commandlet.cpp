@@ -18,17 +18,26 @@ static inline Array<String> parsedWords;
 
 void Commandlet::Initialize()
 {
-	String commandLine;
 #ifdef MR_PLATFORM_WINDOWS
-	commandLine = GetCommandLineW();
+	const LPWSTR cli = GetCommandLineW();
+
+	const int realSize = WideCharToMultiByte(CP_UTF8, 0, cli, -1, nullptr, 0, nullptr, nullptr);
+	char* buffer = new char[realSize];
+	memset(buffer, 0, realSize * sizeof(char));
+
+	WideCharToMultiByte(CP_UTF8, 0, cli, -1, buffer, realSize * sizeof(char), nullptr, nullptr);
 #endif // MR_PLATFORM_WINDOWS
 	
-	char* token = strtok(commandLine.Data(), " ");
+	char* token = strtok(buffer, " ");
 	while (token != nullptr)
 	{
-		parsedWords.Add(String(token));
+		parsedWords.Add(token);
 		token = strtok(nullptr, " ");
 	}
+
+#ifdef MR_PLATFORM_WINDOWS
+	delete[] buffer;
+#endif // MR_PLATFORM_WINDOWS
 
 	bIsInited = true;
 }

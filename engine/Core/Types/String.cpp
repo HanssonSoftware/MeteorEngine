@@ -2,14 +2,8 @@
 
 #include "String.h"
 #include <Logging/Log.h>
-//#include <stdio.h>
-
-//#include <Platform/Platform.h>
-//#include <Platform/PlatformLayout.h>
-//#include <Windows/Windows.h>
 
 #include <MemoryManager.h>
-//#include "Pointers.h"
 
 #pragma warning(disable : 26495)
 #pragma warning(disable : 5082) // second argument to 'va_start' is not the last named parameter
@@ -207,17 +201,6 @@ String& String::operator+=(const char* other)
 
 	String tmp(other);
 	return (*this += tmp);
-}
-
-String String::Delim(const String character, bool first)
-{
-	if (character.IsEmpty())
-		return "";
-
-	//char* A = /*buffer*/nullptr;
-	//char* B = strtok(A, character.Chr());
-	return "";
-	//return first ? B : A;
 }
 
 String String::Format(const String& format, ...)
