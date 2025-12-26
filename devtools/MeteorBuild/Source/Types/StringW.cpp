@@ -239,10 +239,10 @@ StringW& StringW::operator=(const String& other)
 
 #ifdef MR_PLATFORM_WINDOWS
 	const uint32_t narrowSize = other.Length();
-	wchar_t* actualPlace = DetermineLocation(narrowSize);
+	wchar_t* actualPlace = this->DetermineLocation(narrowSize);
 
 	if (!MultiByteToWideChar(CP_UTF8, 0, other.Chr(), narrowSize, actualPlace, narrowSize))
-		return;
+		return *this;
 
 #else
 #error StringW is designed to work with Windows! Feel free to expand to other OS-es.

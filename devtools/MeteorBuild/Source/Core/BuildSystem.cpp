@@ -41,31 +41,21 @@ bool BuildSystem::InitFramework()
 
 		Array<String> filesFoundInSources, scriptsFound;
 
-		Utils::ListDirectory(wideSourceDir, filesFoundInSources);
+		Utils::ListDirectory(sourceDirectoryFromLaunchParameter.Data(), filesFoundInSources);
 		for (auto& pathToDiscoveredItemsIndexed : filesFoundInSources)
 		{
-			wchar_t* base = (wchar_t*)LocalAlloc(LMEM_FIXED | LMEM_ZEROINIT, pathToDiscoveredItemsIndexed.Length() * sizeof(wchar_t));
-			if (MultiByteToWideChar(CP_UTF8, 0, pathToDiscoveredItemsIndexed, -1, base, pathToDiscoveredItemsIndexed.Length()) > 0)
+			wchar_t* base = new wchar_t[pathToDiscoveredItemsIndexed.Length() * sizeof(wchar_t)]();
+			MultiByteToWideChar(CP_UTF8, 0, pathToDiscoveredItemsIndexed, -1, base, pathToDiscoveredItemsIndexed.Length());
+
+			wchar_t* ptr = base;
+			if (SUCCEEDED(PathCchFindExtension(base, pathToDiscoveredItemsIndexed.Length() + 1, &ptr)) && !wcscmp(ptr, L".mrbuild"))
 			{
-				wchar_t* ptr = base;
-				if (PathCchFindExtension(base, pathToDiscoveredItemsIndexed.Length(), &ptr))
-				{
-					scriptsFound.Add(pathToDiscoveredItemsIndexed);
-					MR_LOG(LogBuildSystemFramework, Log, "Found script: %ls", *pathToDiscoveredItemsIndexed);
-				}
-			}
-			else
-			{
-				MR_LOG(LogBuildSystemFramework, Error, "Failed to convert String to wchar_t!");
-				LocalFree(base);
-				return false;
+				scriptsFound.Add(pathToDiscoveredItemsIndexed);
+				MR_LOG(LogBuildSystemFramework, Log, "Found script: %ls", *pathToDiscoveredItemsIndexed);
 			}
 
-			LocalFree(base);
-
+			delete[] base;
 		}
-	
-		delete[] wideSourceDir;
 
 		const uint32_t max = scriptsFound.GetSize() /* Be aware! The last one is always should be the project script!*/;
 		for (uint32_t i = 0; i < max; i++)

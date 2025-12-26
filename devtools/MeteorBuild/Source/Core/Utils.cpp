@@ -124,12 +124,10 @@ void Utils::ListDirectory(wchar_t* name, Array<String>& container)
 					ListDirectory(tempName, container);
 
 					delete[] tempName;
-					break;
 				}
 				else if (foundFile.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
 				{
 					container.Add(String::Format("%ls\\%ls", name, foundFile.cFileName));
-					break;
 				}
 
 			} while (FindNextFileW(fileHandle, &foundFile));
