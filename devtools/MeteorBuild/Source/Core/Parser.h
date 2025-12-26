@@ -18,15 +18,6 @@ enum ECharacterType
 	EndOfFile
 };
 
-struct FoundScriptData
-{
-	String name;
-
-	String path;
-
-	String full;
-};
-
 struct Parser
 {
 	static Module* ParseModuleScript(String* moduleName);

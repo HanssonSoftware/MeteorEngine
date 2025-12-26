@@ -2,11 +2,7 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 #include "Utils.h"
-//#include "Parser.h"
-#include <Platform/FileManager.h>
-#include <Platform/Paths.h>
-#include <Types/Pointers.h>
-#include <Platform/Platform.h>
+#include <Types/StringW.h>
 
 #include "Windows/WindowsPaths.h"
 #include <PathCch.h>
@@ -81,7 +77,7 @@ String Utils::GetLastError()
 	return "";
 }
 
-void Utils::ListDirectory(wchar_t* name, Array<String>& container)
+void Utils::ListDirectory(wchar_t* name, Array<StringW>& container)
 {
 	if (name != nullptr)
 	{
@@ -127,7 +123,11 @@ void Utils::ListDirectory(wchar_t* name, Array<String>& container)
 				}
 				else if (foundFile.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
 				{
-					container.Add(String::Format("%ls\\%ls", name, foundFile.cFileName));
+					wchar_t* tempName = new wchar_t[wcslen(name) + wcslen(foundFile.cFileName) + 10]();
+					StringCchPrintfW(tempName, STRSAFE_MAX_CCH, L"%ls\\%ls", name, foundFile.cFileName);
+					container.Add(tempName);
+				
+					delete[] tempName;
 				}
 
 			} while (FindNextFileW(fileHandle, &foundFile));

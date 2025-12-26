@@ -39,52 +39,52 @@ bool BuildSystem::InitFramework()
 	{
 		sourceDirectoryFromLaunchParameter = sourceDirectoryFromLaunchParameterA;
 
-		Array<String> filesFoundInSources, scriptsFound;
+		Array<StringW> filesFoundInSources, scriptsFound;
 
 		Utils::ListDirectory(sourceDirectoryFromLaunchParameter.Data(), filesFoundInSources);
 		for (auto& pathToDiscoveredItemsIndexed : filesFoundInSources)
 		{
-			wchar_t* base = new wchar_t[pathToDiscoveredItemsIndexed.Length() * sizeof(wchar_t)]();
-			MultiByteToWideChar(CP_UTF8, 0, pathToDiscoveredItemsIndexed, -1, base, pathToDiscoveredItemsIndexed.Length());
-
-			wchar_t* ptr = base;
-			if (SUCCEEDED(PathCchFindExtension(base, pathToDiscoveredItemsIndexed.Length() + 1, &ptr)) && !wcscmp(ptr, L".mrbuild"))
+			wchar_t* ptr = pathToDiscoveredItemsIndexed.Data();
+			if (SUCCEEDED(PathCchFindExtension(pathToDiscoveredItemsIndexed.Data(), pathToDiscoveredItemsIndexed.Length() + 1, &ptr)) && !wcscmp(ptr, L".mrbuild"))
 			{
 				scriptsFound.Add(pathToDiscoveredItemsIndexed);
 				MR_LOG(LogBuildSystemFramework, Log, "Found script: %ls", *pathToDiscoveredItemsIndexed);
 			}
-
-			delete[] base;
 		}
 
-		const uint32_t max = scriptsFound.GetSize() /* Be aware! The last one is always should be the project script!*/;
-		for (uint32_t i = 0; i < max; i++)
+		for (auto& script : scriptsFound)
 		{
-			String indexed = scriptsFound[i];
-
-			Module* mdl = Parser::ParseModuleScript(&indexed);
-			if (mdl != nullptr)
+			HANDLE aScript = CreateFileW(script, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+			if (aScript != INVALID_HANDLE_VALUE)
 			{
-				if (!bAtLeastOneScriptParsed) bAtLeastOneScriptParsed = true;
+				char moduleDefine[10] = { '\0' };
 
-				Array<String> sd;
-				//Utils::ListDirectory(&indexed, sd);
-
-				//for (auto& temp : sd)
-				//{
-				//	mdl->files.Add(*temp);
-				//	MR_LOG(LogBuildSystemFramework, Log, "%ls module, new file added to include list: %ls", *mdl->moduleName, *temp);
-				//}
-
-				loadedModules.Add(*mdl);
-			}
-			else
-			{
-				ps = Parser::ParseProjectScript(&indexed);
-				if (ps != nullptr)
+				DWORD readActually = 0;
+				if (ReadFile(aScript, moduleDefine, 9, &readActually, nullptr) > 0)
 				{
-					bHasProject = true;
+					char* base = moduleDefine;
+
+					int count = 0;
+					while (!isspace(*base))
+					{
+						base++; count++;
+					}
+
+					if (strncmp(moduleDefine, "Module", count) == 0)
+					{
+						int j = 5235;
+					}
+					else if (strncmp(moduleDefine, "Project", count) == 0)
+					{
+						int j = 5235;
+					}
 				}
+				else
+				{
+					MR_LOG(LogBuildSystemFramework, Error, "Failed to read minimum amounts of bytes from file! %ls", *script);
+				}
+
+				CloseHandle(aScript);
 			}
 		}
 	}
