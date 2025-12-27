@@ -2,9 +2,8 @@
 
 #pragma once
 #include <Logging/Log.h>
-#include <Types/Array.h>
 #include <Types/String.h>
-// #include <CoreProxy.h>
+
 class String;
 
 #ifdef MR_CORE_EXPORTS
@@ -17,10 +16,26 @@ LOG_ADDCATEGORY(Commandlet);
 
 struct CORE_API Commandlet
 {
-	static void Initialize();
+	static Commandlet& Get()
+	{
+		static Commandlet instance;
+		return instance;
+	}
 
-	static bool Parse(const String& inParam, String* returnVal);
+	void Initialize(int argumentCount, char argumentList[]);
+
+	void Shutdown();
+
+	bool Parse(const String& inParam, String* returnVal);
+
+	const uint32_t GetArgumentsCount() const { return argumentsCount; }
+
+	const char* GetArgumentsList() const { return rawArgumentList; }
 
 protected:
-	static inline bool bIsInited = false;
+	bool bIsInited = false;
+
+	uint32_t argumentsCount = 0;
+
+	char* rawArgumentList = nullptr;
 };

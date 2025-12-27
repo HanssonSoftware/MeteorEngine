@@ -49,12 +49,15 @@ struct LogDescriptor
         const int reqAmount = vsnprintf(nullptr, 0, message, d);
 
         this->message = MemoryManager::Get().Allocate<char>(reqAmount + 1);
-        memset(this->message, 0, reqAmount + 1);
+        if (this->message != nullptr)
+        {
+            memset(this->message, 0, reqAmount + 1);
 
-        vsnprintf(this->message, reqAmount + 1, message, d);
-        va_end(d);
+            vsnprintf(this->message, reqAmount + 1, message, d);
+            va_end(d);
 
-        this->message[reqAmount] = '\0';
+            this->message[reqAmount] = '\0';
+        }
     }
 
     unsigned int line;

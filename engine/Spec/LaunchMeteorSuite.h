@@ -8,7 +8,7 @@
 
 struct Application;
 
-extern "C" __declspec(dllimport) int LaunchApplication(Application* instance);
+extern "C" __declspec(dllimport) int LaunchApplication(Application* instance, int argc, char argv[]);
           
 #ifdef MR_PLATFORM_WINDOWS
 #define	WIN32_LEAN_AND_MEAN
@@ -62,20 +62,24 @@ extern "C" __declspec(dllimport) int LaunchApplication(Application* instance);
 #define IMPLEMENT_WINDOWS_STARTUP(libName, applicationClass)                                                                             \
     int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)                                       \
     {                                                                                                                                    \
-        wchar_t path[512] = { '0' };                                                                                                     \
-        DWORD count = GetModuleFileNameW(GetModuleHandleW(nullptr), path, 512);                                                          \
-        PathCchRemoveFileSpec(path, count);                                                                                              \
+        wchar_t path[512] = {};                                                                                                          \
+        DWORD count = GetModuleFileNameW(hInstance, path, 512);                                                                          \
+        if (FAILED(PathCchRemoveFileSpec(path, count)))                                                                                  \
+        {                                                                                                                                \
+            MessageBoxW(nullptr, L"Unable to canonicalize engine path!", L"Engine Error!", MB_OK);                                       \
+            return -1;                                                                                                                   \
+        }                                                                                                                                \
                                                                                                                                          \
         AddDllDirectory(path);                                                                                                           \
         HMODULE entryPoint = LoadLibraryExW(L##libName, nullptr, LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_USER_DIRS);   \
-        if (entryPoint != INVALID_HANDLE_VALUE)                                                                                          \
+        if (entryPoint != nullptr)                                                                                                       \
         {                                                                                                                                \
-            typedef int (*ProxyFunction)(Application*);                                                                                  \
+            typedef int (*ProxyFunction)(Application*, int, char*);                                                                      \
             ProxyFunction externalLinkageFunction = (ProxyFunction)GetProcAddress(entryPoint, "LaunchApplication");                      \
             if (externalLinkageFunction)                                                                                                 \
             {                                                                                                                            \
                 applicationClass* application = new applicationClass;                                                                    \
-                int Result = externalLinkageFunction(application);                                                                       \
+                int Result = externalLinkageFunction(application, -1, nullptr);                                                          \
                                                                                                                                          \
                 if (!FreeLibrary(entryPoint))                                                                                            \
                     return -1;                                                                                                           \
@@ -99,8 +103,6 @@ extern "C" __declspec(dllimport) int LaunchApplication(Application* instance);
 //int main(int ArgumentCount, char* Arguments[])                                                                       \
 //{                                                                                                                    \
 ////int Result = LaunchApplication(ArgumentCount, Arguments);                                                      \
-//#ifdef MR_DEBUG                                                                                                      \
-//    _CrtDumpMemoryLeaks();                                                                                           \
-//#endif // MR_DEBUG                                                                                                   \
+                                                                                           \
 //    return 0;                                                                                                        \
 //}                             

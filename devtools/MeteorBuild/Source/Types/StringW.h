@@ -5,6 +5,7 @@
 #include <string>
 #include <stdint.h>
 
+/** Straight copy/paste from Core. */
 class StringW
 {
 	friend class String;

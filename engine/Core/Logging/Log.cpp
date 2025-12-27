@@ -4,9 +4,9 @@
 #include <Commandlet.h>
 //#include <MemoryManager.h>
 
-Logger::Logger()
+Logger::Logger(Logger* newInstance)
 {
-    Initialize();
+    instance = newInstance;
 }
 
 void Logger::Shutdown()
@@ -16,9 +16,9 @@ void Logger::Shutdown()
 
 void Logger::Initialize()
 {
-    //bIsUsingVerbose = Commandlet::Parse("-verbose", nullptr);
+    //bIsUsingVerbose = Commandlet::Get().Parse("-verbose", nullptr);
 
-    //bIsUsingFile = !Commandlet::Parse("-nofilelogging", nullptr);
+    //bIsUsingFile = !Commandlet::Get().Parse("-nofilelogging", nullptr);
 
     //if (bIsUsingFile)
     //{

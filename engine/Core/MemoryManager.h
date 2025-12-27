@@ -32,6 +32,9 @@ struct CORE_API MemoryManager
 	T* Allocate(const uint64_t& size)
 	{
 		void* raw = begin + currentOffset;
+		if (raw == nullptr)
+			return nullptr;
+
 
 		currentOffset += size * sizeof(T);
 		return reinterpret_cast<T*>(raw);

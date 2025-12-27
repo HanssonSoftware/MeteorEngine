@@ -45,7 +45,7 @@ String::String(const wchar_t* Input)
 {
 	NullOut();
 
-	if (!Input || *Input == L'\0')
+	if (!Input || *Input == '\0')
 		return;
 
 
@@ -329,7 +329,7 @@ String& String::operator+=(const String& other)
 		}
 
 		heapBuffer.length = newLen;
-		heapBuffer.ptr[newLen] = L'\0';
+		heapBuffer.ptr[newLen] = '\0';
 	}
 	else
 	{
@@ -337,7 +337,7 @@ String& String::operator+=(const String& other)
 		{
 			memcpy(stackBuffer.ptr + thisLen, otherData, otherLen);
 			stackBuffer.length = newLen;
-			stackBuffer.ptr[newLen] = L'\0';
+			stackBuffer.ptr[newLen] = '\0';
 		}
 		else
 		{

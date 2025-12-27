@@ -90,7 +90,7 @@ void Utils::ListDirectory(wchar_t* name, Array<StringW>& container)
 				return;
 			}
 
-			DWORD length = wcslen(exeDir);
+			DWORD length = (DWORD)wcslen(exeDir);
 			PathCchRemoveFileSpec(exeDir, length);
 
 			PWSTR combinedPathNonCanonicalized = nullptr;

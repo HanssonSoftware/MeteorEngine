@@ -2,7 +2,6 @@
 
 #pragma once
 #include <Types/Delegate.h>
-//// #include <CoreProxy.h>
 
 #ifdef MR_DEBUG
 constexpr inline const bool bIsRunningDebugMode = true;
@@ -31,7 +30,8 @@ public:
 		return instance ? instance : new Logger;
 	};
 
-	Logger();
+	Logger() = default;
+	Logger(Logger* newInstance);
 	virtual ~Logger() noexcept;
 
 	virtual void Initialize();
@@ -43,7 +43,7 @@ public:
 	virtual void HandleFatal(LogDescriptor* Descriptor);
 
 protected:
-	LogDescriptor* current;
+	LogDescriptor* current = nullptr;
 
 	//DelLoggerInitialize loggerInitialized;
 

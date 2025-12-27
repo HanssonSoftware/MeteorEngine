@@ -133,11 +133,11 @@
       <PreprocessorDefinitions>MR_DEBUG;_CONSOLE;MR_PLATFORM_WINDOWS;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir)Source;$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source\;$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir)Source;$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(CoreLibraryDependencies);MeteorEngine-Core.lib</AdditionalDependencies>
     </Link>
@@ -173,15 +173,18 @@
     </ResourceCompile>
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir);$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source\;$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir);$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(CoreLibraryDependencies);MeteorEngine-Core.lib</AdditionalDependencies>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Methods\BuildProjectMethod.cpp" />
+    <ClCompile Include="Source\Core\Log.cpp" />
+    <ClCompile Include="Source\Methods\BaseBuildMethod.cpp" />
     <ClCompile Include="Source\Core\BuildSystem.cpp" />
     <ClCompile Include="Source\Core\Application.cpp" />
     <ClCompile Include="Source\Module\Launcher.cpp" />
@@ -192,6 +195,9 @@
     <ClCompile Include="Source\Types\StringW.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Methods\BuildProjectMethod.h" />
+    <ClInclude Include="Source\Core\Log.h" />
+    <ClInclude Include="Source\Methods\BaseBuildMethod.h" />
     <ClInclude Include="Source\Core\BuildSystem.h" />
     <ClInclude Include="Source\Core\Application.h" />
     <ClInclude Include="Source\Module\Launcher.h" />

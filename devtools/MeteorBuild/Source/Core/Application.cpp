@@ -23,28 +23,61 @@ void BuildSystemApplication::Init()
 {
 	if (!GetBuildSystem().InitFramework())
 	{
-		MR_LOG(LogBuildSystemApplication, Fatal, "Build system error!");
+		//MR_LOG(LogBuildSystemApplication, Fatal, "Build system error!");
 	}
+
+
+	
 
 	Application::Init();
 }
 
 void BuildSystemApplication::Run()
 {
-	// Application::RequestExit(0); should be added somewhere, if not the app will loop over this function
 
-	GetBuildSystem().OrderModules();
-	if (!GetBuildSystem().BuildProjectFiles())
-	{
-		MR_LOG(LogBuildSystemApplication, Fatal, "Failed to create project files!");
-	}
 
 	Application::RequestExit(0);
 }
 
 void BuildSystemApplication::Shutdown()
 {
+	SetAppState(ECurrentApplicationState::SHUTDOWN);
 	Application::Shutdown();
 }
 
-IMPLEMENT_WINDOWS_STARTUP("MeteorEngine-Core.dll", BuildSystemApplication);
+int main(int argc, char argv[])
+{  
+#ifdef MR_PLATFORM_WINDOWS
+	wchar_t path[512] = {};                                                                                                          
+	DWORD count = GetModuleFileNameW(GetModuleHandleW(nullptr), path, 512);
+	if (FAILED(PathCchRemoveFileSpec(path, count)))                                                                               
+	{                                                                                                                                
+		MessageBoxW(nullptr, L"Unable to canonicalize engine path!", L"Engine Error!", MB_OK);                                       
+		return -1;                                                                                                                   
+	}
+
+	AddDllDirectory(path);                                                                                                           
+	HMODULE entryPoint = LoadLibraryExW(L"MeteorEngine-Core.dll", nullptr, LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_USER_DIRS);
+	if (entryPoint != INVALID_HANDLE_VALUE)                                                                                          
+	{                                                                                                                                
+		typedef int (*ProxyFunction)(Application*, int, char*);                                                                                  
+		ProxyFunction externalLinkageFunction = (ProxyFunction)GetProcAddress(entryPoint, "LaunchApplication");                      
+		if (externalLinkageFunction)                                                                                                 
+		{                                                                                                                            
+			BuildSystemApplication* application = new BuildSystemApplication;
+			int Result = externalLinkageFunction(application, argc, argv);                                                                       
+
+			if (!FreeLibrary(entryPoint))                                                                                            
+				return -1;                                                                                                           
+
+			delete application;                                                                                                      
+			return Result;                                                                                                           
+		}                                                                                                                            
+	}                                                                                                                                
+
+	MessageBoxW(nullptr, L"Unable to reach engine code!", L"Engine Error!", MB_OK);
+#else
+#error int main() platform dependant launch missing!
+#endif // MR_PLATFORM_WINDOWS
+	return -1;                                                                                                                       
+};

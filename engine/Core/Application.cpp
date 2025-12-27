@@ -40,6 +40,8 @@ void Application::Init()
     MR_LOG(LogApplication, Log, "Initializing application.");
 
     SetAppState(ECurrentApplicationState::RUNNING);
+    
+    Application::Run();
 }
 
 void Application::Run()
@@ -68,19 +70,21 @@ void Application::Shutdown()
 
         MemoryManager::Get().Shutdown();
     }
+
+#ifdef MR_DEBUG
+    _CrtDumpMemoryLeaks();
+#endif // MR_DEBUG 
 }
 
-extern "C" __declspec(dllexport) int LaunchApplication(Application* instance) \
+extern "C" __declspec(dllexport) int LaunchApplication(Application* instance, int argc, char argv[])
 {	
     int returnCode = 0xDEADBEEF; 
     if (instance != nullptr)
     {
-        Commandlet::Initialize(); 
-        instance->Init(); 
-        instance->Run(); 
-        instance->Shutdown(); 
-        returnCode = instance->GetRequestExitCode(); 
+        Commandlet::Get().Initialize(argc, argv);
+        instance->Init();
+        returnCode = instance->GetRequestExitCode();
+        Commandlet::Get().Shutdown();
     }
-
     return returnCode; 
 }

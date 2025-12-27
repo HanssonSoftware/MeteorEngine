@@ -17,25 +17,68 @@
 #include "Parser.h"
 
 #include <Shlobj.h>
+#include "Application.h"
 #pragma comment(lib, "Shell32.lib")
 #pragma comment(lib, "Pathcch.lib")
+
+#include <Methods/BuildProjectMethod.h>
 
 LOG_ADDCATEGORY(BuildSystemFramework);
 LOG_ADDCATEGORY(Assembler);
 
+static int WINAPI HRoutine(DWORD dwCtrlType)
+{
+	switch (dwCtrlType)
+	{
+		case CTRL_C_EVENT:
+		case CTRL_BREAK_EVENT:
+		case CTRL_CLOSE_EVENT:
+			GetApplication<BuildSystemApplication>()->Shutdown();
+			break;
+		case CTRL_LOGOFF_EVENT:
+			break;
+		case CTRL_SHUTDOWN_EVENT:
+			break;
+	}
+
+	return 1;
+}
+
 bool BuildSystem::InitFramework()
 {
-	if (!ReadArguments())
+	consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+
+	SetStdHandle(STD_INPUT_HANDLE, consoleHandle);
+	SetConsoleOutputCP(CP_UTF8);
+	SetConsoleCP(CP_UTF8);
+	SetConsoleCtrlHandler(HRoutine, 1);
+
+	static constexpr wchar_t header[] = L"========================== MeteorBuild (R) ==========================\n"
+										L"=== Copyright 2020 - 2025, Hansson Software. All rights reserved. ===\r\n\0";
+
+	DWORD written = 0;
+	if (!WriteConsoleW(consoleHandle, header, sizeof(header) / sizeof(header[0]), &written, nullptr))
 	{
-		MR_LOG(LogBuildSystemFramework, Error, "Failed to read arguments!");
+		MessageBoxW(GetConsoleWindow(), L"Failed to write header!", L"MeteorBuild(R) internal error!", MB_ICONERROR | MB_OK);
 		return false;
 	}
+
+	if (Commandlet::Get().GetArgumentsCount() == 0)
+		SendHelpInfo();
+
+	if (!ReadArguments())
+	{
+		MessageBoxW(GetConsoleWindow(), L"Failed to read arguments! Check given values!", L"MeteorBuild(R) internal error!", MB_ICONERROR | MB_OK);
+		return false;
+	}
+
+	return true;
 
 	bool bHasProject = false, bAtLeastOneScriptParsed = false;
 	String sourceDirectoryFromLaunchParameterA;
 	StringW sourceDirectoryFromLaunchParameter;
 
-	if (Commandlet::Parse("-source", &sourceDirectoryFromLaunchParameterA))
+	if (Commandlet::Get().Parse("-source", &sourceDirectoryFromLaunchParameterA))
 	{
 		sourceDirectoryFromLaunchParameter = sourceDirectoryFromLaunchParameterA;
 
@@ -60,7 +103,7 @@ bool BuildSystem::InitFramework()
 				char moduleDefine[10] = { '\0' };
 
 				DWORD readActually = 0;
-				if (ReadFile(aScript, moduleDefine, 9, &readActually, nullptr) > 0)
+				if (ReadFile(aScript, moduleDefine, sizeof(moduleDefine) / sizeof(moduleDefine[0]) - 1, &readActually, nullptr) > 0)
 				{
 					char* base = moduleDefine;
 
@@ -92,9 +135,35 @@ bool BuildSystem::InitFramework()
 	return bHasProject && bAtLeastOneScriptParsed;
 }
 
-/** WARNING! This function uses, C++ standard. */
-void BuildSystem::OrderModules()
+bool BuildSystem::ReadArguments()
 {
+	if (Commandlet::Get().Parse("-build", nullptr))
+	{
+		currentMethod = new BuildProjectMethod();
+	}
+	else if (Commandlet::Get().Parse("-rebuild", nullptr))
+	{
+		//currentMethod = new RebuildProjectMethod;
+	}
+	else if (Commandlet::Get().Parse("-compile", nullptr))
+	{
+
+	}
+	//else if (Commandlet::Get().Parse("-build", nullptr))
+	//{
+
+	//}
+	//else if (Commandlet::Get().Parse("-build", nullptr))
+	//{
+
+	//}
+
+	return false;
+}
+
+/** WARNING! This function uses, C++ standard. */
+//void BuildSystem::OrderModules()
+//{
 	//std::unordered_map<std::string, uint32_t> ordering;
 	//const uint32_t size = loadedModules.GetSize();
 
@@ -155,12 +224,35 @@ void BuildSystem::OrderModules()
 	//	uint32_t score = (it != ordering.end()) ? it->second : 0;
 	//	MR_LOG(LogBuildSystemFramework, Log, "%ls (score %u)", *m.moduleName, score);
 	//}
+//}
+
+void BuildSystem::SendHelpInfo() const
+{
+	const bool bIsHelpRequested = Commandlet::Get().Parse("-help", nullptr) || 
+								  Commandlet::Get().Parse("-h", nullptr) || 
+								  Commandlet::Get().Parse("?", nullptr);
+
+	static constexpr const wchar_t helpA[] = L"\nDon\'t know what to do? List of options below.\n"
+											   L"  -help // -h // ?   -   Brings up help (this pane).\n\0";
+
+	static constexpr const wchar_t helpB[] = L"\nNo parameters in input. Don\'t know what to do? Little help.\n"
+											   L"  -help // -h // ?   -   Brings up help (this pane).\n\0";
+
+	static constexpr const uint32_t helpASize = sizeof(helpA) / sizeof(helpA[0]);
+	static constexpr const uint32_t helpBSize = sizeof(helpB) / sizeof(helpB[0]);
+
+	DWORD written = 0;
+	if (!WriteConsoleW(consoleHandle, bIsHelpRequested ? helpA : helpB, bIsHelpRequested ? helpASize : helpBSize, &written, nullptr))
+	{
+		MessageBoxW(GetConsoleWindow(), L"Failed to write help!", L"MeteorBuild(R) internal error!", MB_ICONERROR | MB_OK);
+		return;
+	}
 }
 
 bool BuildSystem::BuildProjectFiles()
 {
 	//String intermediateLocation;
-	//if (loadedModules.GetSize() > 0 && Commandlet::Parse("-int", &intermediateLocation))
+	//if (loadedModules.GetSize() > 0 && Commandlet::Get().Parse("-int", &intermediateLocation))
 	//{
 	//	if (FileManager::IsPathRelative(&intermediateLocation))
 	//	{
@@ -280,7 +372,7 @@ bool BuildSystem::BuildProjectFiles()
 	//	}
 
 	//	String sourceDir;
-	//	if (Commandlet::Parse("-source", &sourceDir))
+	//	if (Commandlet::Get().Parse("-source", &sourceDir))
 	//	{
 	//		String exeDir = WindowsPaths::GetExecutableDirctory();
 	//		PathCchRemoveFileSpec(exeDir.Data(), exeDir.Length());
@@ -317,72 +409,51 @@ bool BuildSystem::BuildProjectFiles()
 	return false;
 }
 
-bool BuildSystem::GenerateImportExportDefinitions(String* path)
-{
-	//HANDLE importExports = CreateFileW(*path, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-	//if (importExports != INVALID_HANDLE_VALUE)
-	//{
-	//	static constexpr const wchar_t buffer[] =
-	//		L"/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */\n\n/* Automatically generated by MeteorBuild(R) */\n"
-	//		L"\n#pragma once\n"
-	//		L"#define DLLEXPORT __declspec(dllexport)\n"
-	//		L"#define DLLIMPORT __declspec(dllimport)\0"
-	//	;
-	//	
-	//	ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(buffer);
+//bool BuildSystem::GenerateImportExportDefinitions(String* path)
+//{
+//	//HANDLE importExports = CreateFileW(*path, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+//	//if (importExports != INVALID_HANDLE_VALUE)
+//	//{
+//	//	static constexpr const wchar_t buffer[] =
+//	//		L"/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */\n\n/* Automatically generated by MeteorBuild(R) */\n"
+//	//		L"\n#pragma once\n"
+//	//		L"#define DLLEXPORT __declspec(dllexport)\n"
+//	//		L"#define DLLIMPORT __declspec(dllimport)\0"
+//	//	;
+//	//	
+//	//	ScopedPtr<char> skinnyBuffer = Platform::ConvertToNarrow(buffer);
+//
+//	//	DWORD written = 0;
+//	//	if (!WriteFile(importExports, skinnyBuffer.Get(), sizeof(buffer) / sizeof(wchar_t), &written, nullptr))
+//	//	{
+//	//		MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
+//	//	}
+//	//	
+//
+//	//	CloseHandle(importExports);
+//	//	return true;
+//	//}
+//
+//	return false;
+//}
 
-	//	DWORD written = 0;
-	//	if (!WriteFile(importExports, skinnyBuffer.Get(), sizeof(buffer) / sizeof(wchar_t), &written, nullptr))
-	//	{
-	//		MR_LOG(LogAssembler, Error, "WriteFile returned: %ls", *Platform::GetError());
-	//	}
-	//	
-
-	//	CloseHandle(importExports);
-	//	return true;
-	//}
-
-	return false;
-}
-
-Module* BuildSystem::FindModule(const String* name)
-{
-	static Module* last = nullptr;
-	static String lastName;
-	if (lastName == *name)
-		return last;
-
-	for (auto& mdl : loadedModules)
-	{
-		//if (mdl.moduleName == *name)
-		//{
-		//	lastName = *name;
-		//	last = &mdl;
-
-		//	return &mdl;
-		//}
-	}
-
-	return nullptr;
-}
-
-bool BuildSystem::ReadArguments()
-{
-	if (Commandlet::Parse("-build", nullptr))
-	{
-		command = Build;
-		return true;
-	}
-	else if (Commandlet::Parse("-rebuild", nullptr))
-	{
-		command = Rebuild;
-		return true;
-	}
-	else
-	{
-		MR_LOG(LogBuildSystemFramework, Fatal, "Main parameter is missing! Use -build or -rebuild");
-	}
-
-	return false;
-}
-
+//Module* BuildSystem::FindModule(const String* name)
+//{
+//	//static Module* last = nullptr;
+//	//static String lastName;
+//	//if (lastName == *name)
+//	//	return last;
+//
+//	//for (auto& mdl : loadedModules)
+//	//{
+//	//	//if (mdl.moduleName == *name)
+//	//	//{
+//	//	//	lastName = *name;
+//	//	//	last = &mdl;
+//
+//	//	//	return &mdl;
+//	//	//}
+//	//}
+//
+//	return nullptr;
+//}

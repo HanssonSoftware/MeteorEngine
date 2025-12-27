@@ -5,40 +5,29 @@
 #include <Types/String.h>
 #include <Module/Module.h>
 
-#include <Platform/File.h>
-
-class Project;
+class BaseBuildMethod;
 
 class BuildSystem
 {
-protected:
-	enum ERequestedCommandToDo
-	{
-		Build,
-		Rebuild
-
-	} command;
 public:
 	bool InitFramework();
 
-	void OrderModules();
+	template<typename T = BaseBuildMethod>
+	T* GetCurrentMethod() const { return (T*)currentMethod; }
 
-	bool BuildProjectFiles();
+	//bool GenerateImportExportDefinitions(String* path);
 
-	const Array<Module>* GetModules() const { return &loadedModules; };
+	//Module* FindModule(const String* name);
 
-	Project& GetProjectScript() const { return *ps; }
-
-	bool GenerateImportExportDefinitions(String* path);
-
-	Module* FindModule(const String* name);
 protected:
 	bool ReadArguments();
 
-	const ERequestedCommandToDo GetBuildCommand() const { return command; }
+	void SendHelpInfo() const;
 
-	Project* ps;
+	bool BuildProjectFiles();
 
-	Array<Module> loadedModules;
+	HANDLE consoleHandle;
+
+	BaseBuildMethod* currentMethod;
 };
 
