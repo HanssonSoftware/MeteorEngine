@@ -2,7 +2,7 @@
 
 #include "Log.h"
 #include <Commandlet.h>
-//#include <MemoryManager.h>
+#include <Types/String.h>
 
 Logger::Logger(Logger* newInstance)
 {

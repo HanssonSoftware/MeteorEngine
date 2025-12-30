@@ -54,13 +54,13 @@ void Commandlet::Shutdown()
 
 bool Commandlet::Parse(const String& inParam, String* returnVal)
 {
-	for (uint32_t i = 0; i < argumentsCount; i++)
+	for (uint32_t i = 0; i < argumentsCount + 1; i++)
 	{
 		String& item = parsedWords[i];
 
 		if (item == inParam)
 		{
-			if (returnVal != nullptr && i + 1 <= argumentsCount)
+			if (returnVal != nullptr && i + 1 <= argumentsCount + 1)
 				*returnVal = parsedWords[i + 1];
 			
 			return true;

@@ -23,6 +23,8 @@ public:
 
 	StringW(const String* narrowString);
 
+	StringW(const char* Input);
+
 	StringW(const wchar_t* Input);
 
 	StringW(const StringW& other);

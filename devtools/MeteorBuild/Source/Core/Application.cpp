@@ -5,6 +5,7 @@
 #include <MemoryManager.h>
 #include <Platform/FileManager.h>
 
+#include <Methods/BaseBuildMethod.h>
 #include <Spec/LaunchMeteorSuite.h>
 #include <Platform/Platform.h>
 
@@ -25,8 +26,6 @@ void BuildSystemApplication::Init()
 	{
 		//MR_LOG(LogBuildSystemApplication, Fatal, "Build system error!");
 	}
-
-
 	
 
 	Application::Init();
@@ -34,7 +33,10 @@ void BuildSystemApplication::Init()
 
 void BuildSystemApplication::Run()
 {
-
+	if (auto a = GetBuildSystem().GetCurrentMethod())
+	{
+		a->BeginCreating();
+	}
 
 	Application::RequestExit(0);
 }

@@ -35,6 +35,28 @@ StringW::StringW(const String* narrowString)
 #endif // MR_DEBUG
 }
 
+StringW::StringW(const char* Input)
+{
+	if (Input != nullptr)
+	{
+#ifdef MR_PLATFORM_WINDOWS
+		const uint32_t narrowSize = strlen(Input);
+		wchar_t* actualPlace = DetermineLocation(narrowSize);
+
+		if (!MultiByteToWideChar(CP_UTF8, 0, Input, narrowSize, actualPlace, narrowSize))
+			return;
+
+#else
+#error StringW is designed to work with Windows! Feel free to expand to other OS-es.
+#endif // MR_PLATFORM_WINDOWS
+	}
+
+#ifdef MR_DEBUG
+	Stats.bIsInited = true;
+	Stats.functionWhereWasInited = __FUNCSIG__;
+#endif // MR_DEBUG
+}
+
 StringW::~StringW() noexcept
 {
 	if (bIsUsingHeap && heapBuffer.ptr)

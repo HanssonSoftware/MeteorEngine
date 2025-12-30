@@ -52,6 +52,7 @@ bool BuildSystem::InitFramework()
 	SetConsoleOutputCP(CP_UTF8);
 	SetConsoleCP(CP_UTF8);
 	SetConsoleCtrlHandler(HRoutine, 1);
+	SetConsoleTitleW(L"Meteor Build(R)");
 
 	static constexpr wchar_t header[] = L"========================== MeteorBuild (R) ==========================\n"
 										L"=== Copyright 2020 - 2025, Hansson Software. All rights reserved. ===\r\n\0";
@@ -63,13 +64,17 @@ bool BuildSystem::InitFramework()
 		return false;
 	}
 
-	if (Commandlet::Get().GetArgumentsCount() == 0)
-		SendHelpInfo();
-
-	if (!ReadArguments())
+	if (Commandlet::Get().GetArgumentsCount() > 0)
 	{
-		MessageBoxW(GetConsoleWindow(), L"Failed to read arguments! Check given values!", L"MeteorBuild(R) internal error!", MB_ICONERROR | MB_OK);
-		return false;
+		if (!ReadArguments())
+		{
+			//MessageBoxW(GetConsoleWindow(), L"No instruction parameter! Check help!", L"MeteorBuild(R) internal error!", MB_ICONERROR | MB_OK);
+			//return false;
+		}
+	}
+	else
+	{
+		SendHelpInfo();
 	}
 
 	return true;
@@ -146,6 +151,10 @@ bool BuildSystem::ReadArguments()
 		//currentMethod = new RebuildProjectMethod;
 	}
 	else if (Commandlet::Get().Parse("-compile", nullptr))
+	{
+
+	}
+	else if (Commandlet::Get().Parse("-clean", nullptr) || Commandlet::Get().Parse("-clear", nullptr))
 	{
 
 	}
@@ -233,10 +242,20 @@ void BuildSystem::SendHelpInfo() const
 								  Commandlet::Get().Parse("?", nullptr);
 
 	static constexpr const wchar_t helpA[] = L"\nDon\'t know what to do? List of options below.\n"
-											   L"  -help // -h // ?   -   Brings up help (this pane).\n\0";
+											   L"Instruction parameters:\n"
+											   L"  -build\t\t-  Performs a build project method, requires a source, intermediate parameter!\n"
+											   L"\nOrdionary parameters:\n"
+											   L"  -help // -h // ?\t\t-  Brings up help (this pane).\n"
+											   L"  -intermediate // -int\t\t-  Sets the intermediate directory, for your generated project files.\n"
+											   L"  -source // -src // -s\t\t-  Sets the source directory, where your code lives and to search for .mrbuild scripts recursively.\n";
 
 	static constexpr const wchar_t helpB[] = L"\nNo parameters in input. Don\'t know what to do? Little help.\n"
-											   L"  -help // -h // ?   -   Brings up help (this pane).\n\0";
+		L"Instruction parameters:\n"
+		L"  -build\t\t-  Performs a build project method, requires a source, intermediate parameter.\n"
+		L"\nOrdionary parameters:\n"
+		L"  -help // -h // ?\t\t-  Brings up help (this pane).\n"
+		L"  -intermediate // -int\t\t-  Sets the intermediate directory, for your generated project files.\n"
+		L"  -source // -src // -s\t\t-  Sets the source directory, where your code lives and to search for .mrbuild scripts recursively.\n";
 
 	static constexpr const uint32_t helpASize = sizeof(helpA) / sizeof(helpA[0]);
 	static constexpr const uint32_t helpBSize = sizeof(helpB) / sizeof(helpB[0]);

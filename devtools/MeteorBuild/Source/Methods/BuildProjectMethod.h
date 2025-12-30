@@ -6,11 +6,18 @@
 class BuildProjectMethod : public BaseBuildMethod
 {
 public:
-	BuildProjectMethod() = default;
+	BuildProjectMethod();
 
-	void GatherRequiredParameters();
+	virtual bool AcquireRequiredParameters() override;
+
+	virtual void BeginCreating() override;
 
 protected:
 	virtual ~BuildProjectMethod() noexcept = default;
+
+	StringW sourceDirectory;
+
+	StringW intermediateDirectory;
+
 };
 
