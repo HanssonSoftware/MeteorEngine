@@ -2,6 +2,8 @@
 
 #pragma once
 #include "BaseBuildMethod.h"
+#include <Types/Array.h>
+#include <Types/StringW.h>
 
 class BuildProjectMethod : public BaseBuildMethod
 {
@@ -12,6 +14,7 @@ public:
 
 	virtual void BeginCreating() override;
 
+	virtual void Finalize() override;
 protected:
 	virtual ~BuildProjectMethod() noexcept = default;
 
@@ -19,5 +22,10 @@ protected:
 
 	StringW intermediateDirectory;
 
+	StringW alternativeSolutionDir;
+
+	Array<StringW> foundScripts;
+
+	//Array<> modules;
 };
 

@@ -33,9 +33,13 @@ void BuildSystemApplication::Init()
 
 void BuildSystemApplication::Run()
 {
-	if (auto a = GetBuildSystem().GetCurrentMethod())
+	if (BaseBuildMethod* method = GetBuildSystem().GetCurrentMethod())
 	{
-		a->BeginCreating();
+		if (method->AcquireRequiredParameters())
+		{
+			method->BeginCreating();
+			method->Finalize();
+		}
 	}
 
 	Application::RequestExit(0);

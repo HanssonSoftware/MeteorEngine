@@ -3,7 +3,6 @@
 #include "BuildProjectMethod.h"
 #include <Commandlet.h>
 
-
 #define	WIN32_LEAN_AND_MEAN
 #define NOGDICAPMASKS
 #define NOVIRTUALKEYCODES
@@ -44,8 +43,13 @@
 #define NOMCX                                                                                                      
 #include <Windows.h>
 
+#include <shlwapi.h>
 #include <strsafe.h>
+#include <PathCch.h>
+#include <Core/Utils.h>
 
+#pragma comment(lib, "Shlwapi.lib")
+#pragma comment(lib, "Pathcch.lib")
 
 BuildProjectMethod::BuildProjectMethod() : BaseBuildMethod()
 {
@@ -54,16 +58,23 @@ BuildProjectMethod::BuildProjectMethod() : BaseBuildMethod()
 
 bool BuildProjectMethod::AcquireRequiredParameters()
 {
-    if (Commandlet::Get().Parse("-source", ) || Commandlet::Get().Parse("-src", nullptr) || Commandlet::Get().Parse("-s", nullptr))
+    uint32_t hasRequired = 0;
+
+    String source, intermediate, solution;
+    if (Commandlet::Get().Parse("-source", &source) || Commandlet::Get().Parse("-src", &source) || Commandlet::Get().Parse("-s", &source))
+        hasRequired++;
+    
+    if (Commandlet::Get().Parse("-intermediate", &intermediate) || Commandlet::Get().Parse("-int", &intermediate))
+        hasRequired++;
+
+    if (Commandlet::Get().Parse("-solution", &solution) || Commandlet::Get().Parse("-sln", &solution))
     {
-        
-    }
-    else if (Commandlet::Get().Parse("-intermediate", nullptr) || Commandlet::Get().Parse("-intermediate", nullptr))
-    {
-        //currentMethod = new RebuildProjectMethod;
+        alternativeSolutionDir = solution;
     }
 
-    return true;
+    sourceDirectory = source;
+    intermediateDirectory = intermediate;
+    return hasRequired == 2 ? true : false;
 }
 
 void BuildProjectMethod::BeginCreating()
@@ -72,11 +83,57 @@ void BuildProjectMethod::BeginCreating()
     QueryPerformanceCounter(&lg);
     start = lg.QuadPart;
 
-    for (int i = 0; i < 50000; i++)
-    {
-        int j = i;
-    }
+    MR_ASSERT(sourceDirectory, "Source directory parameter missing!");
 
+    StringW formattedSourceDirectory = sourceDirectory;
+
+    Array<StringW> collectedSourcesWithScripts;
+    Utils::ListDirectory(formattedSourceDirectory.Data(), collectedSourcesWithScripts);
+    for (auto& file : collectedSourcesWithScripts)
+    {
+        wchar_t* ptr = file.Data();
+        if (SUCCEEDED(PathCchFindExtension(file.Data(), file.Length() + 1, &ptr)) && !wcscmp(ptr, L".mrbuild"))
+        {
+            foundScripts.Add(file);
+            HANDLE script = CreateFileW(file, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+            if (script != INVALID_HANDLE_VALUE)
+            {
+                char moduleDefine[10] = { '\0' };
+
+                DWORD readActually = 0;
+                if (ReadFile(script, moduleDefine, sizeof(moduleDefine) / sizeof(moduleDefine[0]) - 1, &readActually, nullptr) > 0)
+                {
+                    char* base = moduleDefine;
+
+                    int count = 0;
+                    while (!isspace(*base))
+                    {
+                        base++; count++;
+                    }
+
+                    if (strncmp(moduleDefine, "Module", count) == 0)
+                    {
+                        int j = 5235;
+                    }
+                    else if (strncmp(moduleDefine, "Project", count) == 0)
+                    {
+                        int j = 5235;
+                    }
+                }
+                else
+                {
+                    //MR_LOG(LogBuildSystemFramework, Error, "Failed to read minimum amounts of bytes from file! %ls", *script);
+                }
+
+                CloseHandle(script);
+            }
+        }
+    }
+}
+
+void BuildProjectMethod::Finalize()
+{
+    LARGE_INTEGER lg;
     QueryPerformanceCounter(&lg);
     end = lg.QuadPart;
 

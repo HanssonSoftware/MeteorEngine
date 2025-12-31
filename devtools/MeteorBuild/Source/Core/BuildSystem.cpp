@@ -68,8 +68,8 @@ bool BuildSystem::InitFramework()
 	{
 		if (!ReadArguments())
 		{
-			//MessageBoxW(GetConsoleWindow(), L"No instruction parameter! Check help!", L"MeteorBuild(R) internal error!", MB_ICONERROR | MB_OK);
-			//return false;
+			MessageBoxW(GetConsoleWindow(), L"No instruction parameter! Check help!", L"MeteorBuild(R) internal error!", MB_ICONERROR | MB_OK);
+			return false;
 		}
 	}
 	else
@@ -78,66 +78,6 @@ bool BuildSystem::InitFramework()
 	}
 
 	return true;
-
-	bool bHasProject = false, bAtLeastOneScriptParsed = false;
-	String sourceDirectoryFromLaunchParameterA;
-	StringW sourceDirectoryFromLaunchParameter;
-
-	if (Commandlet::Get().Parse("-source", &sourceDirectoryFromLaunchParameterA))
-	{
-		sourceDirectoryFromLaunchParameter = sourceDirectoryFromLaunchParameterA;
-
-		Array<StringW> filesFoundInSources, scriptsFound;
-
-		Utils::ListDirectory(sourceDirectoryFromLaunchParameter.Data(), filesFoundInSources);
-		for (auto& pathToDiscoveredItemsIndexed : filesFoundInSources)
-		{
-			wchar_t* ptr = pathToDiscoveredItemsIndexed.Data();
-			if (SUCCEEDED(PathCchFindExtension(pathToDiscoveredItemsIndexed.Data(), pathToDiscoveredItemsIndexed.Length() + 1, &ptr)) && !wcscmp(ptr, L".mrbuild"))
-			{
-				scriptsFound.Add(pathToDiscoveredItemsIndexed);
-				MR_LOG(LogBuildSystemFramework, Log, "Found script: %ls", *pathToDiscoveredItemsIndexed);
-			}
-		}
-
-		for (auto& script : scriptsFound)
-		{
-			HANDLE aScript = CreateFileW(script, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-			if (aScript != INVALID_HANDLE_VALUE)
-			{
-				char moduleDefine[10] = { '\0' };
-
-				DWORD readActually = 0;
-				if (ReadFile(aScript, moduleDefine, sizeof(moduleDefine) / sizeof(moduleDefine[0]) - 1, &readActually, nullptr) > 0)
-				{
-					char* base = moduleDefine;
-
-					int count = 0;
-					while (!isspace(*base))
-					{
-						base++; count++;
-					}
-
-					if (strncmp(moduleDefine, "Module", count) == 0)
-					{
-						int j = 5235;
-					}
-					else if (strncmp(moduleDefine, "Project", count) == 0)
-					{
-						int j = 5235;
-					}
-				}
-				else
-				{
-					MR_LOG(LogBuildSystemFramework, Error, "Failed to read minimum amounts of bytes from file! %ls", *script);
-				}
-
-				CloseHandle(aScript);
-			}
-		}
-	}
-
-	return bHasProject && bAtLeastOneScriptParsed;
 }
 
 bool BuildSystem::ReadArguments()
@@ -242,20 +182,24 @@ void BuildSystem::SendHelpInfo() const
 								  Commandlet::Get().Parse("?", nullptr);
 
 	static constexpr const wchar_t helpA[] = L"\nDon\'t know what to do? List of options below.\n"
-											   L"Instruction parameters:\n"
-											   L"  -build\t\t-  Performs a build project method, requires a source, intermediate parameter!\n"
-											   L"\nOrdionary parameters:\n"
-											   L"  -help // -h // ?\t\t-  Brings up help (this pane).\n"
-											   L"  -intermediate // -int\t\t-  Sets the intermediate directory, for your generated project files.\n"
-											   L"  -source // -src // -s\t\t-  Sets the source directory, where your code lives and to search for .mrbuild scripts recursively.\n";
+		L"Instruction parameters:\n"
+		L"  -build\t\t-  Performs a build project method, requires a source, intermediate parameter!\n"
+		L"  -rebuild\t\t-  Performs a full rebuild method, requires the same parameters as the -build, but it deletes everything.\n"
+		L"\nOrdionary parameters:\n"
+		L"  -help // -h // ?\t\t-  Brings up help (this pane).\n"
+		L"  -intermediate // -int\t\t-  Sets the intermediate directory, for your generated project files.\n"
+		L"  -source // -src // -s\t\t-  Sets the source directory, where your code lives and to search for .mrbuild scripts recursively.\n"
+		L"  -solution // -sln\t\t-  Sets an alternative solution directory, when selected instruction is done your solution will be copied into that path.\n";
 
 	static constexpr const wchar_t helpB[] = L"\nNo parameters in input. Don\'t know what to do? Little help.\n"
 		L"Instruction parameters:\n"
 		L"  -build\t\t-  Performs a build project method, requires a source, intermediate parameter.\n"
+		L"  -rebuild\t\t-  Performs a full rebuild method, requires the same parameters as the -build, but it deletes everything.\n"
 		L"\nOrdionary parameters:\n"
 		L"  -help // -h // ?\t\t-  Brings up help (this pane).\n"
 		L"  -intermediate // -int\t\t-  Sets the intermediate directory, for your generated project files.\n"
-		L"  -source // -src // -s\t\t-  Sets the source directory, where your code lives and to search for .mrbuild scripts recursively.\n";
+		L"  -source // -src // -s\t\t-  Sets the source directory, where your code lives and to search for .mrbuild scripts recursively.\n"
+		L"  -solution // -sln\t\t-  Sets an alternative solution directory, when selected instruction is done your solution will be copied into that path.\n";
 
 	static constexpr const uint32_t helpASize = sizeof(helpA) / sizeof(helpA[0]);
 	static constexpr const uint32_t helpBSize = sizeof(helpB) / sizeof(helpB[0]);
