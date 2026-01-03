@@ -40,7 +40,7 @@ StringW::StringW(const char* Input)
 	if (Input != nullptr)
 	{
 #ifdef MR_PLATFORM_WINDOWS
-		const uint32_t narrowSize = strlen(Input);
+		const uint32_t narrowSize = (uint32_t)strlen(Input);
 		wchar_t* actualPlace = DetermineLocation(narrowSize);
 
 		if (!MultiByteToWideChar(CP_UTF8, 0, Input, narrowSize, actualPlace, narrowSize))

@@ -30,7 +30,7 @@ struct CORE_API Commandlet
 
 	const uint32_t GetArgumentsCount() const { return argumentsCount; }
 
-	const char* GetArgumentsList() const { return rawArgumentList; }
+	inline const char* GetArgumentsList() const { return rawArgumentList; }
 
 protected:
 	bool bIsInited = false;

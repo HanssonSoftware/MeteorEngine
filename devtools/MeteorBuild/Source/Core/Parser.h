@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Types/String.h>
+#include <Types/StringW.h>
 
 class Module;
 class Project;
@@ -20,9 +20,9 @@ enum ECharacterType
 
 struct Parser
 {
-	static Module* ParseModuleScript(String* moduleName);
+	static Module* ParseModuleScript(StringW* moduleName);
 
-	static Project* ParseProjectScript(String* projectPath);
+	static Project* ParseProjectScript(StringW* projectPath);
 
 	static ECharacterType GetCharacterType(const char*& str);
 

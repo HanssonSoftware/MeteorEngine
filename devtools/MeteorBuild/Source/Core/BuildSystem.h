@@ -26,7 +26,7 @@ protected:
 
 	bool BuildProjectFiles();
 
-	HANDLE consoleHandle;
+	HANDLE hConsoleRef;
 
 	BaseBuildMethod* currentMethod;
 };

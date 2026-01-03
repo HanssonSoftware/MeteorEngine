@@ -16,5 +16,10 @@ public:
 	virtual void TransmitAssertion(const LogAssertion* Info);
 	virtual void SendToOutputBuffer(const String* Buffer);
 	virtual void HandleFatal(LogDescriptor* Descriptor);
+
+	HANDLE GetOutputHandle() const { return hConsole; }
+
+protected:
+	HANDLE hConsole = nullptr;
 };
 

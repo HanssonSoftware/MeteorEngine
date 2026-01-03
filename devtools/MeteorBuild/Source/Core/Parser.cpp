@@ -32,7 +32,7 @@ static bool AddVerbDetail(Project* projectToWrite, const String& verb, const Str
 	return false;
 }
 
-Module* Parser::ParseModuleScript(String* moduleName)
+Module* Parser::ParseModuleScript(StringW* moduleName)
 {
 	bool bFailed = false;
 
@@ -152,7 +152,7 @@ Module* Parser::ParseModuleScript(String* moduleName)
 	return nullptr;
 }
 
-Project* Parser::ParseProjectScript(String* projectPath)
+Project* Parser::ParseProjectScript(StringW* projectPath)
 {
 	//ScopedPtr<IFile> module = FileManager::CreateFileOperation(projectPath, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
 	//if (module != nullptr)

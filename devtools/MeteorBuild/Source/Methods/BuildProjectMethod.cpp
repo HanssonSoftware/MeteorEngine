@@ -2,6 +2,7 @@
 
 #include "BuildProjectMethod.h"
 #include <Commandlet.h>
+#include <Core/Log.h>
 
 #define	WIN32_LEAN_AND_MEAN
 #define NOGDICAPMASKS
@@ -68,9 +69,7 @@ bool BuildProjectMethod::AcquireRequiredParameters()
         hasRequired++;
 
     if (Commandlet::Get().Parse("-solution", &solution) || Commandlet::Get().Parse("-sln", &solution))
-    {
         alternativeSolutionDir = solution;
-    }
 
     sourceDirectory = source;
     intermediateDirectory = intermediate;
@@ -89,6 +88,7 @@ void BuildProjectMethod::BeginCreating()
 
     Array<StringW> collectedSourcesWithScripts;
     Utils::ListDirectory(formattedSourceDirectory.Data(), collectedSourcesWithScripts);
+
     for (auto& file : collectedSourcesWithScripts)
     {
         wchar_t* ptr = file.Data();
@@ -101,31 +101,51 @@ void BuildProjectMethod::BeginCreating()
                 char moduleDefine[10] = { '\0' };
 
                 DWORD readActually = 0;
-                if (ReadFile(script, moduleDefine, sizeof(moduleDefine) / sizeof(moduleDefine[0]) - 1, &readActually, nullptr) > 0)
+                if (ReadFile(script, moduleDefine, (sizeof(moduleDefine) / sizeof(moduleDefine[0])) - 1, &readActually, nullptr) > 0)
                 {
+                    readActually = 0;
+
                     char* base = moduleDefine;
+                    char* end = base;
 
-                    int count = 0;
-                    while (!isspace(*base))
+                    while (!isspace(*end))
+                        end++;
+
+                    LARGE_INTEGER lg;
+                    GetFileSizeEx(script, &lg);
+
+                    SetFilePointer(script, 0, 0, FILE_BEGIN);
+
+                    char* buffer = new char[lg.QuadPart + 1]();
+                    if (ReadFile(script, buffer, (DWORD)lg.QuadPart, &readActually, nullptr) > 0)
                     {
-                        base++; count++;
+                        switch (DetectScriptType(moduleDefine, end - base))
+                        {
+                        case ScriptType::Project:
+                            ParseProject(buffer);
+                            break;
+                        case ScriptType::Module:
+                            ParseModule(buffer);
+                            break;
+
+                        default:
+                            MR_LOG(LogTemp, Error, "Unable to detect script type!");
+                            break;
+                        }
                     }
 
-                    if (strncmp(moduleDefine, "Module", count) == 0)
-                    {
-                        int j = 5235;
-                    }
-                    else if (strncmp(moduleDefine, "Project", count) == 0)
-                    {
-                        int j = 5235;
-                    }
+                    delete[] buffer;
                 }
                 else
                 {
-                    //MR_LOG(LogBuildSystemFramework, Error, "Failed to read minimum amounts of bytes from file! %ls", *script);
+                    MR_LOG(LogTemp, Error, "Failed to read minimum amounts of bytes from file! %ls", *file);
                 }
 
                 CloseHandle(script);
+            }
+            else
+            {
+                MR_LOG(LogTemp, Error, "Unable to open %ls script!", *file);
             }
         }
     }
@@ -133,19 +153,68 @@ void BuildProjectMethod::BeginCreating()
 
 void BuildProjectMethod::Finalize()
 {
-    LARGE_INTEGER lg;
-    QueryPerformanceCounter(&lg);
-    end = lg.QuadPart;
-
-    LARGE_INTEGER frq;
-    QueryPerformanceFrequency(&frq);
-
-    wchar_t result[256] = {};
-    StringCchPrintfW(result, 256, L"%s method is ran successfully in %.2f seconds!", *name, (end - start) / (double)frq.QuadPart);
-
-    DWORD actual = 0;
-    if (!WriteConsoleW(GetStdHandle(STD_OUTPUT_HANDLE), result, 256, &actual, nullptr))
+    if (BuildSystemLogger* bls = (BuildSystemLogger*)Logger::Get())
     {
+        LARGE_INTEGER lg;
+        QueryPerformanceCounter(&lg);
 
+        LARGE_INTEGER frq;
+        QueryPerformanceFrequency(&frq);
+
+        wchar_t result[256] = {};
+        if (SUCCEEDED((result, 256, L"%s method is ran successfully in %.2f seconds!", *name, (lg.QuadPart - start) / (double)frq.QuadPart)))
+        {
+            DWORD actual = 0;
+            if (!WriteConsoleW(bls->GetOutputHandle(), result, 256, &actual, nullptr))
+            {
+
+            }
+        }
     }
+}
+
+static inline void Specifier()
+{
+
+}
+
+Project* BuildProjectMethod::ParseProject(char* buffer)
+{
+    if (buffer != nullptr)
+    {
+        char* begin = buffer;
+        char* end = begin;
+
+        //ReadFile(fileHandle, )
+        //return ;
+    }
+
+    return nullptr;
+}
+
+Module* BuildProjectMethod::ParseModule(char* buffer)
+{
+    if (buffer != nullptr)
+    {
+        char* begin = buffer;
+        char* end = begin;
+
+        //return ;
+    }
+
+    return nullptr;
+}
+
+BuildProjectMethod::ScriptType BuildProjectMethod::DetectScriptType(const char* buffer, uint32_t length) const noexcept
+{
+    if (!strncmp(buffer, "Project", length))
+    {
+        return ScriptType::Project;
+    }
+    else if (!strncmp(buffer, "Module", length))
+    {
+        return ScriptType::Module;
+    }
+
+    return ScriptType::None;
 }

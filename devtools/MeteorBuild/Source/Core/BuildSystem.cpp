@@ -2,6 +2,7 @@
 
 #include "BuildSystem.h"
 #include <Types/StringW.h>
+#include <Core/Log.h>
 
 #include <Commandlet.h>
 #include <Platform/FileManager.h>
@@ -26,39 +27,19 @@
 LOG_ADDCATEGORY(BuildSystemFramework);
 LOG_ADDCATEGORY(Assembler);
 
-static int WINAPI HRoutine(DWORD dwCtrlType)
-{
-	switch (dwCtrlType)
-	{
-		case CTRL_C_EVENT:
-		case CTRL_BREAK_EVENT:
-		case CTRL_CLOSE_EVENT:
-			GetApplication<BuildSystemApplication>()->Shutdown();
-			break;
-		case CTRL_LOGOFF_EVENT:
-			break;
-		case CTRL_SHUTDOWN_EVENT:
-			break;
-	}
-
-	return 1;
-}
-
 bool BuildSystem::InitFramework()
 {
-	consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	BuildSystemLogger* bl = new BuildSystemLogger;
+	*Logger::Get() = Logger(bl);
 
-	SetStdHandle(STD_INPUT_HANDLE, consoleHandle);
-	SetConsoleOutputCP(CP_UTF8);
-	SetConsoleCP(CP_UTF8);
-	SetConsoleCtrlHandler(HRoutine, 1);
-	SetConsoleTitleW(L"Meteor Build(R)");
+	bl->Initialize();
+	hConsoleRef = bl->GetOutputHandle();
 
 	static constexpr wchar_t header[] = L"========================== MeteorBuild (R) ==========================\n"
 										L"=== Copyright 2020 - 2025, Hansson Software. All rights reserved. ===\r\n\0";
 
 	DWORD written = 0;
-	if (!WriteConsoleW(consoleHandle, header, sizeof(header) / sizeof(header[0]), &written, nullptr))
+	if (!WriteConsoleW(hConsoleRef, header, sizeof(header) / sizeof(header[0]), &written, nullptr))
 	{
 		MessageBoxW(GetConsoleWindow(), L"Failed to write header!", L"MeteorBuild(R) internal error!", MB_ICONERROR | MB_OK);
 		return false;
@@ -85,6 +66,7 @@ bool BuildSystem::ReadArguments()
 	if (Commandlet::Get().Parse("-build", nullptr))
 	{
 		currentMethod = new BuildProjectMethod();
+		return true;
 	}
 	else if (Commandlet::Get().Parse("-rebuild", nullptr))
 	{
@@ -205,7 +187,7 @@ void BuildSystem::SendHelpInfo() const
 	static constexpr const uint32_t helpBSize = sizeof(helpB) / sizeof(helpB[0]);
 
 	DWORD written = 0;
-	if (!WriteConsoleW(consoleHandle, bIsHelpRequested ? helpA : helpB, bIsHelpRequested ? helpASize : helpBSize, &written, nullptr))
+	if (!WriteConsoleW(hConsoleRef, bIsHelpRequested ? helpA : helpB, bIsHelpRequested ? helpASize : helpBSize, &written, nullptr))
 	{
 		MessageBoxW(GetConsoleWindow(), L"Failed to write help!", L"MeteorBuild(R) internal error!", MB_ICONERROR | MB_OK);
 		return;

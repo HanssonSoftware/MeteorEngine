@@ -12,6 +12,7 @@ constexpr inline const bool bIsRunningDebugMode = false;
 class String;
 struct LogDescriptor;
 struct LogAssertion;
+
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)
 #else
@@ -48,6 +49,7 @@ protected:
 	//DelLoggerInitialize loggerInitialized;
 
 	bool bIsInitialized = false;
+
 private:
 	static inline Logger* instance;
 };
