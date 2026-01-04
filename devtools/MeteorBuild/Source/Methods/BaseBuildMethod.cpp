@@ -1,3 +1,3 @@
-/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
+/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "BaseBuildMethod.h"

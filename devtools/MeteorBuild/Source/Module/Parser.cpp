@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
+/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "Parser.h"
 #include <Module/Module.h>
@@ -16,25 +16,22 @@ LOG_ADDCATEGORY(Parser);
 
 static bool AddVerbDetail(Module* moduleToWrite, const String& verb, const String& value)
 {
-	if (verb == "IncludePath" || verb == "IncludePaths") { moduleToWrite->includePaths.Add(value); return true; }
-	if (verb == "Dependencies") { moduleToWrite->requires.Add(value); return true; }
+	//if (verb == "IncludePath" || verb == "IncludePaths") { moduleToWrite->includePaths.Add(value); return true; }
+	//if (verb == "Dependencies") { moduleToWrite->requires.Add(value); return true; }
 
-	MR_LOG(LogParser, Error, "Unknown verb: %ls", *verb);
+	//MR_LOG(LogParser, Error, "Unknown verb: %ls", *verb);
 	return false;
 }
 
 static bool AddVerbDetail(Project* projectToWrite, const String& verb, const String& value)
 {
-	if (verb == "GlobalDefine" || verb == "GlobalDefines") { projectToWrite->globalDefines.Add(value); return true; }
-	if (verb == "Executable") { projectToWrite->launcher = value; return true; }
+	//if (verb == "GlobalDefine" || verb == "GlobalDefines") { projectToWrite->globalDefines.Add(value); return true; }
+	//if (verb == "Executable") { projectToWrite->launcher = value; return true; }
 
-	MR_LOG(LogParser, Error, "Unknown verb: %ls", *verb);
+	//MR_LOG(LogParser, Error, "Unknown verb: %ls", *verb);
 	return false;
 }
 
-Module* Parser::ParseModuleScript(StringW* moduleName)
-{
-	bool bFailed = false;
 
 	//ScopedPtr<IFile> module = FileManager::CreateFileOperation(moduleName, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
 	//if (module != nullptr)
@@ -149,11 +146,8 @@ Module* Parser::ParseModuleScript(StringW* moduleName)
 	//	return nullptr;
 	//}
 
-	return nullptr;
-}
 
-Project* Parser::ParseProjectScript(StringW* projectPath)
-{
+
 	//ScopedPtr<IFile> module = FileManager::CreateFileOperation(projectPath, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
 	//if (module != nullptr)
 	//{
@@ -231,10 +225,7 @@ Project* Parser::ParseProjectScript(StringW* projectPath)
 	//	return nullptr;
 	//}
 
-	return nullptr;
-}
-
-ECharacterType Parser::GetCharacterType(const char*& str)
+ECharacterType GetCharacterType(char*& str)
 {
 	if (!str) return None;
 
@@ -270,11 +261,15 @@ ECharacterType Parser::GetCharacterType(const char*& str)
 	{
 		return Colon;
 	}
+	else if (*constStr == '\0')
+	{
+		return EndOfFile;
+	}
 
 	return None;
 }
 
-void Parser::SkipCharacterType(const char*& str, ECharacterType type)
+bool SkipCharacterType(char*& str, ECharacterType type)
 {
 	if (str)
 	{
@@ -287,26 +282,30 @@ void Parser::SkipCharacterType(const char*& str, ECharacterType type)
 				while (!isspace(*str))
 					str++;
 
-				return;
+				return true;
 			}
 			break;
 		}
 		default:
 			if (GetCharacterType(str) == type)
+			{
 				str++;
-
+				return true;
+			}
 			break;
 		}
 	}
+
+	return false;
 }
 
-String Parser::GetWord(const char*& in, bool bStep)
+String GetWord(char*& in, bool bStep)
 {
 	while (isspace(*in))
 		in++;
 
-	const char* begin = in;
-	const char* end = nullptr;
+	char* begin = in;
+	char* end = nullptr;
 	uint32_t chars = 0;
 
 	if (*begin == '"')
@@ -351,16 +350,22 @@ String Parser::GetWord(const char*& in, bool bStep)
 	return returned;
 }
 
-void Parser::SkipWord(const char*& in)
+bool SkipWord(char*& in, int& line, int& character)
 {
 	if (in)
 	{
 		while (*in && !isspace(*in))
+		{
 			in++;
+		}
+		
+		return true;
 	}
+
+	return false;
 }
 
-bool Parser::IsSpace(const char* buffer)
+bool IsSpace(const char* buffer)
 {
 	return *buffer == ' ' ? true : false;
 }

@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
+/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
 #include <Types/Array.h>
@@ -19,6 +19,7 @@ public:
 
 	//Module* FindModule(const String* name);
 
+	void Shutdown();
 protected:
 	bool ReadArguments();
 

@@ -191,7 +191,7 @@
     <ClCompile Include="Source\Module\Module.cpp" />
     <ClCompile Include="Source\Core\Utils.cpp" />
     <ClCompile Include="Source\Module\Project.cpp" />
-    <ClCompile Include="Source\Core\Parser.cpp" />
+    <ClCompile Include="Source\Module\Parser.cpp" />
     <ClCompile Include="Source\Types\StringW.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -203,7 +203,7 @@
     <ClInclude Include="Source\Module\Launcher.h" />
     <ClInclude Include="Source\Module\Module.h" />
     <ClInclude Include="Source\Module\Project.h" />
-    <ClInclude Include="Source\Core\Parser.h" />
+    <ClInclude Include="Source\Module\Parser.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Source\Core\Utils.h" />
     <ClInclude Include="Source\Types\StringW.h" />

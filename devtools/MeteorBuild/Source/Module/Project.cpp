@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
+/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "Project.h"
 #include <Core/Utils.h>
@@ -10,8 +10,7 @@
 
 LOG_ADDCATEGORY(ProjectScriptParser);
 
-bool Project::Finalize(String* output)
-{
+
 	//if (BuildSystemApplication* app = GetApplication<BuildSystemApplication>())
 	//{
 	//	//const Array<Module>* modules = app->GetBuildSystem().GetModules();
@@ -39,5 +38,3 @@ bool Project::Finalize(String* output)
 	//	return true;
 	//}
 
-	return false;
-}

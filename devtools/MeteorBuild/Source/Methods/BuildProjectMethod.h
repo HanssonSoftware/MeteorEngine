@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
+/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
 #include "BaseBuildMethod.h"
@@ -19,6 +19,8 @@ public:
 
 	virtual void Finalize() override;
 
+	virtual void CleanUp() override;
+
 protected:
 	virtual ~BuildProjectMethod() noexcept = default;
 
@@ -35,6 +37,8 @@ protected:
 
 	ScriptType DetectScriptType(const char* buffer, uint32_t length) const noexcept;
 
+	void SetSpecifier(::Module* module, const char* verb, const char* verbEntry, uint32_t length) noexcept;
+
 	StringW sourceDirectory;
 
 	StringW intermediateDirectory;
@@ -43,6 +47,6 @@ protected:
 
 	Array<StringW> foundScripts;
 
-	//Array<> modules;
+	Array<::Module*> modules;
 };
 

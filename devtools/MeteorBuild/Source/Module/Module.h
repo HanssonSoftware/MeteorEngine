@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
+/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
 #include <Types/String.h>
@@ -8,21 +8,13 @@ class Project;
 
 class Module
 {
+	friend class BuildProjectMethod;
 public:
 	Module() = default;
 
 	virtual	~Module() noexcept = default;
 
-	bool ConstructProjectFile(String* output);
-
-	bool GenerateProxyHeader(String* output);
-
-	bool GenerateBootstrapHeader(String* output);
-
-	bool GetIsParsed() const { return bIsParsed; }
-
-	void SetIsParsed(bool newVal) { bIsParsed = newVal; }
-
+protected:
 	String moduleName; // "Core"
 
 	String defineName; // "CORE(_EXPORTS)"
@@ -42,7 +34,5 @@ public:
 	String identification; // Guid
 
 	Project* parent = nullptr;
-protected:
-	bool bIsParsed = false;
 };
 

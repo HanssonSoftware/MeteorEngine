@@ -1,8 +1,11 @@
-/* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
+/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "BuildProjectMethod.h"
 #include <Commandlet.h>
 #include <Core/Log.h>
+#include <Module/Parser.h>
+#include <Module/Module.h>
+#include <Module/Project.h>
 
 #define	WIN32_LEAN_AND_MEAN
 #define NOGDICAPMASKS
@@ -51,6 +54,8 @@
 
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "Pathcch.lib")
+
+#define INSERT_SPECIFIER(x, statement) if (!strncmp(verb, x, length)) { statement return; }
 
 BuildProjectMethod::BuildProjectMethod() : BaseBuildMethod()
 {
@@ -171,10 +176,14 @@ void BuildProjectMethod::Finalize()
             }
         }
     }
+
+    CleanUp();
 }
 
-static inline void Specifier()
+void BuildProjectMethod::CleanUp()
 {
+    for (auto& module : modules)
+        delete module;
 
 }
 
@@ -196,10 +205,57 @@ Module* BuildProjectMethod::ParseModule(char* buffer)
 {
     if (buffer != nullptr)
     {
+        int line = 1, character = 1;
+
         char* begin = buffer;
         char* end = begin;
 
-        //return ;
+        ::Module* newModule = new ::Module;
+        if (SkipWord(end, line, character))
+        {
+            newModule->moduleName = GetWord(end);
+            if (!SkipCharacterType(end, Colon))
+            {
+                MR_LOG(LogTemp, Fatal, "Module is not associated with any project! %s", *newModule->moduleName);
+                
+                delete newModule;
+                return nullptr;
+            }
+
+            newModule->dependsOn = GetWord(end);
+            while (GetCharacterType(end) != EndOfFile)
+            {
+                if (SkipCharacterType(end, OpenBrace))
+                {
+                    if (String verb = GetWord(end))
+                    {
+                        if (SkipCharacterType(end, Colon) && SkipCharacterType(end, OpenBrace))
+                        {
+                            while (GetCharacterType(end) != ClosedBrace)
+                            {
+                                SkipCharacterType(end, Comma);
+
+                                String entry = GetWord(end);
+                                SetSpecifier(newModule, verb, entry, entry.Length());
+                            }
+                        }
+                    }
+                }
+            }
+
+            int j = 23;
+        }
+
+
+        if (*end != '\0')
+        {
+            MR_LOG(LogTemp, Fatal, "Failed to parse buffer!");
+
+            delete newModule;
+            return nullptr;
+        }
+
+        return nullptr;
     }
 
     return nullptr;
@@ -217,4 +273,17 @@ BuildProjectMethod::ScriptType BuildProjectMethod::DetectScriptType(const char* 
     }
 
     return ScriptType::None;
+}
+
+void BuildProjectMethod::SetSpecifier(::Module* module, const char* verb, const char* verbEntry, uint32_t length) noexcept
+{
+    MR_ASSERT(module != nullptr, "Module is invalid!");
+
+    if (module == nullptr)
+    {
+        MR_LOG(LogTemp, Log, "Unknown specifier! %s", verb);
+        return;
+    }
+
+    INSERT_SPECIFIER("IncludePath", module->includePaths.Add(verbEntry); );
 }

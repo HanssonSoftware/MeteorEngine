@@ -30,7 +30,7 @@
     <ClCompile Include="Source\Module\Project.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\Parser.cpp">
+    <ClCompile Include="Source\Module\Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Module\Launcher.cpp">
@@ -68,7 +68,7 @@
     <ClInclude Include="Source\Module\Project.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Core\Parser.h">
+    <ClInclude Include="Source\Module\Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Module\Launcher.h">
