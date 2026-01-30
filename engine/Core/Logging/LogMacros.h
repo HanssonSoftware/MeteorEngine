@@ -1,12 +1,55 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <MemoryManager.h>
+#include <Resource/MemoryManager.h>
 #include <type_traits>
+#include <stdint.h>
+#include <cstdarg>
 
 #define MERGE(x, y) x##y
 #define MERGE2(x) #x
 
+
+struct LogAssertion
+{
+    friend class Logger;
+
+    LogAssertion() = delete;
+
+    virtual ~LogAssertion() noexcept = default;
+
+    constexpr LogAssertion(const char* inputFile, int inputLine, const char* statement)
+        : assertLocationInFile(inputFile)
+        , assertLineInFile(inputLine)
+        , assertStatement(statement)
+    {
+
+    }
+
+    void SetMessage(const char* message, ...)
+    {
+        va_list d = nullptr;
+        va_start(d, message);
+        const int reqAmount = vsnprintf(nullptr, 0, message, d);
+
+        this->message = GetMemoryManager()->Allocate<char>(reqAmount + 1);
+        if (this->message != nullptr)
+        {
+            vsnprintf(this->message, reqAmount + 1, message, d);
+            va_end(d);
+
+            this->message[reqAmount] = '\0';
+        }
+    }
+
+    uint32_t assertLineInFile = 0;
+
+    const char* assertLocationInFile = nullptr;
+
+    const char* assertStatement = nullptr;
+
+    char* message = nullptr;
+};
 
 enum LogSeverity : short
 {
@@ -29,7 +72,7 @@ struct LogDescriptor
     {
         if (message != nullptr)
         {
-            MemoryManager::Get().Deallocate<char>(message);
+            GetMemoryManager()->Deallocate<char>(message);
         }
     }
 
@@ -48,11 +91,9 @@ struct LogDescriptor
         va_start(d, message);
         const int reqAmount = vsnprintf(nullptr, 0, message, d);
 
-        this->message = MemoryManager::Get().Allocate<char>(reqAmount + 1);
+        this->message = GetMemoryManager()->Allocate<char>(reqAmount + 1);
         if (this->message != nullptr)
         {
-            memset(this->message, 0, reqAmount + 1);
-
             vsnprintf(this->message, reqAmount + 1, message, d);
             va_end(d);
 
@@ -108,8 +149,9 @@ LOG_ADDCATEGORY(Temp);
     do { \
         if (!(expression)) \
         {   \
-            /*LogAssertion asserta(__FILE__, __LINE__, #expression, message, __VA_ARGS__);*/\
-            if (/*Logger::Get()->TransmitAssertion(&asserta) == 1*/1) __debugbreak(); \
+            LogAssertion asserta(__FILE__, __LINE__, #expression);\
+            asserta.SetMessage(message, __VA_ARGS__);\
+            if (Logger* inst = Logger::Get()) { inst->TransmitAssertion(&asserta); __debugbreak(); }\
                                                              \
         }                                                                      \
     } while (0)

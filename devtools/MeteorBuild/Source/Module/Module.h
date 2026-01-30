@@ -23,7 +23,7 @@ protected:
 
 	String modulePath; // ..\\Core.mrbuild
 
-	String dependsOn; // "Meteor"
+	String parent; // "Meteor"
 
 	Array<String> files; // Detected sources
 
@@ -32,7 +32,5 @@ protected:
 	Array<String> requires; // Dependency modules: Core, Platform, etc.
 
 	String identification; // Guid
-
-	Project* parent = nullptr;
 };
 

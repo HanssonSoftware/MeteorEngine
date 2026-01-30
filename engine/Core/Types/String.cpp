@@ -3,7 +3,7 @@
 #include "String.h"
 #include <Logging/Log.h>
 
-#include <MemoryManager.h>
+#include <Resource/MemoryManager.h>
 
 #pragma warning(disable : 26495)
 #pragma warning(disable : 5082) // second argument to 'va_start' is not the last named parameter
@@ -14,7 +14,7 @@ LOG_ADDCATEGORY(StringSet);
 String::~String() noexcept
 {
 	if (bIsUsingHeap && heapBuffer.ptr)
-		MemoryManager::Get().Deallocate<char>(heapBuffer.ptr);
+		GetMemoryManager()->Deallocate<char>(heapBuffer.ptr);
 
 	NullOut();
 
@@ -120,7 +120,7 @@ String::String(const String& other)
 	{
 		heapBuffer.capacity = other.heapBuffer.capacity;
 		heapBuffer.length = other.heapBuffer.length;
-		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity * sizeof(wchar_t));
+		heapBuffer.ptr = GetMemoryManager()->Allocate<char>(heapBuffer.capacity * sizeof(wchar_t));
 
 		memset(heapBuffer.ptr, 0, heapBuffer.capacity);
 		strncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
@@ -155,18 +155,6 @@ String::String(const char* Input, uint32_t length)
 #endif // MR_DEBUG
 }
 
-String::String(const wchar_t* string, uint32_t length)
-{
-	NullOut();
-	
-
-#ifdef MR_DEBUG
-	bIsInited = true;	
-	functionWhereWasInited = __FUNCSIG__;
-#endif // MR_DEBUG
-}
-
-
 String String::operator+(const String& Other)
 {
 	//const char* thisData = Data();
@@ -179,7 +167,7 @@ String String::operator+(const String& Other)
 
 	//if (this->bIsUsingHeap)
 	//{
-	//	ScopedPtr<char> newBuffer = MemoryManager::Get().Allocate<char>(thisSize + otherSize + 1u);
+	//	ScopedPtr<char> newBuffer = GetMemoryManager()->Allocate<char>(thisSize + otherSize + 1u);
 	//	memcpy(newBuffer.Get(), thisData, thisSize);
 	//	memcpy(newBuffer.Get() + thisSize, otherData, otherSize);
 
@@ -215,14 +203,14 @@ String String::Format(const String& format, ...)
 	const int sizeForVA = vsnprintf(nullptr, 0, formattingBuffer, a_cpy);
 	va_end(a_cpy);
 
-	char* newFormattedBuffer = MemoryManager::Get().Allocate<char>(sizeForVA + 1);
+	char* newFormattedBuffer = GetMemoryManager()->Allocate<char>(sizeForVA + 1);
 
 	const int result = vsnprintf(newFormattedBuffer, sizeForVA + 1 ,formattingBuffer, a);
 	va_end(a);
 
 	String stringized(newFormattedBuffer);
 
-	MemoryManager::Get().Deallocate(newFormattedBuffer);
+	GetMemoryManager()->Deallocate(newFormattedBuffer);
 	return stringized;
 }
 
@@ -251,7 +239,7 @@ char* String::DetermineLocation(uint32_t size)
 	if (bIsUsingHeap)
 	{
 		heapBuffer.capacity = size * 2;
-		heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity * sizeof(wchar_t));
+		heapBuffer.ptr = GetMemoryManager()->Allocate<char>(heapBuffer.capacity * sizeof(wchar_t));
 		heapBuffer.length = size;
 
 		memset(heapBuffer.ptr, 0, heapBuffer.capacity);
@@ -271,7 +259,7 @@ String& String::operator=(const String& other)
 		{
 			heapBuffer.capacity = other.heapBuffer.capacity;
 			heapBuffer.length = other.heapBuffer.length;
-			heapBuffer.ptr = MemoryManager::Get().Allocate<char>(heapBuffer.capacity * sizeof(wchar_t));
+			heapBuffer.ptr = GetMemoryManager()->Allocate<char>(heapBuffer.capacity * sizeof(wchar_t));
 
 			memset(heapBuffer.ptr, 0, heapBuffer.capacity);
 			strncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
@@ -309,7 +297,7 @@ String& String::operator+=(const String& other)
 		if (heapBuffer.capacity <= newLen)
 		{
 			const uint32_t newCap = newLen * 2;
-			char* newPtr = MemoryManager::Get().Allocate<char>(newCap * sizeof(wchar_t));
+			char* newPtr = GetMemoryManager()->Allocate<char>(newCap * sizeof(wchar_t));
 			memset(newPtr, 0, newCap);
 
 			if (heapBuffer.ptr && thisLen > 0)
@@ -318,7 +306,7 @@ String& String::operator+=(const String& other)
 			memcpy(newPtr + thisLen, otherData, otherLen);
 
 			if (heapBuffer.ptr)
-				MemoryManager::Get().Deallocate<char>(heapBuffer.ptr);
+				GetMemoryManager()->Deallocate<char>(heapBuffer.ptr);
 
 			heapBuffer.ptr = newPtr;
 			heapBuffer.capacity = newCap;
@@ -342,7 +330,7 @@ String& String::operator+=(const String& other)
 		else
 		{
 			const uint32_t newCap = newLen * 2;
-			char* newPtr = MemoryManager::Get().Allocate<char>(newCap * sizeof(char));
+			char* newPtr = GetMemoryManager()->Allocate<char>(newCap * sizeof(char));
 			memset(newPtr, 0, newCap);
 
 			if (thisLen > 0)

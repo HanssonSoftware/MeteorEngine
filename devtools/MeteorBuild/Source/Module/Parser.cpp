@@ -308,20 +308,20 @@ String GetWord(char*& in, bool bStep)
 	char* end = nullptr;
 	uint32_t chars = 0;
 
-	if (*begin == '"')
-	{
-		begin++; // "
-		end = begin;
+	//if (*begin == '"')
+	//{
+	//	begin++; // "
+	//	end = begin;
 
-		while (*end && /*isalpha(*end)*/ *end != '"')
-		{
-			chars++;
-			end++;
-		}
+	//	while (*end && /*isalpha(*end)*/ *end != '"')
+	//	{
+	//		chars++;
+	//		end++;
+	//	}
 
-		end++;
-	}
-	else if (*begin == '$')
+	//	end++;
+	//}
+	if (*begin == '$')
 	{
 		end = begin;
 
@@ -343,6 +343,41 @@ String GetWord(char*& in, bool bStep)
 
 		chars = (uint32_t)(end - begin);
 	}
+
+	String returned(begin, chars);
+	if (bStep) in = end;
+
+	return returned;
+}
+
+String GetQuotedWord(char*& in, bool bStep)
+{
+	while (isspace(*in))
+		in++;
+
+	in++; // "
+
+	char* begin = in;
+	char* end = nullptr;
+	uint32_t chars = 0;
+
+	if (/**begin == '$'*/false)
+	{
+ 	//	end = begin;
+		//end++;
+
+		//while (*end != ')' && isalpha(*end)) end++;
+		//chars = (uint32_t)(end - begin);
+	}
+	else
+	{
+		end = begin;
+
+		while (*end != '"') end++;
+		chars = (uint32_t)(end - begin);
+	}
+
+	end++; // "
 
 	String returned(begin, chars);
 	if (bStep) in = end;

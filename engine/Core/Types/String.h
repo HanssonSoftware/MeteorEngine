@@ -1,9 +1,12 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
+#include <Resource/ResourceAgent.h>
+
 #define _CRT_SECURE_NO_WARNINGS
 #include <string>
 #include <stdint.h>
+
 
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)
@@ -12,7 +15,7 @@
 #endif // MR_CORE_EXPORTS
 
 /** Human readable piece of text. */
-class CORE_API String
+class CORE_API String : public IResourceAgent
 {
 	friend class StringW;
 public:
@@ -40,8 +43,6 @@ public:
 	String(const String& other);
 
 	String(const char* string, uint32_t length);
-
-	String(const wchar_t* string, uint32_t length);
 
 	String(String&& other) noexcept;
 
@@ -100,17 +101,17 @@ public:
 	{
 		return bIsUsingHeap ? 
 			heapBuffer.length == 0 || heapBuffer.ptr == nullptr : 
-			stackBuffer.length == 0 || stackBuffer.ptr[0] == L'\0';
+			stackBuffer.length == 0 || stackBuffer.ptr[0] == '\0';
 	}
 
 	int ToInt() const noexcept
 	{
-		return std::stol(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr, 0);
+		return strtol(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr, 10);
 	}
 
 	float ToFloat() const noexcept
 	{
-		return std::stof(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr);
+		return strtof(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, nullptr);
 	}
 
 	const uint32_t Length() const noexcept
@@ -160,7 +161,6 @@ private:
 		struct
 		{
 			char* ptr = nullptr;
-
 			uint32_t length = 0;
 
 			uint32_t capacity = 0;
@@ -168,8 +168,8 @@ private:
 		} heapBuffer;
 
 		struct
-		{ 
-			char ptr[sizeof(heapBuffer) - sizeof(uint32_t)] = {L'\0'};
+		{
+			char ptr[sizeof(heapBuffer) - sizeof(uint32_t)] = {'\0'};
 
 			uint32_t length = 0;
 
@@ -183,10 +183,26 @@ private:
 #ifdef MR_DEBUG
 	bool bIsInited = false;
 
-	// enum instantiationStatus { None, Valid, NeedsClean, Error, Empty } status = None;
-
 	const char* functionWhereWasInited = nullptr;
 #endif // MR_DEBUG
 };
 
-String operator+(const String& OtherA, const String& OtherB);
+struct StringView
+{
+	StringView() = delete;
+
+	StringView(const char* data, uint32_t length)
+		: ptr(data)
+		, size(length)
+	{
+
+	}
+
+	virtual ~StringView() noexcept = default;
+
+	const char* ptr = nullptr;
+
+	const uint32_t size = 0;
+};
+
+//String operator+(const String& OtherA, const String& OtherB);

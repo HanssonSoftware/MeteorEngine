@@ -25,6 +25,8 @@ bool SkipCharacterType(char*& str, ECharacterType type);
 
 String GetWord(char*& in, bool bStep = true);
 
+String GetQuotedWord(char*& in, bool bStep = true);
+
 bool SkipWord(char*& in, int& line, int& character);
 
 bool IsSpace(const char* buffer);

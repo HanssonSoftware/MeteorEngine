@@ -1,5 +1,4 @@
 D:\Meteor-Engine\engine\Core\Logging\Log.cpp;D:\Meteor-Engine\Intermediate\Meteor\Log.obj
-D:\Meteor-Engine\engine\Core\Logging\LogAssertion.cpp;D:\Meteor-Engine\Intermediate\Meteor\LogAssertion.obj
 D:\Meteor-Engine\engine\Core\Object\Object.cpp;D:\Meteor-Engine\Intermediate\Meteor\Object.obj
 D:\Meteor-Engine\engine\Core\Application.cpp;D:\Meteor-Engine\Intermediate\Meteor\Application.obj
 D:\Meteor-Engine\engine\Core\Commandlet.cpp;D:\Meteor-Engine\Intermediate\Meteor\Commandlet.obj
@@ -7,7 +6,10 @@ D:\Meteor-Engine\engine\Core\Layers\Layer.cpp;D:\Meteor-Engine\Intermediate\Mete
 D:\Meteor-Engine\engine\Core\Layers\LayerManager.cpp;D:\Meteor-Engine\Intermediate\Meteor\LayerManager.obj
 D:\Meteor-Engine\engine\Core\Types\String.cpp;D:\Meteor-Engine\Intermediate\Meteor\String.obj
 D:\Meteor-Engine\engine\Core\Types\Vector.cpp;D:\Meteor-Engine\Intermediate\Meteor\Vector.obj
-D:\Meteor-Engine\engine\Core\MemoryManager.cpp;D:\Meteor-Engine\Intermediate\Meteor\MemoryManager.obj
+D:\Meteor-Engine\engine\Core\Resource\MemoryManager.cpp;D:\Meteor-Engine\Intermediate\Meteor\MemoryManager.obj
 D:\Meteor-Engine\engine\Core\Module\ModuleManager.cpp;D:\Meteor-Engine\Intermediate\Meteor\ModuleManager.obj
 D:\Meteor-Engine\engine\Core\Module\Module.cpp;D:\Meteor-Engine\Intermediate\Meteor\Module.obj
-D:\Meteor-Engine\engine\Spec\LaunchMeteorSuite.h;D:\Meteor-Engine\Intermediate\Meteor\LaunchMeteorSuite.obj
+D:\Meteor-Engine\engine\Core\Special\LaunchMeteorSuite.h;D:\Meteor-Engine\Intermediate\Meteor\LaunchMeteorSuite.obj
+D:\Meteor-Engine\engine\Core\Types\Map.cpp;D:\Meteor-Engine\Intermediate\Meteor\Map.obj
+D:\Meteor-Engine\engine\Core\Resource\MemoryPackage.cpp;D:\Meteor-Engine\Intermediate\Meteor\MemoryPackage.obj
+D:\Meteor-Engine\engine\Core\Resource\MemoryRegion.cpp;D:\Meteor-Engine\Intermediate\Meteor\MemoryRegion.obj

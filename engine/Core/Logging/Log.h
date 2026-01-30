@@ -51,7 +51,7 @@ protected:
 	bool bIsInitialized = false;
 
 private:
-	static inline Logger* instance;
+	static inline Logger* instance = nullptr;
 };
 
 #include "LogMacros.h"

@@ -4,6 +4,10 @@
 #include <Commandlet.h>
 #include <Types/String.h>
 
+#define USER
+#define MB
+#include <Windows/Windows.h>
+
 Logger::Logger(Logger* newInstance)
 {
     instance = newInstance;
@@ -76,21 +80,18 @@ void Logger::TransmitMessage(LogDescriptor* Descriptor)
 
 void Logger::TransmitAssertion(const LogAssertion* Info)
 {
-	//if (!Info) return;
+	if (!Info) return;
 
- //   MessageBoxDescriptor mbxInfo = {};
- //   mbxInfo.Description = String::Format(
- //       "Assertion failed: %ls\tLine: %d\tFile: %ls\n",
- //       Info->assertStatement,
- //       Info->assertLineInFile,
- //       Info->assertLocationInFile
- //   );
- //   mbxInfo.Title = "Assertion failed";
-
-    //systemLayer->AddMessageBox(&mbxInfo);
+#ifdef MR_PLATFORM_WINDOWS
+    MessageBoxA(nullptr, Info->message, "Assertion failed!", MB_ICONEXCLAMATION | MB_OK);
+#endif // MR_PLATFORM_WINDOWS
 }
 
 void Logger::SendToOutputBuffer(const String* Buffer)
 {
-    // purposely leaved on empty
+#if defined(MR_PLATFORM_WINDOWS) && defined(MR_DEBUG)
+    OutputDebugStringA(*Buffer);
+    //OutputDebugStringA("\n");
+#endif // MR_PLATFORM_WINDOWS && MR_DEBUG
+
 }

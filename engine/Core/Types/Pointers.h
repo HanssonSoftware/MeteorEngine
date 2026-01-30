@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include "MemoryManager.h"
+#include "Resource/MemoryManager.h"
 // #include <CoreProxy.h>
 /**
  * ScopedPtr owns a pointer, so you don't have to think about deleting it.
@@ -26,7 +26,7 @@ public:
 	{
 		if (ptr != nullptr)
 		{
-			MemoryManager::Get().Deallocate<T>(ptr); //delete ptr;
+			//GetMemoryManager()->Deallocate<T>(ptr); //delete ptr;
 			ptr = nullptr;
 		}
 	};

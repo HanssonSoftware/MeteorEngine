@@ -24,9 +24,11 @@ public:
 protected:
 	virtual ~BuildProjectMethod() noexcept = default;
 
-	virtual Project* ParseProject(char* buffer);
-
 	virtual Module* ParseModule(char* buffer);
+
+	virtual inline String GenerateGUID() const;
+
+	String ConvertPath(StringW* wideBuffer);
 
 	enum ScriptType
 	{
@@ -35,9 +37,11 @@ protected:
 		Project
 	};
 
-	ScriptType DetectScriptType(const char* buffer, uint32_t length) const noexcept;
+	inline BuildProjectMethod::ScriptType DetectScriptType(const char* buffer, uint32_t length) const noexcept;
 
-	void SetSpecifier(::Module* module, const char* verb, const char* verbEntry, uint32_t length) noexcept;
+	inline void SetSpecifierForModule(::Module* module, const char* verb, const char* verbEntry, uint32_t length) noexcept;
+
+	inline void SetSpecifierForProject(::Project* project, const char* verb, const char* verbEntry, uint32_t length) noexcept;
 
 	StringW sourceDirectory;
 

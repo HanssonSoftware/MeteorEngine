@@ -238,18 +238,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="engine\Core\Logging\Log.cpp" />
-    <ClCompile Include="engine\Core\Logging\LogAssertion.cpp" />
     <ClCompile Include="engine\Core\Object\Object.cpp" />
     <ClCompile Include="engine\Core\Application.cpp" />
     <ClCompile Include="engine\Core\Commandlet.cpp" />
     <ClCompile Include="engine\Core\Layers\Layer.cpp" />
     <ClCompile Include="engine\Core\Layers\LayerManager.cpp" />
+    <ClCompile Include="engine\Core\Types\Name.cpp" />
     <ClCompile Include="engine\Core\Types\String.cpp" />
     <ClCompile Include="engine\Core\Types\Vector.cpp" />
-    <ClCompile Include="engine\Core\MemoryManager.cpp" />
+    <ClCompile Include="engine\Core\Resource\MemoryManager.cpp" />
     <ClCompile Include="engine\Core\Module\ModuleManager.cpp" />
     <ClCompile Include="engine\Core\Module\Module.cpp" />
-    <ClCompile Include="engine\Spec\LaunchMeteorSuite.h" />
+    <ClCompile Include="engine\Core\Special\LaunchMeteorSuite.h" />
+    <ClCompile Include="engine\Core\Types\Map.cpp" />
+    <ClCompile Include="engine\Core\Resource\MemoryPackage.cpp" />
+    <ClCompile Include="engine\Core\Resource\MemoryRegion.cpp" />
+    <ClCompile Include="engine\Core\Types\NameCollection.cpp" />
+    <ClCompile Include="engine\Core\Resource\ResourceAgent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Common\Maths.h" />
@@ -264,7 +269,7 @@
     <ClInclude Include="engine\Core\TEMPIMPORT.h" />
     <ClInclude Include="engine\Core\Types\Array.h" />
     <ClInclude Include="engine\Core\Types\Delegate.h" />
-    <ClInclude Include="engine\Core\Types\Cast.h" />
+    <ClInclude Include="engine\Core\Types\Name.h" />
     <ClInclude Include="engine\Core\Types\String.h" />
     <ClInclude Include="engine\Core\Types\Traits.h" />
     <ClInclude Include="engine\Core\Types\Vector.h" />
@@ -350,16 +355,20 @@
     <ClInclude Include="engine\ThirdParty\assimp\XmlParser.h" />
     <ClInclude Include="engine\ThirdParty\assimp\XMLTools.h" />
     <ClInclude Include="engine\ThirdParty\assimp\ZipArchiveIOSystem.h" />
-    <ClInclude Include="engine\Spec\Version.h" />
+    <ClInclude Include="engine\Core\Special\Version.h" />
     <ClInclude Include="engine\Core\Types\Pointers.h" />
-    <ClInclude Include="engine\Core\Logging\LogAssertion.h" />
-    <ClInclude Include="engine\Core\MemoryManager.h" />
+    <ClInclude Include="engine\Core\Resource\MemoryManager.h" />
     <ClInclude Include="engine\Core\Module\ModuleManager.h" />
     <ClInclude Include="engine\Core\Types\Iterator.h" />
     <ClInclude Include="engine\Core\Module\Module.h" />
     <ClInclude Include="engine\Core\Layers\ThreadPool.h" />
     <ClInclude Include="engine\Platform\WindowManager\WindowMenu.h" />
     <ClInclude Include="engine\Platform\WindowManager\WindowExtender.h" />
+    <ClInclude Include="engine\Core\Types\Map.h" />
+    <ClInclude Include="engine\Core\Resource\MemoryPackage.h" />
+    <ClInclude Include="engine\Core\Resource\MemoryRegion.h" />
+    <ClInclude Include="engine\Core\Types\NameCollection.h" />
+    <ClInclude Include="engine\Core\Resource\ResourceAgent.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="engine\Engine.mrbuild" />
@@ -372,6 +381,9 @@
     <None Include="engine\ThirdParty\assimp\vector2.inl" />
     <None Include="engine\ThirdParty\assimp\vector3.inl" />
     <None Include="Resources\d1.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="engine\Core\Core.natvis" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

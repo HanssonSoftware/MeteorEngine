@@ -2,11 +2,11 @@
 
 #include "Application.h"
 #include <Types/String.h>
-#include <MemoryManager.h>
+#include <Resource/MemoryManager.h>
 #include <Platform/FileManager.h>
 
 #include <Methods/BaseBuildMethod.h>
-#include <Spec/LaunchMeteorSuite.h>
+#include <Special/LaunchMeteorSuite.h>
 #include <Platform/Platform.h>
 
 //#pragma comment(lib, "Shell32.lib")

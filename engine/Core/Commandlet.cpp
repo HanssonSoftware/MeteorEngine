@@ -6,11 +6,10 @@
 #include <Types/Array.h>
 #include <Platform/PlatformLayout.h>
 
-#ifdef MR_PLATFORM_WINDOWS
+#define KERNEL
+#define NLS
 #include <Windows/Windows.h>
-#endif // MR_PLATFORM_WINDOWS
-
-#include <MemoryManager.h>
+#include <Resource/MemoryManager.h>
 
 #pragma warning(disable : 6031)
 
@@ -39,7 +38,7 @@ void Commandlet::Initialize(int argumentCount, char argumentList[])
 		token = strtok(nullptr, " ");
 	}
 
-
+	argumentsCount = parsedWords.GetSize();
 	bIsInited = true;
 }
 
@@ -54,7 +53,7 @@ void Commandlet::Shutdown()
 
 bool Commandlet::Parse(const String& inParam, String* returnVal)
 {
-	for (uint32_t i = 0; i < argumentsCount + 1; i++)
+	for (uint32_t i = 0; i < argumentsCount; i++)
 	{
 		String& item = parsedWords[i];
 

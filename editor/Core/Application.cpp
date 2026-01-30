@@ -1,7 +1,8 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "Application.h"
-#include <MemoryManager.h>
+#include <Resource/MemoryManager.h>
+#include <Special/LaunchMeteorSuite.h>
 #include <Types/String.h>
 #include <Layers/LayerManager.h>
 #include <iostream>
@@ -28,27 +29,6 @@ void EditorApplication::Init()
 {
 	Application::Init();
 	
-	int32_t j = 76;
-	String ad = "fasz";
-	Array<int32_t> is(4);
-	for (uint32_t i = 0; i < is.GetSize(); i++)
-	{
-		int32_t& a = is[i];
-
-		a = i + 1000;
-	}
-
-	is.Add(j);
-	is.Pop(3);
-
-	for (int32_t i : is)
-	{
-		int32_t jsa = 523;
-	}
-
-	//MemoryManager::Deallocate(asd);
-
-	EditorLayer Super("Editor Layer");
 
 	Application::Run();
 }
@@ -63,4 +43,4 @@ void EditorApplication::Shutdown()
 	Application::Shutdown();
 }
 
-IMPLEMENT_APPLICATION(EditorApplication);
+IMPLEMENT_WINDOWS_STARTUP("MeteorEngine-Core", EditorApplication);

@@ -1,3 +1,9 @@
 /* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
-#include "EditorLayer.h"
+#pragma once
+
+struct IResourceAgent
+{
+	
+};
+

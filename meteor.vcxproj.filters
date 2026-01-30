@@ -36,7 +36,7 @@
     <ClCompile Include="engine\Core\Object\Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\MemoryManager.cpp">
+    <ClCompile Include="engine\Core\Resource\MemoryManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Module\ModuleManager.cpp">
@@ -45,13 +45,28 @@
     <ClCompile Include="engine\Core\Module\Module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Spec\LaunchMeteorSuite.h">
+    <ClCompile Include="engine\Core\Special\LaunchMeteorSuite.h">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Logging\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Logging\LogAssertion.cpp">
+    <ClCompile Include="engine\Core\Types\Map.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Resource\MemoryPackage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Resource\MemoryRegion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Types\Name.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Types\NameCollection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Resource\ResourceAgent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,16 +89,13 @@
     <ClInclude Include="engine\Core\Types\Delegate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Types\Cast.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Types\String.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Types\Vector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Spec\Version.h">
+    <ClInclude Include="engine\Core\Special\Version.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\ThirdParty\assimp\Compiler\poppack1.h">
@@ -344,10 +356,7 @@
     <ClInclude Include="engine\Core\Layers\ThreadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Logging\LogAssertion.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\MemoryManager.h">
+    <ClInclude Include="engine\Core\Resource\MemoryManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Module\ModuleManager.h">
@@ -380,6 +389,24 @@
     <ClInclude Include="engine\Core\TEMPIMPORT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="engine\Core\Types\Map.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Resource\MemoryPackage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Resource\MemoryRegion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Types\Name.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Types\NameCollection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Resource\ResourceAgent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\d1.bin">
@@ -410,5 +437,8 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="engine\Engine.mrbuild" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="engine\Core\Core.natvis" />
   </ItemGroup>
 </Project>

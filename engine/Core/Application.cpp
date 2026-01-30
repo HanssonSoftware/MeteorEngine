@@ -4,7 +4,7 @@
 #include <WindowManager/WindowManager.h>
 #include <Platform/FileManager.h>
 
-#include <MemoryManager.h>
+#include <Resource/MemoryManager.h>
 #include <Layers/LayerManager.h>
 #include "Commandlet.h"
 
@@ -18,8 +18,6 @@
 Application::Application()
 {
     appFramework = this;
-
-    MemoryManager::Get().Initialize(0.15f);
 }
 
 
@@ -68,7 +66,7 @@ void Application::Shutdown()
 
         Logger::Get()->Shutdown();
 
-        MemoryManager::Get().Shutdown();
+        GetMemoryManager()->Shutdown();
     }
 
 #ifdef MR_DEBUG
@@ -82,6 +80,7 @@ extern "C" __declspec(dllexport) int LaunchApplication(Application* instance, in
     if (instance != nullptr)
     {
         Commandlet::Get().Initialize(argc, argv);
+        GetMemoryManager()->Initialize();
         instance->Init();
         returnCode = instance->GetRequestExitCode();
         Commandlet::Get().Shutdown();

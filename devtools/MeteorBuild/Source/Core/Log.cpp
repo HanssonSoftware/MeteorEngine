@@ -67,9 +67,15 @@ void BuildSystemLogger::Shutdown()
 	CloseHandle(hConsole);
 }
 
+static StringW fullMessage;
 void BuildSystemLogger::TransmitMessage(LogDescriptor* Descriptor)
 {
 	
+	
+	//MultiByteToWideChar(CP_UTF8, 0, Descriptor->message, -1, nullptr, 0);
+
+	//FormatConsoleColorBySeverity(Descriptor->severity);
+	//SendToOutputBuffer(nullptr);
 }
 
 void BuildSystemLogger::TransmitAssertion(const LogAssertion* Info)
@@ -79,23 +85,37 @@ void BuildSystemLogger::TransmitAssertion(const LogAssertion* Info)
 
 void BuildSystemLogger::SendToOutputBuffer(const String* Buffer)
 {
-	wchar_t* super = MemoryManager::Get().Allocate<wchar_t>(Buffer->Length() + 1);
-	if (!MultiByteToWideChar(CP_UTF8, 0, **Buffer, Buffer->Length() * sizeof(char), super, Buffer->Length()))
-	{
-
-
-		MemoryManager::Get().Deallocate(super);
-	}
-
 	DWORD written = 0;
-	if (!WriteConsoleW(hConsole, super, Buffer->Length(), &written, nullptr))
+
+	if (!WriteConsoleW(hConsole, fullMessage, fullMessage.Length(), &written, nullptr))
 	{
 
 	}
 
-	MemoryManager::Get().Deallocate(super);
+	//FormatConsoleColorBySeverity(Log);
 }
 
 void BuildSystemLogger::HandleFatal(LogDescriptor* Descriptor)
 {
+}
+
+static constexpr inline void FormatConsoleColorBySeverity(short Severity) noexcept
+{
+	switch (Severity)
+	{
+	case Log:
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 37);
+		break;
+	case Warn:
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 33);
+		break;
+	case Error:
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 31);
+		break;
+	case Fatal:
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 31);
+		break;
+	case Verbose:
+		break;
+	}
 }
