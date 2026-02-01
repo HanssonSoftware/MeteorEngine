@@ -32,6 +32,8 @@ public:
 		regionSize = (uint32_t)(end - start);
 	};
 
+	bool CheckOccupation(uint32_t size) { return false; };
+
 	MemoryRegion* GetPreviousRegion() const { return prevRegion; };
 	MemoryRegion* GetNextRegion() const { return nextRegion; };
 

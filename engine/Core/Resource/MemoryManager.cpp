@@ -7,10 +7,12 @@
 #include <cstdlib>
 //#include <Platform/Platform.h>
 
+#include <Special/EngineConstants.h>
 
 LOG_ADDCATEGORY(Arena);
 
 static MemoryManager* object = new MemoryManager;
+inline constexpr uint64_t minRam = /*8589934592u*/1 * 1024 * 1024 * 1024; /* Equivalent for 1GB */
 
 struct
 {
@@ -42,14 +44,21 @@ MemoryManager* GetMemoryManager()
 
 void MemoryManager::Initialize()
 {
-	totalMemory = DetermineBestAmount();
+	uint64_t initialMemory = ReadFromCommandline();
+	if (initialMemory == 0)
+	{
+		initialMemory = CalculateInitialFromParameters();
+
+	}
 
 #ifdef MR_PLATFORM_WINDOWS
-	begin = (uint8_t*)VirtualAlloc(nullptr, totalMemory, MEM_RESERVE, PAGE_READWRITE);
+	begin = (uint8_t*)VirtualAlloc(nullptr, initialMemory, MEM_RESERVE, PAGE_READWRITE);
+	if (!begin)
+	{
 
-	MR_ASSERT(begin != nullptr, "Failed to reserve, the engine recommended memory! Application exiting...");
+	}
 
-	end = (uint8_t*)begin + totalMemory;
+	end = (uint8_t*)begin + initialMemory;
 #else
 #error MemoryManager class (Initialize) is only implemented to windows.
 #endif // MR_PLATFORM_WINDOWS
@@ -95,30 +104,8 @@ void MemoryManager::FillBlocks(uint64_t blocksToFill, uint64_t size)
 
 }
 
-uint64_t MemoryManager::AlignToNearest(uint64_t x, uint64_t y)
+uint64_t MemoryManager::ReadFromCommandline()
 {
-	return (x + y / 2) & ~(y - 1);
-}
-
-static constexpr uint64_t minRam = /*8589934592u*/1 * 1024 * 1024 * 1024; /* Equivalent for 8GB */
-
-uint64_t MemoryManager::DetermineBestAmount()
-{
-#ifdef MR_PLATFORM_WINDOWS
-	MEMORYSTATUSEX longlong = { sizeof(MEMORYSTATUSEX) };
-	GlobalMemoryStatusEx(&longlong);
-
-	if (longlong.ullTotalPhys < minRam)
-	{
-		MessageBoxW(nullptr, L"Your PC does not have enough memory! You need at least 1GB of RAM.", L"Engine error!", MB_OK);
-
-		TerminateProcess(GetCurrentProcess(), UINT_MAX);
-		return 0;
-	}
-
-	SYSTEM_INFO si = {};
-	GetSystemInfo(&si);
-
 	String maxRam;
 	uint64_t hasMaxRamSwitch = 0;
 	if (Commandlet::Get().Parse("-maxram", &maxRam))
@@ -128,12 +115,71 @@ uint64_t MemoryManager::DetermineBestAmount()
 		{
 			MR_LOG(LogArena, Warn, "Invalid parameter detail provided for: -maxram was: %s", *maxRam);
 		}
+
+		return hasMaxRamSwitch;
 	}
 
-	return hasMaxRamSwitch > 0 ? 
-		longlong.ullTotalPageFile >= hasMaxRamSwitch ? hasMaxRamSwitch : 
-		longlong.ullTotalPageFile * 0.4 : 
-		longlong.ullTotalPageFile * 0.4;
+	return 0;
+}
+
+uint64_t MemoryManager::CalculateInitialFromParameters()
+{
+	MEMORYSTATUSEX longlong = { sizeof(MEMORYSTATUSEX) };
+	GlobalMemoryStatusEx(&longlong);
+
+	if (longlong.ullTotalPhys < minRam)
+	{
+		MessageBoxW(nullptr, L"Your computer does not have enough memory!", WIDE_ENGINE_NAME_SPACE, MB_ICONERROR | MB_OK);
+
+		TerminateProcess(GetCurrentProcess(), UINT_MAX);
+		return;
+	}
+
+
+
+	return 0;
+}
+
+constexpr uint64_t MemoryManager::CeilPow2(uint64_t x) noexcept
+{
+	if (x <= 1) return 1;
+	x--;
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	x |= x >> 32;
+	return x + 1;
+}
+
+constexpr uint64_t MemoryManager::FloorPow2(uint64_t x) noexcept
+{
+	if (x == 0) return 0;
+	x |= x >> 1;
+	x |= x >> 2;
+	x |= x >> 4;
+	x |= x >> 8;
+	x |= x >> 16;
+	x |= x >> 32;
+	return x - (x >> 1);
+}
+
+constexpr uint64_t MemoryManager::AlignUp(uint64_t x, uint64_t a) noexcept
+{
+	return (x + (a - 1)) & ~(a - 1);
+}
+
+uint64_t MemoryManager::DetermineBestAmount()
+{
+#ifdef MR_PLATFORM_WINDOWS
+
+
+
+
+	//return hasMaxRamSwitch > 0 ? longlong.ullTotalPageFile >= hasMaxRamSwitch ? hasMaxRamSwitch : 
+	//	(uint64_t)longlong.ullTotalPageFile * 0.4 : 
+	//	(uint64_t)longlong.ullTotalPageFile * 0.4;
 #else
 #error MemoryManager class (DetermineBestAmount) is only implemented to windows.
 #endif // MR_PLATFORM_WINDOWS

@@ -2,7 +2,6 @@
 
 #include "Application.h"
 #include <Resource/MemoryManager.h>
-#include <Special/LaunchMeteorSuite.h>
 #include <Types/String.h>
 #include <Layers/LayerManager.h>
 #include <iostream>
@@ -15,6 +14,7 @@
 #include <Types/Pointers.h>
 #include <Platform/Paths.h>
 #include <Platform/Platform.h>
+#include <Special/LaunchMeteorSuite.h>
 
 EditorApplication::EditorApplication() 
 	: Application()

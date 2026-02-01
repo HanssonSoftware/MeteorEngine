@@ -6,9 +6,12 @@
 #include <Types/Array.h>
 #include <Platform/PlatformLayout.h>
 
+#define MB
 #define KERNEL
 #define NLS
 #include <Windows/Windows.h>
+#include <stringapiset.h>
+
 #include <Resource/MemoryManager.h>
 
 #pragma warning(disable : 6031)

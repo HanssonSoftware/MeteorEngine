@@ -4,6 +4,10 @@
 #include <Types/String.h>
 #include "NameCollection.h"
 
+constexpr Name::Name(const char* string)
+{
+}
+
 Name::Name(const String* string)
 {
 	NameCollection::LookUp(string);

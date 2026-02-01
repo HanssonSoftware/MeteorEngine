@@ -6,8 +6,6 @@
 #include <crtdbg.h>
 #endif // MR_DEBUG
 
-#define ENGINE_NAME_SPACE "Meteor Engine"
-#define ENGINE_NAME "MeteorEngine"
 
 struct Application;
 
@@ -53,7 +51,9 @@ extern "C" __declspec(dllimport) int LaunchApplication(Application* instance, in
 #define NOMCX
 #include <Windows.h>
 #include <PathCch.h>
-#pragma comment (lib, "Pathcch.lib")                                                                                 
+#include <winuser.h>
+#pragma comment (lib, "Pathcch.lib")                                                                     
+#pragma comment (lib, "User32.lib")                                                                          
                                                                                                                             
 #pragma warning (disable : 28251)                                                                                    
 #endif // MR_PLATFORM_WINDOWS                                                                                          
@@ -97,7 +97,6 @@ extern "C" __declspec(dllimport) int LaunchApplication(Application* instance, in
 #else
 #define IMPLEMENT_WINDOWS_STARTUP(libName, applicationClass)
 #endif // MR_PLATFORM_WINDOWS
-
 
 //#ifdef MR_DEBUG                                                                                                                               \
 //            _CrtDumpMemoryLeaks();                                                                                                                    \

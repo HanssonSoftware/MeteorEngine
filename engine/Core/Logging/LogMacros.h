@@ -159,7 +159,7 @@ LOG_ADDCATEGORY(Temp);
 #ifdef _WIN64
 #endif // _WIN64
 #else
-#define MR_ASSERT(...) //* This function does nothing, if you want someting, switch to Debug!
+#define MR_ASSERT(...) //* This function does nothing, if you want something, switch to Debug!
 #endif // DEBUG
 
 

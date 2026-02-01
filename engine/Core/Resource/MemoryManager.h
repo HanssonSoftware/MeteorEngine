@@ -3,13 +3,9 @@
 #pragma once
 
 #include <stdint.h>
-#include <Logging/LogMacros.h>
 #include "MemoryPackage.h"
 #include "MemoryRegion.h"
 
-#define MB
-#define USER
-#define KERNEL
 #include <Windows/Windows.h>
 
 //	OC = Occupied // AV = Available
@@ -38,17 +34,15 @@ public:
 	template<typename T>
 	MemoryPackage<T> Allocate(uint64_t size)
 	{
-		MR_ASSERT(projectResource, "Check reserved memory for project!");
+		//if (projectResource->nextRegion) 
+		//{
+		//
+		//};
 
+		//void* allocated = VirtualAlloc(nullptr, size, MEM_COMMIT, PAGE_READWRITE);
 
-		if (projectResource->nextRegion) 
-		{
-		
-		};
+		MemoryPackage<T> allocatedReady((T*)malloc(size));
 
-		void* allocated = VirtualAlloc();
-
-		MemoryPackage<T> allocatedReady((T*)allocated);
 		return allocatedReady;
 	}
 
@@ -60,13 +54,16 @@ public:
 
 	void FillBlocks(uint64_t blocksToFill, uint64_t size);
 protected:
-	uint64_t AlignToNearest(uint64_t x, uint64_t y);
+	uint64_t ReadFromCommandline();
+	uint64_t CalculateInitialFromParameters();
+
+	constexpr uint64_t CeilPow2(uint64_t x) noexcept;
+	constexpr uint64_t FloorPow2(uint64_t x) noexcept;
+	constexpr uint64_t AlignUp(uint64_t x, uint64_t a) noexcept;
 
 	uint64_t DetermineBestAmount();
 
 	MemoryRegion* FindNextAvailableRegion();
-
-	uint64_t totalMemory = 0;
 
 	uint64_t minimumStartingMemory = 0;
 

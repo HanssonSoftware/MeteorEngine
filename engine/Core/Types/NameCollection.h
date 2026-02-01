@@ -24,6 +24,6 @@ public:
 		return "";
 	}
 
-	static constexpr Name GetEmptyName() { return; };
+	static constexpr Name GetEmptyName() { return ""; };
 };
 
