@@ -243,7 +243,7 @@
   <ItemGroup>
     <ClCompile Include="engine\Core\Logging\Log.cpp" />
     <ClCompile Include="engine\Core\Object\Object.cpp" />
-    <ClCompile Include="engine\Core\Application.cpp" />
+    <ClCompile Include="engine\Core\Application\Application.cpp" />
     <ClCompile Include="engine\Core\Commandlet.cpp" />
     <ClCompile Include="engine\Core\Layers\Layer.cpp" />
     <ClCompile Include="engine\Core\Layers\LayerManager.cpp" />
@@ -258,15 +258,17 @@
     <ClCompile Include="engine\Core\Resource\MemoryPackage.cpp" />
     <ClCompile Include="engine\Core\Resource\MemoryRegion.cpp" />
     <ClCompile Include="engine\Core\Types\NameCollection.cpp" />
-    <ClCompile Include="engine\Core\Resource\ResourceAgent.cpp" />
+    <ClCompile Include="engine\Core\Resource\Allocator.cpp" />
+    <ClCompile Include="engine\Core\Resource\MemoryAllocatorArena.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\Core\Application\Configuration.h" />
     <ClInclude Include="engine\Core\Common\Maths.h" />
     <ClInclude Include="engine\Core\Logging\Log.h" />
     <ClInclude Include="engine\Core\Logging\LogMacros.h" />
     <ClInclude Include="engine\Core\Common\Conversions.h" />
     <ClInclude Include="engine\Core\Object\Object.h" />
-    <ClInclude Include="engine\Core\Application.h" />
+    <ClInclude Include="engine\Core\Application\Application.h" />
     <ClInclude Include="engine\Core\Commandlet.h" />
     <ClInclude Include="engine\Core\Layers\Layer.h" />
     <ClInclude Include="engine\Core\Layers\LayerManager.h" />
@@ -373,7 +375,8 @@
     <ClInclude Include="engine\Core\Resource\MemoryPackage.h" />
     <ClInclude Include="engine\Core\Resource\MemoryRegion.h" />
     <ClInclude Include="engine\Core\Types\NameCollection.h" />
-    <ClInclude Include="engine\Core\Resource\ResourceAgent.h" />
+    <ClInclude Include="engine\Core\Resource\Allocator.h" />
+    <ClInclude Include="engine\Core\Resource\MemoryAllocatorArena.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="engine\Engine.mrbuild" />

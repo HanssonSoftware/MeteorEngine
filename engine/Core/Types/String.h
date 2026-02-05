@@ -1,7 +1,6 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Resource/ResourceAgent.h>
 
 #define _CRT_SECURE_NO_WARNINGS
 #include <string>
@@ -15,7 +14,7 @@
 #endif // MR_CORE_EXPORTS
 
 /** Human readable piece of text. */
-class CORE_API String : public IResourceAgent
+class CORE_API String
 {
 	friend class StringW;
 public:

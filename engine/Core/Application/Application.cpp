@@ -85,5 +85,6 @@ extern "C" __declspec(dllexport) int LaunchApplication(Application* instance, in
         returnCode = instance->GetRequestExitCode();
         Commandlet::Get().Shutdown();
     }
+
     return returnCode; 
 }

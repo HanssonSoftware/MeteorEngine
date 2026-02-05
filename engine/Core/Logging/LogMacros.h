@@ -12,13 +12,7 @@
 
 struct LogAssertion
 {
-    friend class Logger;
-
-    LogAssertion() = delete;
-
-    virtual ~LogAssertion() noexcept = default;
-
-    constexpr LogAssertion(const char* inputFile, int inputLine, const char* statement)
+    constexpr LogAssertion(const char* inputFile, uint32_t inputLine, const char* statement)
         : assertLocationInFile(inputFile)
         , assertLineInFile(inputLine)
         , assertStatement(statement)
@@ -30,16 +24,8 @@ struct LogAssertion
     {
         va_list d = nullptr;
         va_start(d, message);
-        const int reqAmount = vsnprintf(nullptr, 0, message, d);
-
-        this->message = GetMemoryManager()->Allocate<char>(reqAmount + 1);
-        if (this->message != nullptr)
-        {
-            vsnprintf(this->message, reqAmount + 1, message, d);
-            va_end(d);
-
-            this->message[reqAmount] = '\0';
-        }
+        vsnprintf(this->message, bIsRunningDebugMode ? 256 : 128, message, d);
+        va_end(d);
     }
 
     uint32_t assertLineInFile = 0;
@@ -48,7 +34,7 @@ struct LogAssertion
 
     const char* assertStatement = nullptr;
 
-    char* message = nullptr;
+    char message[bIsRunningDebugMode ? 256 : 128] = { '\0' };
 };
 
 enum LogSeverity : short
@@ -101,17 +87,17 @@ struct LogDescriptor
         }
     }
 
-    unsigned int line;
-
-    short severity;
-
-    char* message = nullptr;
+    uint8_t severity;
+    uint32_t line;
 
     const char* team;
 
+#ifdef MR_DEBUG
     const char* function;
-
     const char* file;
+#endif // MR_DEBUG
+
+    char* message = nullptr;
 };
 
 
@@ -148,12 +134,9 @@ LOG_ADDCATEGORY(Temp);
 #define MR_ASSERT(expression, message, ...) \
     do { \
         if (!(expression)) \
-        {   \
-            LogAssertion asserta(__FILE__, __LINE__, #expression);\
-            asserta.SetMessage(message, __VA_ARGS__);\
-            if (Logger* inst = Logger::Get()) { inst->TransmitAssertion(&asserta); __debugbreak(); }\
-                                                             \
-        }                                                                      \
+        {\
+            LogAssertion assertion = { __FILE__, (uint32_t)__LINE__, #expression }; assertion.SetMessage(message); Logger::Get()->TransmitAssertion(&assertion); \
+        }\
     } while (0)
 
 #ifdef _WIN64

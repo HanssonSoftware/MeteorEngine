@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
+﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "MemoryManager.h"
 #include <Platform/PlatformLayout.h>
@@ -12,29 +12,6 @@
 LOG_ADDCATEGORY(Arena);
 
 static MemoryManager* object = new MemoryManager;
-inline constexpr uint64_t minRam = /*8589934592u*/1 * 1024 * 1024 * 1024; /* Equivalent for 1GB */
-
-struct
-{
-	uint64_t offset = 0;
-} Resource;
-
-#ifdef MR_PLATFORM_WINDOWS
-
-static HANDLE CreateMRNotify(MEMORY_RESOURCE_NOTIFICATION_TYPE NotificationType)
-{
-	switch (NotificationType)
-	{
-		case LowMemoryResourceNotification:
-			break;
-		case HighMemoryResourceNotification:
-			break;	
-	}
-
-	return nullptr;
-}
-
-#endif // MR_PLATFORM_WINDOWS
 
 MemoryManager* GetMemoryManager()
 {
@@ -44,21 +21,38 @@ MemoryManager* GetMemoryManager()
 
 void MemoryManager::Initialize()
 {
-	uint64_t initialMemory = ReadFromCommandline();
-	if (initialMemory == 0)
+#ifdef MR_PLATFORM_WINDOWS
+	bool bIsCommandWasValid = false;
+	uint64_t reservedMemory = 0;
+
+	MEMORYSTATUSEX status = { sizeof(MEMORYSTATUSEX) };
+	GlobalMemoryStatusEx(&status);
+
+	if (Commandlet::Get().Parse("-maxram", nullptr))
 	{
-		initialMemory = CalculateInitialFromParameters();
+		String ramSwitch;
+		Commandlet::Get().Parse("-maxram", &ramSwitch);
+
+		reservedMemory = (uint64_t)strtoul(ramSwitch, nullptr, 10) * 1024 * 1024; // bytes
+		if (reservedMemory == 0)
+		{
+			MR_LOG(LogArena, Warn, "Invalid parameter detail provided for: -maxram was: %s", ramSwitch);
+		}
+
+		status.
+	}
+	else
+	{
 
 	}
 
-#ifdef MR_PLATFORM_WINDOWS
-	begin = (uint8_t*)VirtualAlloc(nullptr, initialMemory, MEM_RESERVE, PAGE_READWRITE);
+	begin = (uint8_t*)VirtualAlloc(nullptr, reservedMemory, MEM_RESERVE, PAGE_READWRITE);
 	if (!begin)
 	{
 
 	}
 
-	end = (uint8_t*)begin + initialMemory;
+	end = (uint8_t*)((uint64_t)begin + reservedMemory);
 #else
 #error MemoryManager class (Initialize) is only implemented to windows.
 #endif // MR_PLATFORM_WINDOWS
@@ -73,7 +67,7 @@ void MemoryManager::Shutdown()
 		MR_LOG(LogArena, Fatal, "VirtualFree failed!");
 	}
 
-	begin, end = nullptr;
+	begin = end = nullptr;
 	delete object;
 }
 
@@ -85,12 +79,14 @@ bool MemoryManager::AllocateToEngine(uint64_t size)
 bool MemoryManager::RequestResource(uint64_t size)
 {
 #ifdef MR_PLATFORM_WINDOWS
-	if (!VirtualAlloc((uint64_t*)begin + Resource.offset, size, MEM_COMMIT, PAGE_READWRITE))
+	if (!VirtualAlloc((uint64_t*)begin + offset, size, MEM_COMMIT, PAGE_READWRITE))
 	{
+		DWORD a = GetLastError();
 
+		DebugBreak();
 	}
 	
-	Resource.offset += size;
+	offset += size;
 
 	return true;
 #else
@@ -106,18 +102,7 @@ void MemoryManager::FillBlocks(uint64_t blocksToFill, uint64_t size)
 
 uint64_t MemoryManager::ReadFromCommandline()
 {
-	String maxRam;
-	uint64_t hasMaxRamSwitch = 0;
-	if (Commandlet::Get().Parse("-maxram", &maxRam))
-	{
-		hasMaxRamSwitch = (uint64_t)strtoul(maxRam, nullptr, 10) * 1024 * 1024; // bytes
-		if (hasMaxRamSwitch == 0)
-		{
-			MR_LOG(LogArena, Warn, "Invalid parameter detail provided for: -maxram was: %s", *maxRam);
-		}
 
-		return hasMaxRamSwitch;
-	}
 
 	return 0;
 }
@@ -127,12 +112,12 @@ uint64_t MemoryManager::CalculateInitialFromParameters()
 	MEMORYSTATUSEX longlong = { sizeof(MEMORYSTATUSEX) };
 	GlobalMemoryStatusEx(&longlong);
 
-	if (longlong.ullTotalPhys < minRam)
+	if (longlong.ullTotalPhys < 1 * 1024 * 1024 * 1024)
 	{
 		MessageBoxW(nullptr, L"Your computer does not have enough memory!", WIDE_ENGINE_NAME_SPACE, MB_ICONERROR | MB_OK);
 
 		TerminateProcess(GetCurrentProcess(), UINT_MAX);
-		return;
+		return 0;
 	}
 
 

@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="engine\Core\Application.cpp">
+    <ClCompile Include="engine\Core\Application\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Commandlet.cpp">
@@ -66,12 +66,15 @@
     <ClCompile Include="engine\Core\Types\NameCollection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Resource\ResourceAgent.cpp">
+    <ClCompile Include="engine\Core\Resource\Allocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Resource\MemoryAllocatorArena.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="engine\Core\Application.h">
+    <ClInclude Include="engine\Core\Application\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Commandlet.h">
@@ -404,10 +407,16 @@
     <ClInclude Include="engine\Core\Types\NameCollection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Resource\ResourceAgent.h">
+    <ClInclude Include="engine\Core\Resource\Allocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Special\EngineConstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Resource\MemoryAllocatorArena.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Application\Configuration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

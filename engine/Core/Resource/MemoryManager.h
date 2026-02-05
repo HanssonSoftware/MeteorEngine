@@ -71,6 +71,8 @@ protected:
 
 	MemoryRegion* projectResource = nullptr;
 
+	uint32_t offset = 0;
+
 	uint8_t* begin = nullptr;
 
 	uint8_t* end = nullptr;
