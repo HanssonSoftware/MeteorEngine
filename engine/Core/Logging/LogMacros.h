@@ -54,13 +54,7 @@ struct LogDescriptor
 
     }
 
-    ~LogDescriptor()
-    {
-        if (message != nullptr)
-        {
-            GetMemoryManager()->Deallocate<char>(message);
-        }
-    }
+    ~LogDescriptor() = default;
 
     constexpr void SetValues(const char* category, int severity, const char* function, const char* file, const int line) noexcept
     {
@@ -75,16 +69,9 @@ struct LogDescriptor
     {
         va_list d = nullptr;
         va_start(d, message);
-        const int reqAmount = vsnprintf(nullptr, 0, message, d);
+        vsnprintf(this->message, bIsRunningDebugMode ? 1024 : 256, message, d);
+        va_end(d);
 
-        this->message = GetMemoryManager()->Allocate<char>(reqAmount + 1);
-        if (this->message != nullptr)
-        {
-            vsnprintf(this->message, reqAmount + 1, message, d);
-            va_end(d);
-
-            this->message[reqAmount] = '\0';
-        }
     }
 
     uint8_t severity;
@@ -97,7 +84,7 @@ struct LogDescriptor
     const char* file;
 #endif // MR_DEBUG
 
-    char* message = nullptr;
+    char message[bIsRunningDebugMode ? 1024 : 256] = { '\0' };
 };
 
 

@@ -1,3 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?> 
+﻿<?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+	<Type Name="String">
+		<Expand>
+			<Item Name="Size">length</Item>
+			<DisplayString Condition="bIsUsingHeap">"trie"</DisplayString>
+			<Expand>
+				<Item Name="Capacity">capacity</Item>
+			</Expand>
+			<Item Name="Heap?">bIsUsingHeap</Item>
+		</Expand>
+	</Type>
 </AutoVisualizer>

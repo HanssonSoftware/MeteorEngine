@@ -245,8 +245,6 @@
     <ClCompile Include="engine\Core\Object\Object.cpp" />
     <ClCompile Include="engine\Core\Application\Application.cpp" />
     <ClCompile Include="engine\Core\Commandlet.cpp" />
-    <ClCompile Include="engine\Core\Layers\Layer.cpp" />
-    <ClCompile Include="engine\Core\Layers\LayerManager.cpp" />
     <ClCompile Include="engine\Core\Types\Name.cpp" />
     <ClCompile Include="engine\Core\Types\String.cpp" />
     <ClCompile Include="engine\Core\Types\Vector.cpp" />
@@ -270,8 +268,6 @@
     <ClInclude Include="engine\Core\Object\Object.h" />
     <ClInclude Include="engine\Core\Application\Application.h" />
     <ClInclude Include="engine\Core\Commandlet.h" />
-    <ClInclude Include="engine\Core\Layers\Layer.h" />
-    <ClInclude Include="engine\Core\Layers\LayerManager.h" />
     <ClInclude Include="engine\Core\Special\EngineConstants.h" />
     <ClInclude Include="engine\Core\TEMPIMPORT.h" />
     <ClInclude Include="engine\Core\Types\Array.h" />

@@ -1,10 +1,10 @@
-/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
+﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
 
 #include <stdint.h>
-#include "MemoryPackage.h"
 #include "MemoryRegion.h"
+#include "MemoryPackage.h"
 
 #include <Windows/Windows.h>
 
@@ -22,7 +22,7 @@
 class CORE_API MemoryManager
 {
 public:
-	constexpr MemoryManager() = default;
+	MemoryManager();
 	virtual ~MemoryManager() noexcept = default;
 
 	void Initialize();
@@ -67,15 +67,15 @@ protected:
 
 	uint64_t minimumStartingMemory = 0;
 
-	MemoryRegion* engineResource = nullptr;
+	MemoryRegion engineResource;
 
-	MemoryRegion* projectResource = nullptr;
+	MemoryRegion projectResource;
 
-	uint32_t offset = 0;
+	uint64_t offset = 0;
 
-	uint8_t* begin = nullptr;
+	char* begin = nullptr;
 
-	uint8_t* end = nullptr;
+	char* end = nullptr;
 };
 
 MemoryManager* GetMemoryManager();

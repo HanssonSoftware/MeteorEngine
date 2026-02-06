@@ -5,7 +5,6 @@
 #include <Platform/FileManager.h>
 
 #include <Resource/MemoryManager.h>
-#include <Layers/LayerManager.h>
 #include "Commandlet.h"
 
 #ifdef MR_DEBUG

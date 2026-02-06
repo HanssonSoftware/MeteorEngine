@@ -1,9 +1,7 @@
 D:\Meteor-Engine\engine\Core\Logging\Log.cpp;D:\Meteor-Engine\Intermediate\Meteor\Log.obj
 D:\Meteor-Engine\engine\Core\Object\Object.cpp;D:\Meteor-Engine\Intermediate\Meteor\Object.obj
-D:\Meteor-Engine\engine\Core\Application.cpp;D:\Meteor-Engine\Intermediate\Meteor\Application.obj
+D:\Meteor-Engine\engine\Core\Application\Application.cpp;D:\Meteor-Engine\Intermediate\Meteor\Application.obj
 D:\Meteor-Engine\engine\Core\Commandlet.cpp;D:\Meteor-Engine\Intermediate\Meteor\Commandlet.obj
-D:\Meteor-Engine\engine\Core\Layers\Layer.cpp;D:\Meteor-Engine\Intermediate\Meteor\Layer.obj
-D:\Meteor-Engine\engine\Core\Layers\LayerManager.cpp;D:\Meteor-Engine\Intermediate\Meteor\LayerManager.obj
 D:\Meteor-Engine\engine\Core\Types\Name.cpp;D:\Meteor-Engine\Intermediate\Meteor\Name.obj
 D:\Meteor-Engine\engine\Core\Types\String.cpp;D:\Meteor-Engine\Intermediate\Meteor\String.obj
 D:\Meteor-Engine\engine\Core\Types\Vector.cpp;D:\Meteor-Engine\Intermediate\Meteor\Vector.obj
@@ -15,4 +13,5 @@ D:\Meteor-Engine\engine\Core\Types\Map.cpp;D:\Meteor-Engine\Intermediate\Meteor\
 D:\Meteor-Engine\engine\Core\Resource\MemoryPackage.cpp;D:\Meteor-Engine\Intermediate\Meteor\MemoryPackage.obj
 D:\Meteor-Engine\engine\Core\Resource\MemoryRegion.cpp;D:\Meteor-Engine\Intermediate\Meteor\MemoryRegion.obj
 D:\Meteor-Engine\engine\Core\Types\NameCollection.cpp;D:\Meteor-Engine\Intermediate\Meteor\NameCollection.obj
-D:\Meteor-Engine\engine\Core\Resource\ResourceAgent.cpp;D:\Meteor-Engine\Intermediate\Meteor\ResourceAgent.obj
+D:\Meteor-Engine\engine\Core\Resource\Allocator.cpp;D:\Meteor-Engine\Intermediate\Meteor\Allocator.obj
+D:\Meteor-Engine\engine\Core\Resource\MemoryAllocatorArena.cpp;D:\Meteor-Engine\Intermediate\Meteor\MemoryAllocatorArena.obj

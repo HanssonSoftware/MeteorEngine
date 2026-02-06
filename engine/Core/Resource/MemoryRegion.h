@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
+﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
 #include <cstdint>
@@ -17,13 +17,14 @@ class CORE_API MemoryRegion
 	MemoryRegion* prevRegion = nullptr;
 	MemoryRegion* nextRegion = nullptr;
 
-	uint8_t* regionStart = nullptr;
-	uint8_t* regionEnd = nullptr;
+	char* regionStart = nullptr;
+	char* regionEnd = nullptr;
 
 public:
-	MemoryRegion() = delete;
+	constexpr MemoryRegion() = default;
+	MemoryRegion(const MemoryRegion&) = delete;
 	~MemoryRegion() noexcept = default;
-	MemoryRegion(MemoryRegion* prev, MemoryRegion* next, uint8_t* start, uint8_t* end)
+	MemoryRegion(MemoryRegion* prev, MemoryRegion* next, char* start, char* end)
 		: prevRegion(prev)
 		, nextRegion(next)
 		, regionStart(start)
@@ -32,13 +33,11 @@ public:
 		regionSize = (uint32_t)(end - start);
 	};
 
-	bool CheckOccupation(uint32_t size) { return false; };
-
 	MemoryRegion* GetPreviousRegion() const { return prevRegion; };
 	MemoryRegion* GetNextRegion() const { return nextRegion; };
 
-	uint8_t* GetRegionBegin() const { return regionStart; };
-	uint8_t* GetRegionEnd() const { return regionEnd; };
+	char* GetRegionBegin() const { return regionStart; };
+	char* GetRegionEnd() const { return regionEnd; };
 
 	//String GetRegionName() const { return regionName; };
 	

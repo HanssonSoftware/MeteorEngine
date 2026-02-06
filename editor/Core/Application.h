@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Application.h>
+#include <Application/Application.h>
 #include <Types/Vector.h>
 #include <WindowManager/WindowManager.h>
 #include <Commandlet.h>

@@ -61,18 +61,18 @@ void Logger::TransmitMessage(LogDescriptor* Descriptor)
     if (Descriptor->severity == Fatal)
     {
         fullMessage = String::Format(
-            "=============[ Fatal error ]=============\nWhere:\t\t%ls\nWhen:\t\t%ls\nMessage:\t%ls\n\nFile:\t%ls\n",
+            "=============[ Fatal error ]=============\nWhere:\t\t%s\nWhen:\t\t%s\nMessage:\t%s\n\nFile:\t%s\n",
             Descriptor->function,
             *current,
-            *Descriptor->message,
+            Descriptor->message,
             Descriptor->file);
     }
     else
     {
-        fullMessage = String::Format("[%ls] %ls: %ls\n", 
+        fullMessage = String::Format("[%s] %s: %s\n", 
             current.Chr(),
             Descriptor->team,
-            *Descriptor->message);
+            Descriptor->message);
     }
 
     SendToOutputBuffer(&fullMessage);
