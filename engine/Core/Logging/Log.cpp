@@ -53,8 +53,6 @@ void Logger::HandleFatal(LogDescriptor* Descriptor)
 
 void Logger::TransmitMessage(LogDescriptor* Descriptor)
 {
-    current = Descriptor;
-
     String fullMessage;
     const String current = /*Timer::Format()*/"yyyy-MM-dd HH:mm:ss";
 

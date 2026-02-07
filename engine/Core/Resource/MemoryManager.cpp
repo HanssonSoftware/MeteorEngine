@@ -146,12 +146,12 @@ void MemoryManager::Initialize()
 
 	end = (char*)((char*)begin + reservedMemory);
 
-	uint64_t reservedQuarter = (reservedMemory / 2) / 2;
+	uint64_t reservedQuarter = CeilPow2(reservedMemory / 4ull);
 
 	engineResource = MemoryRegion(nullptr, nullptr, begin, begin + reservedQuarter);
 	projectResource = MemoryRegion(nullptr, nullptr, begin + reservedQuarter, end);
 
-
+	return;
 #else
 #error MemoryManager class (Initialize) is only implemented to windows.
 #endif // MR_PLATFORM_WINDOWS

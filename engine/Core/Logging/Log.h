@@ -44,8 +44,6 @@ public:
 	virtual void HandleFatal(LogDescriptor* Descriptor);
 
 protected:
-	LogDescriptor* current = nullptr;
-
 	//DelLoggerInitialize loggerInitialized;
 
 	bool bIsInitialized = false;

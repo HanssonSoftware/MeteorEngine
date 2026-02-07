@@ -258,6 +258,7 @@
     <ClCompile Include="engine\Core\Types\NameCollection.cpp" />
     <ClCompile Include="engine\Core\Resource\Allocator.cpp" />
     <ClCompile Include="engine\Core\Resource\MemoryAllocatorArena.cpp" />
+    <ClCompile Include="engine\Core\Resource\MemoryAllocatorBase.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Application\Configuration.h" />
@@ -373,6 +374,7 @@
     <ClInclude Include="engine\Core\Types\NameCollection.h" />
     <ClInclude Include="engine\Core\Resource\Allocator.h" />
     <ClInclude Include="engine\Core\Resource\MemoryAllocatorArena.h" />
+    <ClInclude Include="engine\Core\Resource\MemoryAllocatorBase.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="engine\Engine.mrbuild" />

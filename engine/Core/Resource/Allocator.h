@@ -5,7 +5,7 @@
 
 struct IResourceAllocator
 {
-	virtual uint8_t* Allocate(uint64_t byte) = 0;
+	virtual char* Allocate(uint64_t byte) = 0;
 	virtual void Deallocate(uint64_t byte) = 0;
 
 	virtual ~IResourceAllocator() noexcept = default;

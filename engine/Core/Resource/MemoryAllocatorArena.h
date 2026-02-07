@@ -6,7 +6,7 @@
 class MemoryAllocatorArena : public IResourceAllocator
 {
 public:
-	virtual uint8_t* Allocate(uint64_t byte);
+	virtual char* Allocate(uint64_t byte);
 	virtual void Deallocate(uint64_t byte);
 
 
