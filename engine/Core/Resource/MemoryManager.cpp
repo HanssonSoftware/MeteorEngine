@@ -11,6 +11,9 @@
 
 LOG_ADDCATEGORY(Arena);
 
+static inline MemoryRegion engineResource;
+static inline MemoryRegion projectResource;
+
 static MemoryManager* object = new MemoryManager;
 
 static inline uint32_t SwitchOnMemory(uint64_t x)
@@ -141,15 +144,22 @@ void MemoryManager::Initialize()
 		}
 	}
 
-	begin = (char*)VirtualAlloc(nullptr, reservedMemory, MEM_RESERVE, PAGE_READWRITE);
-	MR_ASSERT(!begin || reservedMemory != 0, "Failed to reserve %d bytes!", reservedMemory);
+	begin = (char*)VirtualAlloc(nullptr, reservedMemory, MEM_COMMIT, PAGE_READWRITE);
+	if (!begin && reservedMemory != 0)
+	{
+		wchar_t chars[256] = { L'\0' };
+
+		FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, GetLastError(), LANG_USER_DEFAULT, chars, 256, nullptr);
+		
+		MR_LOG(LogArena, Error, "%ls", chars);
+	}
 
 	end = (char*)((char*)begin + reservedMemory);
 
-	uint64_t reservedQuarter = CeilPow2(reservedMemory / 4ull);
+	uint64_t reservedQuarter = reservedMemory / 4ull;
 
-	engineResource = MemoryRegion(nullptr, nullptr, begin, begin + reservedQuarter);
-	projectResource = MemoryRegion(nullptr, nullptr, begin + reservedQuarter, end);
+	engineResource = MemoryRegion(nullptr, nullptr, begin, (char*)(begin + reservedQuarter));
+	projectResource = MemoryRegion(nullptr, nullptr, (char*)(begin + reservedQuarter), end);
 
 	return;
 #else
@@ -176,14 +186,14 @@ bool MemoryManager::AllocateToEngine(uint64_t size)
 bool MemoryManager::RequestResource(uint64_t size)
 {
 #ifdef MR_PLATFORM_WINDOWS
-	if (!VirtualAlloc((uint64_t*)begin + offset, size, MEM_COMMIT, PAGE_READWRITE))
+	//if (!VirtualAlloc((uint64_t*)begin + offset, size, MEM_COMMIT, PAGE_READWRITE))
 	{
 		DWORD a = GetLastError();
 
 		DebugBreak();
 	}
 	
-	offset += size;
+	//offset += size;
 
 	return true;
 #else
@@ -197,29 +207,9 @@ void MemoryManager::FillBlocks(uint64_t blocksToFill, uint64_t size)
 
 }
 
-uint64_t MemoryManager::ReadFromCommandline()
+bool MemoryManager::CalculateStartingMembers()
 {
-
-
-	return 0;
-}
-
-uint64_t MemoryManager::CalculateInitialFromParameters()
-{
-	MEMORYSTATUSEX longlong = { sizeof(MEMORYSTATUSEX) };
-	GlobalMemoryStatusEx(&longlong);
-
-	if (longlong.ullTotalPhys < 1 * 1024 * 1024 * 1024)
-	{
-		MessageBoxW(nullptr, L"Your computer does not have enough memory!", WIDE_ENGINE_NAME_SPACE, MB_ICONERROR | MB_OK);
-
-		TerminateProcess(GetCurrentProcess(), UINT_MAX);
-		return 0;
-	}
-
-
-
-	return 0;
+	return false;
 }
 
 constexpr uint64_t MemoryManager::CeilPow2(uint64_t x) noexcept

@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>D:\Meteor-Engine\Product\MeteorEditor.exe</FullPath>
+      <FullPath>C:\MeteorEngine\Product\MeteorEditor.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

@@ -16,7 +16,6 @@
 /** Human readable piece of text. */
 class CORE_API String
 {
-	friend class StringW;
 public:
 	String() noexcept
 	{

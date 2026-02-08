@@ -66,9 +66,6 @@
     <ClCompile Include="engine\Core\Resource\MemoryAllocatorArena.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Resource\MemoryAllocatorBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Application\Application.h">
@@ -408,9 +405,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Application\Configuration.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\Core\Resource\MemoryAllocatorBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

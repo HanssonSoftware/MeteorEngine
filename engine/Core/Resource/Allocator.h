@@ -3,7 +3,13 @@
 #pragma once
 #include <cstdint>
 
-struct IResourceAllocator
+#ifdef MR_CORE_EXPORTS
+#define CORE_API __declspec(dllexport)
+#else
+#define CORE_API __declspec(dllimport)
+#endif // MR_CORE_EXPORTS
+
+struct CORE_API IResourceAllocator
 {
 	virtual char* Allocate(uint64_t byte) = 0;
 	virtual void Deallocate(uint64_t byte) = 0;

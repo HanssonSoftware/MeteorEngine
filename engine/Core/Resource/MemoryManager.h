@@ -21,6 +21,7 @@
 
 class CORE_API MemoryManager
 {
+	friend class MemoryAllocatorArena;
 public:
 	MemoryManager();
 	virtual ~MemoryManager() noexcept = default;
@@ -54,8 +55,7 @@ public:
 
 	void FillBlocks(uint64_t blocksToFill, uint64_t size);
 protected:
-	uint64_t ReadFromCommandline();
-	uint64_t CalculateInitialFromParameters();
+	bool CalculateStartingMembers();
 
 	constexpr uint64_t CeilPow2(uint64_t x) noexcept;
 	constexpr uint64_t FloorPow2(uint64_t x) noexcept;
@@ -67,14 +67,7 @@ protected:
 
 	uint64_t minimumStartingMemory = 0;
 
-	MemoryRegion engineResource;
-
-	MemoryRegion projectResource;
-
-	uint64_t offset = 0;
-
 	char* begin = nullptr;
-
 	char* end = nullptr;
 };
 

@@ -60,7 +60,7 @@ StringW::StringW(const char* Input)
 StringW::~StringW() noexcept
 {
 	if (bIsUsingHeap && heapBuffer.ptr)
-		GetMemoryManager()->Deallocate<wchar_t>(heapBuffer.ptr);
+		GetMemoryManager()->Deallocate(heapBuffer.ptr);
 
 	NullOut();
 
@@ -121,7 +121,7 @@ StringW::StringW(const StringW& other)
 	{
 		heapBuffer.capacity = other.heapBuffer.capacity;
 		heapBuffer.length = other.heapBuffer.length;
-		heapBuffer.ptr = GetMemoryManager()->Allocate<wchar_t>(heapBuffer.capacity * sizeof(wchar_t));
+		heapBuffer.ptr = GetMemoryManager()->Allocate(heapBuffer.capacity * sizeof(wchar_t));
 
 		wmemset(heapBuffer.ptr, 0, heapBuffer.capacity);
 		wcsncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
@@ -195,7 +195,7 @@ StringW StringW::Format(const StringW& format, ...)
 	const int sizeForVA = vswprintf(nullptr, 0, formattingBuffer, a_cpy);
 	va_end(a_cpy);
 
-	wchar_t* newFormattedBuffer = GetMemoryManager()->Allocate<wchar_t>(sizeForVA + 1);
+	wchar_t* newFormattedBuffer = GetMemoryManager()->Allocate(sizeForVA + 1);
 
 	const int result = vswprintf(newFormattedBuffer, sizeForVA + 1 ,formattingBuffer, a);
 	va_end(a);
@@ -212,7 +212,7 @@ wchar_t* StringW::DetermineLocation(uint32_t size)
 	if (bIsUsingHeap)
 	{
 		heapBuffer.capacity = size * 2;
-		heapBuffer.ptr = GetMemoryManager()->Allocate<wchar_t>(heapBuffer.capacity * sizeof(wchar_t));
+		heapBuffer.ptr = GetMemoryManager()->Allocate(heapBuffer.capacity * sizeof(wchar_t));
 		heapBuffer.length = size;
 
 		wmemset(heapBuffer.ptr, 0, heapBuffer.capacity);
@@ -232,7 +232,7 @@ StringW& StringW::operator=(const StringW& other)
 		{
 			heapBuffer.capacity = other.heapBuffer.capacity;
 			heapBuffer.length = other.heapBuffer.length;
-			heapBuffer.ptr = GetMemoryManager()->Allocate<wchar_t>(heapBuffer.capacity * sizeof(wchar_t));
+			heapBuffer.ptr = GetMemoryManager()->Allocate(heapBuffer.capacity * sizeof(wchar_t));
 
 			wmemset(heapBuffer.ptr, 0, heapBuffer.capacity);
 			wcsncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
@@ -293,7 +293,7 @@ StringW& StringW::operator+=(const StringW& other)
 		if (heapBuffer.capacity <= newLen)
 		{
 			const uint32_t newCap = newLen * 2;
-			wchar_t* newPtr = GetMemoryManager()->Allocate<wchar_t>(newCap * sizeof(wchar_t));
+			wchar_t* newPtr = GetMemoryManager()->Allocate(newCap * sizeof(wchar_t));
 			wmemset(newPtr, 0, newCap);
 
 			if (heapBuffer.ptr && thisLen > 0)
@@ -302,7 +302,7 @@ StringW& StringW::operator+=(const StringW& other)
 			wmemcpy(newPtr + thisLen, otherData, otherLen);
 
 			if (heapBuffer.ptr)
-				GetMemoryManager()->Deallocate<wchar_t>(heapBuffer.ptr);
+				GetMemoryManager()->Deallocate(heapBuffer.ptr);
 
 			heapBuffer.ptr = newPtr;
 			heapBuffer.capacity = newCap;
@@ -326,7 +326,7 @@ StringW& StringW::operator+=(const StringW& other)
 		else
 		{
 			const uint32_t newCap = newLen * 2;
-			wchar_t* newPtr = GetMemoryManager()->Allocate<wchar_t>(newCap * sizeof(wchar_t));
+			wchar_t* newPtr = GetMemoryManager()->Allocate(newCap * sizeof(wchar_t));
 			wmemset(newPtr, 0, newCap);
 
 			if (thisLen > 0)

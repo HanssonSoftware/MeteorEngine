@@ -2,14 +2,37 @@
 
 #pragma once
 #include "Allocator.h"
+#include <cstdint>
 
-class MemoryAllocatorArena : public IResourceAllocator
+#include "MemoryManager.h"
+
+class MemoryAllocatorArena
 {
 public:
-	virtual char* Allocate(uint64_t byte);
-	virtual void Deallocate(uint64_t byte);
+	explicit MemoryAllocatorArena(uint64_t maximumAllocated)
+	{
+		
+	}
+
+	template<typename T>
+	T* Allocate(uint64_t bytesToAllocate)
+	{
+		T* pointer = begin + offset;
 
 
+		return nullptr;
+	}
 
+	bool Reset()
+	{
+		offset = 0;
+		return true;
+	}
+
+	uint64_t offset = 0;
+
+	char* begin = nullptr;
 };
 
+
+typedef MemoryAllocatorArena Arena;

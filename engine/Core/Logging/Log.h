@@ -48,6 +48,10 @@ protected:
 
 	bool bIsInitialized = false;
 
+#ifdef MR_PLATFORM_WINDOWS
+	typedef void* HANDLE;
+	HANDLE fileHandle;
+#endif // MR_PLATFORM_WINDOWS
 private:
 	static inline Logger* instance = nullptr;
 };

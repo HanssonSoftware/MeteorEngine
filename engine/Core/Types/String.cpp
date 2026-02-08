@@ -14,7 +14,7 @@ LOG_ADDCATEGORY(StringSet);
 String::~String() noexcept
 {
 	if (bIsUsingHeap && heapBuffer.ptr)
-		GetMemoryManager()->Deallocate<char>(heapBuffer.ptr);
+		GetMemoryManager()->Deallocate(heapBuffer.ptr);
 
 	NullOut();
 
@@ -259,7 +259,7 @@ String& String::operator=(const String& other)
 		{
 			heapBuffer.capacity = other.heapBuffer.capacity;
 			heapBuffer.length = other.heapBuffer.length;
-			heapBuffer.ptr = GetMemoryManager()->Allocate<char>(heapBuffer.capacity * sizeof(wchar_t));
+			heapBuffer.ptr = GetMemoryManager()->Allocate<char>(heapBuffer.capacity * sizeof(char));
 
 			memset(heapBuffer.ptr, 0, heapBuffer.capacity);
 			strncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
@@ -306,7 +306,7 @@ String& String::operator+=(const String& other)
 			memcpy(newPtr + thisLen, otherData, otherLen);
 
 			if (heapBuffer.ptr)
-				GetMemoryManager()->Deallocate<char>(heapBuffer.ptr);
+				GetMemoryManager()->Deallocate(heapBuffer.ptr);
 
 			heapBuffer.ptr = newPtr;
 			heapBuffer.capacity = newCap;
