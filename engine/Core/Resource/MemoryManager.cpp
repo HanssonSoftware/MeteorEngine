@@ -11,40 +11,9 @@
 
 LOG_ADDCATEGORY(Arena);
 
-static inline MemoryRegion engineResource;
-static inline MemoryRegion projectResource;
+
 
 static MemoryManager* object = new MemoryManager;
-
-static inline uint32_t SwitchOnMemory(uint64_t x)
-{
-	if (x > 32ull * 1024ull * 1024ull * 1024ull)
-	{
-		return 4;
-	}
-	else if (x >= 16ull * 1024ull * 1024ull * 1024ull)
-	{
-		return 3;
-	}
-	else if (x >= 8ull * 1024ull * 1024ull * 1024ull)
-	{
-		return 2;
-	}
-	else if (x >= 4ull * 1024ull * 1024ull * 1024ull)
-	{
-		return 1;
-	}
-	else if (x < 4ull * 1024ull * 1024ull * 1024ull)
-	{
-		return 0;
-	}
-	else
-	{
-		MR_ASSERT(false, "What to do at here?");
-	}
-
-	return 0;
-}
 
 MemoryManager::MemoryManager()
 {
@@ -65,83 +34,13 @@ void MemoryManager::Initialize()
 	MEMORYSTATUSEX status = { sizeof(MEMORYSTATUSEX) };
 	GlobalMemoryStatusEx(&status);
 
-	String ramSwitch;
-	if (Commandlet::Get().Parse("-maxram", &ramSwitch))
+	if (status.ullTotalPageFile > 8ull * 1024ull * 1024ull * 1024ull)
 	{
-		bool bIsCommandWasValid = false;
-
-		reservedMemory = (uint64_t)strtoul(ramSwitch, nullptr, 10) * 1024ull * 1024ull; // bytes
-		if (reservedMemory == 0)
-		{
-			MR_LOG(LogArena, Warn, "Invalid parameter detail provided for: -maxram was: %s", *ramSwitch);
-		}
-
-		if (reservedMemory > (uint64_t)status.ullTotalPageFile || reservedMemory == 0)
-		{
-			switch (SwitchOnMemory((uint64_t)status.ullTotalPageFile))
-			{
-				case 0:
-				{
-					MessageBoxW(nullptr, L"Your computer does not have enough memory!", WIDE_ENGINE_NAME_SPACE, MB_ICONERROR | MB_OK);
-
-					TerminateProcess(GetCurrentProcess(), UINT_MAX);
-					return;
-				}
-				case 1:
-				{
-					reservedMemory = 256ull * 1024ull * 1024ull;
-					break;
-				}
-				case 2:
-				{
-					reservedMemory = 512ull * 1024ull * 1024ull;
-					break;
-				}
-				case 3:
-				{
-					reservedMemory = 1024ull * 1024ull * 1024ull;
-					break;
-				}
-				case 4:
-				{
-					reservedMemory = 2ull * 1024ull * 1024ull * 1024ull;
-					break;
-				}
-			}
-		}
+		reservedMemory = 512ull * 1024ull * 1024ull;
 	}
-	else
+	else if (status.ullTotalPageFile > 4ull * 1024ull * 1024ull * 1024ull)
 	{
-		switch (SwitchOnMemory((uint64_t)status.ullTotalPageFile))
-		{
-			case 0:
-			{
-				MessageBoxW(nullptr, L"Your computer does not have enough memory!", WIDE_ENGINE_NAME_SPACE, MB_ICONERROR | MB_OK);
-
-				TerminateProcess(GetCurrentProcess(), UINT_MAX);
-				return;
-			}
-			case 1:
-			{
-				reservedMemory = 256ull * 1024ull * 1024ull;
-				break;
-			}
-			case 2:
-			{
-				reservedMemory = 512ull * 1024ull * 1024ull;
-				break;
-			}
-			case 3:
-			{
-				reservedMemory = 1024ull * 1024ull * 1024ull;
-				break;
-			}
-			case 4:
-			{
-				reservedMemory = 2ull * 1024ull * 1024ull * 1024ull;
-				break;
-			}
-		}
+		reservedMemory = 256ull * 1024ull * 1024ull;
 	}
 
 	begin = (char*)VirtualAlloc(nullptr, reservedMemory, MEM_COMMIT, PAGE_READWRITE);
@@ -157,11 +56,10 @@ void MemoryManager::Initialize()
 	end = (char*)((char*)begin + reservedMemory);
 
 	uint64_t reservedQuarter = reservedMemory / 4ull;
-
+	
 	engineResource = MemoryRegion(nullptr, nullptr, begin, (char*)(begin + reservedQuarter));
 	projectResource = MemoryRegion(nullptr, nullptr, (char*)(begin + reservedQuarter), end);
 
-	return;
 #else
 #error MemoryManager class (Initialize) is only implemented to windows.
 #endif // MR_PLATFORM_WINDOWS
@@ -178,7 +76,7 @@ void MemoryManager::Shutdown()
 	delete object;
 }
 
-bool MemoryManager::AllocateToEngine(uint64_t size)
+bool MemoryManager::RequestResourceFromEngine(uint64_t size)
 {
 	return false;
 }
@@ -199,16 +97,6 @@ bool MemoryManager::RequestResource(uint64_t size)
 #else
 #error MemoryManager class (RequestResource) is only implemented to windows.
 #endif // MR_PLATFORM_WINDOWS
-	return false;
-}
-
-void MemoryManager::FillBlocks(uint64_t blocksToFill, uint64_t size)
-{
-
-}
-
-bool MemoryManager::CalculateStartingMembers()
-{
 	return false;
 }
 
@@ -240,26 +128,4 @@ constexpr uint64_t MemoryManager::FloorPow2(uint64_t x) noexcept
 constexpr uint64_t MemoryManager::AlignUp(uint64_t x, uint64_t a) noexcept
 {
 	return (x + (a - 1)) & ~(a - 1);
-}
-
-uint64_t MemoryManager::DetermineBestAmount()
-{
-#ifdef MR_PLATFORM_WINDOWS
-
-
-
-
-	//return hasMaxRamSwitch > 0 ? longlong.ullTotalPageFile >= hasMaxRamSwitch ? hasMaxRamSwitch : 
-	//	(uint64_t)longlong.ullTotalPageFile * 0.4 : 
-	//	(uint64_t)longlong.ullTotalPageFile * 0.4;
-#else
-#error MemoryManager class (DetermineBestAmount) is only implemented to windows.
-#endif // MR_PLATFORM_WINDOWS
-	return 0;
-}
-
-MemoryRegion* MemoryManager::FindNextAvailableRegion()
-{
-
-	return nullptr;
 }

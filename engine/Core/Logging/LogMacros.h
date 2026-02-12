@@ -112,7 +112,7 @@ LOG_ADDCATEGORY(Temp);
                 if constexpr (Severity >= Fatal) \
                     Logger::Get()->HandleFatal(&descriptor); \
                 else if constexpr (Severity < Fatal && bIsRunningDebugMode)\
-                    Logger::Get()->TransmitMessage(&descriptor); \
+                    Logger::Get()->FormatLogMessage(&descriptor); \
              \
         } while (0); \
     }

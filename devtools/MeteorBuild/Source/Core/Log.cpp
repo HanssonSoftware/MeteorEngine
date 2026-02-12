@@ -68,7 +68,7 @@ void BuildSystemLogger::Shutdown()
 }
 
 static StringW fullMessage;
-void BuildSystemLogger::TransmitMessage(LogDescriptor* Descriptor)
+void BuildSystemLogger::FormatLogMessage(LogDescriptor* Descriptor)
 {
 	
 	
