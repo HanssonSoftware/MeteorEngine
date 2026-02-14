@@ -245,6 +245,7 @@
     <ClCompile Include="engine\Core\Object\Object.cpp" />
     <ClCompile Include="engine\Core\Application\Application.cpp" />
     <ClCompile Include="engine\Core\Commandlet.cpp" />
+    <ClCompile Include="engine\Core\Platform\Platform_Win32.cpp" />
     <ClCompile Include="engine\Core\Types\Name.cpp" />
     <ClCompile Include="engine\Core\Types\String.cpp" />
     <ClCompile Include="engine\Core\Types\Vector.cpp" />
@@ -268,9 +269,11 @@
     <ClInclude Include="engine\Core\Object\Object.h" />
     <ClInclude Include="engine\Core\Application\Application.h" />
     <ClInclude Include="engine\Core\Commandlet.h" />
+    <ClInclude Include="engine\Core\Platform\Platform.h" />
     <ClInclude Include="engine\Core\Special\EngineConstants.h" />
     <ClInclude Include="engine\Core\TEMPIMPORT.h" />
     <ClInclude Include="engine\Core\Types\Array.h" />
+    <ClInclude Include="engine\Core\Platform\DataTypes.h" />
     <ClInclude Include="engine\Core\Types\Delegate.h" />
     <ClInclude Include="engine\Core\Types\Name.h" />
     <ClInclude Include="engine\Core\Types\String.h" />
@@ -375,6 +378,7 @@
     <ClInclude Include="engine\Core\Resource\MemoryAllocatorArena.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="engine\Core\Types\StringMacros.inl" />
     <None Include="engine\Engine.mrbuild" />
     <None Include="engine\ThirdParty\assimp\color4.inl" />
     <None Include="engine\ThirdParty\assimp\material.inl" />

@@ -21,25 +21,25 @@ static inline Array<String> parsedWords;
 void Commandlet::Initialize(int argumentCount, char argumentList[])
 {
 	if (argumentCount != -1) argumentsCount = argumentCount - 1;
-	if (argumentList != nullptr) rawArgumentList = argumentList;
+	//if (argumentList != nullptr) rawArgumentList = argumentList;
 
-#ifdef MR_PLATFORM_WINDOWS
-	const wchar_t* cli = GetCommandLineW();
-
-	const int realSize = WideCharToMultiByte(CP_UTF8, 0, cli, -1, nullptr, 0, nullptr, nullptr);
-	rawArgumentList = new char[realSize];
-	memset(rawArgumentList, 0, realSize * sizeof(char));
-
-	WideCharToMultiByte(CP_UTF8, 0, cli, -1, rawArgumentList, realSize * sizeof(char), nullptr, nullptr);
-#endif // MR_PLATFORM_WINDOWS
-	
-	char* token = strtok(rawArgumentList, " ");
-	while (token != nullptr)
-	{
-		// argumentsCount++;
-		parsedWords.Add(token);
-		token = strtok(nullptr, " ");
-	}
+//#ifdef MR_PLATFORM_WINDOWS
+//	const Char* cli = GetCommandLineW();
+//
+//	const int realSize = WideCharToMultiByte(CP_UTF8, 0, cli, -1, nullptr, 0, nullptr, nullptr);
+//	rawArgumentList = new Char[realSize];
+//	memset(rawArgumentList, 0, realSize * sizeof(char));
+//
+//	WideCharToMultiByte(CP_UTF8, 0, cli, -1, rawArgumentList, realSize * sizeof(char), nullptr, nullptr);
+//#endif // MR_PLATFORM_WINDOWS
+//	
+//	Char* token = strtok(rawArgumentList, " ");
+	//while (token != nullptr)
+	//{
+	//	// argumentsCount++;
+	//	parsedWords.Add(token);
+	//	token = strtok(nullptr, " ");
+	//}
 
 	argumentsCount = parsedWords.GetSize();
 	bIsInited = true;
@@ -54,7 +54,7 @@ void Commandlet::Shutdown()
 	bIsInited = false;
 }
 
-bool Commandlet::Parse(const String& inParam, String* returnVal)
+String* Commandlet::Parse(const String& inParam)
 {
 	for (uint32_t i = 0; i < argumentsCount; i++)
 	{
@@ -62,12 +62,14 @@ bool Commandlet::Parse(const String& inParam, String* returnVal)
 
 		if (item == inParam)
 		{
-			if (returnVal != nullptr && i + 1 <= argumentsCount + 1)
-				*returnVal = parsedWords[i + 1];
-			
-			return true;
+			return &item;
 		}
 	}
 
+	return nullptr;
+}
+
+bool Commandlet::Check(const String& inParam)
+{
 	return false;
 }

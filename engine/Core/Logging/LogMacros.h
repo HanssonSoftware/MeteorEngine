@@ -94,6 +94,7 @@ struct LogDescriptor
     struct Log##CategoryName : public LogEntry \
 	{ \
         static constexpr const char* GetName() { return #CategoryName; }; \
+        static constexpr const wchar_t* GetNameW() { return L#CategoryName; }; \
     }
 
 LOG_ADDCATEGORY(Temp);

@@ -66,6 +66,9 @@
     <ClCompile Include="engine\Core\Resource\MemoryAllocatorArena.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\Core\Platform\Platform_Win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Application\Application.h">
@@ -407,6 +410,12 @@
     <ClInclude Include="engine\Core\Application\Configuration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="engine\Core\Platform\Platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Platform\DataTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\d1.bin">
@@ -437,6 +446,9 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="engine\Engine.mrbuild" />
+    <None Include="engine\Core\Types\StringMacros.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="engine\Core\Core.natvis" />

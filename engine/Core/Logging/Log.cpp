@@ -4,6 +4,7 @@
 #include "Log.h"
 #include <Commandlet.h>
 #include <Types/String.h>
+#include <Platform/DataTypes.h>
 
 #include <Application/Application.h>
 #include <Special/EngineConstants.h>
@@ -21,6 +22,7 @@
 
 #ifdef MR_PLATFORM_WINDOWS
 static HANDLE instanceFile;
+static HANDLE fileHandle;
 #endif // MR_PLATFORM_WINDOWS
 
 
@@ -28,6 +30,12 @@ Logger::Logger(Logger* newInstance)
 {
     instance = newInstance;
 }
+
+Logger::~Logger() noexcept
+{
+
+}
+
 
 void Logger::Shutdown()
 {
@@ -40,80 +48,68 @@ void Logger::Shutdown()
 void Logger::Initialize()
 {
 #ifdef MR_PLATFORM_WINDOWS
-    if (!Commandlet::Get().Parse("-nofilelogging", nullptr))
+    if (!Commandlet::Get().Check(TEXT("-nofilelogging")))
     {
-        wchar_t* foundPath = nullptr;
+        Char* foundPath = nullptr;
 
         if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &foundPath)))
         {
-            wchar_t path[512] = { L'\0' };
+            Char path[512] = { L'\0' };
             wcscpy(path, foundPath);
 
-            static constexpr const wchar_t pathToCat[] = L"\\" WIDE_COMPANY_NAME L"\\";
+            static constexpr const Char pathToCat[] = L"\\" WIDE_COMPANY_NAME L"\\";
             wcscat(path, pathToCat);
 
-            wchar_t path2[64] = { L'\0' };
-            const uint32_t converted = MultiByteToWideChar(CP_UTF8, 0, GetApplication()->GetApplicationNameNoSpaces(), GetApplication()->GetApplicationNameNoSpaces().Length(), path2, GetApplication()->GetApplicationNameNoSpaces().Length());
-            if (!converted)
-            {
-
-            }
-
-            wcsncat(path, path2, converted);
+            wcsncat(path, GetApplication()->GetApplicationNameNoSpaces(), GetApplication()->GetApplicationNameNoSpaces().Length());
 
             SHCreateDirectoryExW(nullptr, path, nullptr);
 
-            static constexpr const wchar_t instanceRunningFilePath[] = L"\\.livestatus";
+            static constexpr const Char instanceRunningFilePath[] = L"\\.livestatus";
             wcsncat(path, instanceRunningFilePath, sizeof(instanceRunningFilePath) / sizeof(instanceRunningFilePath[0]));
 
             instanceFile = CreateFileW(path, GENERIC_READ, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, nullptr);
             if (GetLastError() == ERROR_ALREADY_EXISTS)
             {
-                static constexpr const wchar_t title[] = WIDE_ENGINE_NAME_SPACE L" - Info";
+                static constexpr const Char title[] = WIDE_ENGINE_NAME_SPACE L" - Info";
                 MessageBoxW(nullptr, L"This application does not shutdown correctly, enable safe mode?", title, MB_OKCANCEL | MB_ICONEXCLAMATION);
             }
 
             PathCchRemoveFileSpec(path, wcslen(path));
 
-            static constexpr const wchar_t pathToCat2[] = L"\\" L"Logs" L"\\";
+            static constexpr const Char pathToCat2[] = L"\\" L"Logs" L"\\";
             wcsncat(path, pathToCat2, sizeof(pathToCat2) / sizeof(pathToCat2[0]));
             SHCreateDirectoryExW(nullptr, path, nullptr);
 
             SYSTEMTIME st = {};
             GetLocalTime(&st);
 
-            wchar_t date[32] = { L'\0' };
+            Char date[32] = { L'\0' };
             swprintf(date, 32, L"%02d%02d%02d-%02d%02d%02d.txt", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
             wcsncat(path, date, 32);
 
             fileHandle = CreateFileW(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
             if (fileHandle == INVALID_HANDLE_VALUE)
             {
-                wchar_t chars[256] = { L'\0' };
+                Char chars[256] = { L'\0' };
 
                 FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, GetLastError(), LANG_USER_DEFAULT, chars, 256, nullptr);
 
                 MR_LOG(LogTemp, Error, "%ls", chars);
             }
 
-            static constexpr const char fileBeginFormatting[] = "Logging started at: %02d/%02d/%02d %02d:%02d:%02d\n\n\n";
+            static constexpr const char fileBeginFormatting[] = "Logging started at: %02d/%02d/%02d %02d:%02d:%02d\n";
             char fileBeginFormatted[64] = "\0";
 
-            snprintf(fileBeginFormatted, 64, fileBeginFormatting, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+            const u32 count = snprintf(fileBeginFormatted, 64, fileBeginFormatting, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
 
             DWORD toWrite = 0;
-            WriteFile(fileHandle, fileBeginFormatted, strlen(fileBeginFormatted), &toWrite, nullptr);
+            WriteFile(fileHandle, fileBeginFormatted, count, &toWrite, nullptr);
             FlushFileBuffers(fileHandle);
 
             CoTaskMemFree(foundPath);
         }
     }
 #endif // MR_PLATFORM_WINDOWS
-}
-
-Logger::~Logger() noexcept
-{
-
 }
 
 void Logger::HandleFatal(LogDescriptor* Descriptor)

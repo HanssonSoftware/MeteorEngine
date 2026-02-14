@@ -18,9 +18,9 @@
 EditorApplication::EditorApplication() 
 	: Application()
 {
-	appName = "Meteor Editor";
-	appNameNoSpaces = "MeteorEditor";
-	appCodeName = "Astronaut";
+	appName = TEXT("Meteor Editor");
+	appNameNoSpaces = TEXT("MeteorEditor");
+	appCodeName = TEXT("Astronaut");
 
 }
 

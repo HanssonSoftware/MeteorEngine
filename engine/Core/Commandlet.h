@@ -26,16 +26,18 @@ struct CORE_API Commandlet
 
 	void Shutdown();
 
-	bool Parse(const String& inParam, String* returnVal);
+	String* Parse(const String& inParam);
 
-	const uint32_t GetArgumentsCount() const { return argumentsCount; }
+	bool Check(const String& inParam);
 
-	inline const char* GetArgumentsList() const { return rawArgumentList; }
+	const u32 GetArgumentsCount() const { return argumentsCount; }
+
+	inline const Char* GetArgumentsList() const { return rawArgumentList; }
 
 protected:
 	bool bIsInited = false;
 
-	uint32_t argumentsCount = 0;
+	u32 argumentsCount = 0;
 
-	char* rawArgumentList = nullptr;
+	Char* rawArgumentList = nullptr;
 };
