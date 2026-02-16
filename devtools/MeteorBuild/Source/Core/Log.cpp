@@ -1,8 +1,9 @@
-/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
+﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "Log.h"
 #include "Application.h"
 #include <Types/StringW.h>
+#include <Application/Application.h>
 
 static LONG ExceptionHandler(EXCEPTION_POINTERS* ptr)
 {
@@ -68,7 +69,7 @@ void BuildSystemLogger::Shutdown()
 }
 
 static StringW fullMessage;
-void BuildSystemLogger::FormatLogMessage(LogDescriptor* Descriptor)
+void BuildSystemLogger::FormatLogMessage(const LogDescriptor* Descriptor)
 {
 	
 	

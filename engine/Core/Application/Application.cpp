@@ -11,6 +11,11 @@
 #include <crtdbg.h>
 #endif // MR_DEBUG
 
+#ifdef MR_PLATFORM_WINDOWS
+#include <winsock.h>
+#endif // MR_PLATFORM_WINDOWS
+
+
 #include <Platform/PerformanceTimer.h>
 #include <Module/ModuleManager.h>
 
@@ -18,7 +23,6 @@ Application::Application()
 {
     appFramework = this;
 }
-
 
 void Application::RequestExit(int Code)
 {
@@ -75,6 +79,10 @@ void Application::Shutdown()
 
 extern "C" __declspec(dllexport) int LaunchApplication(Application* instance, int argc, char argv[])
 {	
+#ifdef MR_PLATFORM_WINDOWS
+    
+#endif // MR_PLATFORM_WINDOWS
+
     int returnCode = 0xDEADBEEF; 
     if (instance != nullptr)
     {

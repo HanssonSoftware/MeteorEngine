@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
+﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "BuildProjectMethod.h"
 #include <Commandlet.h>
@@ -128,7 +128,7 @@ void BuildProjectMethod::BeginCreating()
                 }
 
                 delete[] buffer;
-                CloseHandle(script);
+                FormatLogMessage(script);
             }
             else
             {

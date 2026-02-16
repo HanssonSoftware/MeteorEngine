@@ -3,11 +3,11 @@
 #pragma once
 #include <Resource/MemoryManager.h>
 #include <type_traits>
-#include <stdint.h>
-#include <cstdarg>
+#include <Platform/DataTypes.h>
 
 #define MERGE(x, y) x##y
 #define MERGE2(x) #x
+
 
 
 struct LogAssertion
@@ -37,26 +37,34 @@ struct LogAssertion
     char message[bIsRunningDebugMode ? 256 : 128] = { '\0' };
 };
 
-enum LogSeverity : short
+enum LogSeverity
 {
-    Log,
+    Log      = 1,
     Verbose,
     Warn,
     Error,
     Fatal
 };
 
+enum LogFormatting
+{
+    Category,
+    Time,
+    Severity,
+    Message
+};
+
 struct LogDescriptor
 {
-    constexpr LogDescriptor(const char* category, int severity, const char* function, const char* file, int line)
-        : team(category), severity(severity), function(function), file(file), line(line)
+    constexpr LogDescriptor(const Char* category, const Char* severity, const u32 severityNum, const Char* function, const Char* file, int line)
+        : team(category), severity(severity), severityNum(severityNum), function(function), file(file), line(line)
     {
 
     }
 
     ~LogDescriptor() = default;
 
-    constexpr void SetValues(const char* category, int severity, const char* function, const char* file, const int line) noexcept
+    constexpr void SetValues(const Char* category,const Char* severity, const Char* function, const Char* file, const u32 line) noexcept
     {
         this->line = line;
         this->severity = severity;
@@ -65,26 +73,31 @@ struct LogDescriptor
         this->team = category;
     }
 
-    void SetMessage(const char* message, ...)
+    void SetMessage(const Char* message, ...)
     {
         va_list d = nullptr;
         va_start(d, message);
-        vsnprintf(this->message, bIsRunningDebugMode ? 1024 : 256, message, d);
+#ifdef MR_PLATFORM_WINDOWS
+        vswprintf(this->message, bIsRunningDebugMode ? 512 : 128, message, d);
+#else
+        vsnprintf(this->message, bIsRunningDebugMode ? 512 : 128, message, d);
+#endif
         va_end(d);
-
     }
 
-    uint8_t severity;
-    uint32_t line;
+    const Char* severity;
+    u32 severityNum;
 
-    const char* team;
+    u32 line;
+
+    const Char* team;
 
 #ifdef MR_DEBUG
-    const char* function;
-    const char* file;
+    const Char* function;
+    const Char* file;
 #endif // MR_DEBUG
 
-    char message[bIsRunningDebugMode ? 1024 : 256] = { '\0' };
+    Char message[bIsRunningDebugMode ? 512 : 128] = { '\0' };
 };
 
 
@@ -102,18 +115,23 @@ LOG_ADDCATEGORY(Temp);
 #define LINE _CRT_WIDE(__LINE__)
 #define Lize(x) L##x
 
-#define MR_LOG(CategoryName, Severity, Message, ...) \
+#define MR_LOG(CategoryName, severity, message, ...) \
 	/*static_assert(!std::is_same<decltype(_exception::retval), const wchar_t*>::value, "Formatting must be either TEXT() or L'Text'"); */\
     static_assert(std::is_base_of<LogEntry, CategoryName>::value, "Category must inherit from LogEntry (Use LOG_ADDCATEGORY() macro)"); \
-    if constexpr (bIsRunningDebugMode || Severity != Fatal) \
+    if constexpr (bIsRunningDebugMode || severity != Fatal) \
     {\
-        do { \
-             LogDescriptor descriptor = { #CategoryName, Severity, __FUNCTION__, __FILE__, __LINE__ };\
-             descriptor.SetMessage(Message, __VA_ARGS__); \
-                if constexpr (Severity >= Fatal) \
-                    Logger::Get()->HandleFatal(&descriptor); \
-                else if constexpr (Severity < Fatal && bIsRunningDebugMode)\
-                    Logger::Get()->FormatLogMessage(&descriptor); \
+        do \
+        { \
+             LogDescriptor descriptor = { TEXT(#CategoryName), TEXT(#severity), severity, __FUNCTIONW__, __FILEW__, __LINE__ };\
+             descriptor.SetMessage(TEXT(message), __VA_ARGS__);\
+             if constexpr (severity != Fatal) \
+             { \
+                Char buffer[1024] = {'\0'};\
+                Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Time, &descriptor));\
+                Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Category, &descriptor));\
+                Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Severity, &descriptor));\
+                Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Message, &descriptor));\
+             } \
              \
         } while (0); \
     }

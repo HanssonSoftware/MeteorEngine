@@ -19,6 +19,8 @@ typedef wchar_t C;
 static constexpr const u64 CharSize = sizeof(C);
 static constexpr const bool bIsUsingWide = true;
 
+#define Len(x) wcslen(x);
+
 #elif MR_PLATFORM_LINUX
 typedef signed char i8;
 typedef short i16;
@@ -36,6 +38,7 @@ typedef char C;
 static constexpr const u64 CharSize = sizeof(C);
 
 #define TEXT(x) #x
+#define Len(x) strlen(x);
 
 #else
 #error No platform found! (DataTypes.h)

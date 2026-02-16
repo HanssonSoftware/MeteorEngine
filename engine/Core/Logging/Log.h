@@ -2,6 +2,7 @@
 
 #pragma once
 #include <Types/Delegate.h>
+#include <Platform/DataTypes.h>
 
 #ifdef MR_DEBUG
 constexpr inline const bool bIsRunningDebugMode = true;
@@ -11,6 +12,7 @@ constexpr inline const bool bIsRunningDebugMode = false;
 
 class String;
 struct LogDescriptor;
+enum LogFormatting;
 struct LogAssertion;
 
 #ifdef MR_CORE_EXPORTS
@@ -38,14 +40,12 @@ public:
 	virtual void Initialize();
 	virtual void Shutdown();
 
-	virtual void FormatLogMessage(LogDescriptor* Descriptor);
+	virtual u32 FormatLogMessage(Char* buffer, LogFormatting format, LogDescriptor* descriptor);
 	virtual void TransmitAssertion(const LogAssertion* Info);
-	virtual void SendToOutputBuffer(const String* Buffer);
+	virtual void SendToOutputBuffer(Char* buffer, const u32 count);
 	virtual void HandleFatal(LogDescriptor* Descriptor);
 
 protected:
-	//DelLoggerInitialize loggerInitialized;
-
 	bool bIsInitialized = false;
 private:
 	static inline Logger* instance = nullptr;
