@@ -9,13 +9,13 @@
 class MemoryAllocatorArena
 {
 public:
-	explicit MemoryAllocatorArena(uint64_t maximumAllocated)
+	explicit MemoryAllocatorArena(u64 maximumAllocated)
 	{
 		
 	}
 
 	template<typename T>
-	T* Allocate(uint64_t bytesToAllocate)
+	T* Allocate(u64 bytesToAllocate)
 	{
 		T* pointer = begin + offset;
 
@@ -29,7 +29,7 @@ public:
 		return true;
 	}
 
-	uint64_t offset = 0;
+	u64 offset = 0;
 
 	char* begin = nullptr;
 };

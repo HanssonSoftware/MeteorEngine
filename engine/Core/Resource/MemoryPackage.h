@@ -1,21 +1,20 @@
 /* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <stdint.h>
+//#include <Platform/DataTypes.h>
+
+class MemoryManager;
 
 template<typename T>
 struct MemoryPackage
 {
-	MemoryPackage(T* inputData)
-		: internalData(inputData)
+	MemoryPackage(MemoryManager* owner)
+		: owner(owner)
 	{
 
 	}
 
-	virtual ~MemoryPackage() noexcept
-	{
-
-	};
+	virtual ~MemoryPackage() noexcept = default;
 
 	T* internalData = nullptr;
 
@@ -29,8 +28,6 @@ struct MemoryPackage
 		return *this->internalData;
 	}
 
-	MemoryPackage* nextPackage = nullptr;
-
-	uint64_t offset = 0;
+	MemoryManager* owner = nullptr;
 };
 

@@ -10,7 +10,7 @@ class NameCollection
 {
 	struct NameEntry
 	{
-		uint64_t hash;
+		u64 hash;
 		const char* name;
 	};
 

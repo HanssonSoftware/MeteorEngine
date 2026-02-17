@@ -13,7 +13,7 @@ Name::Name(const String* string)
 	NameCollection::LookUp(string);
 }
 
-Name::Name(uint64_t hashVal)
+Name::Name(u64 hashVal)
 {
 	
 }

@@ -41,7 +41,7 @@ public:
 
 	//String GetRegionName() const { return regionName; };
 	
-	uint64_t regionSize = 0;
-	uint64_t offset = 0;
+	u64 regionSize = 0;
+	u64 offset = 0;
 };
 

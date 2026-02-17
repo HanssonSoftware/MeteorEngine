@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <Platform/DataTypes.h>
 #include "MemoryRegion.h"
 #include "MemoryPackage.h"
 
@@ -29,24 +29,25 @@ public:
 	void Initialize();
 	void Shutdown();
 
-	bool RequestResourceFromEngine(uint64_t size);
-	bool RequestResource(uint64_t size);
+	bool RequestResourceFromEngine(u64 size);
+	bool RequestResource(u64 size);
 
 	template<typename T>
-	MemoryPackage<T> Allocate(uint64_t size)
+	MemoryPackage<T> Allocate(u64 size)
 	{
+		MemoryPackage<T> allocatedReady(this);
 		if (projectResource.regionStart)
 		{
-			void* found = projectResource.regionStart + projectResource.offset;
+			T* found = (T*)(projectResource.regionStart + projectResource.offset);
 			if (!found)
 			{
-				return nullptr;
+				return allocatedReady;
 			}
 
 			projectResource.offset += size;
-		}
 
-		MemoryPackage<T> allocatedReady((T*)malloc(size));
+			allocatedReady.internalData = (T*)found;
+		}
 
 		return allocatedReady;
 	}
@@ -54,15 +55,15 @@ public:
 	template<typename T>
 	void Deallocate(T* data)
 	{
-		free(data);
+		
 	}
 
 protected:
-	constexpr uint64_t CeilPow2(uint64_t x) noexcept;
-	constexpr uint64_t FloorPow2(uint64_t x) noexcept;
-	constexpr uint64_t AlignUp(uint64_t x, uint64_t a) noexcept;
+	constexpr u64 CeilPow2(u64 x) noexcept;
+	constexpr u64 FloorPow2(u64 x) noexcept;
+	constexpr u64 AlignUp(u64 x, u64 a) noexcept;
 
-	uint64_t minimumStartingMemory = 0;
+	u64 minimumStartingMemory = 0;
 
 	MemoryRegion engineResource;
 	MemoryRegion projectResource;

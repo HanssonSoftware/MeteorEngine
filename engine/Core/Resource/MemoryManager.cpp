@@ -29,7 +29,7 @@ MemoryManager* GetMemoryManager()
 void MemoryManager::Initialize()
 {
 #ifdef MR_PLATFORM_WINDOWS
-	uint64_t reservedMemory = 0;
+	u64 reservedMemory = 0;
 
 	MEMORYSTATUSEX status = { sizeof(MEMORYSTATUSEX) };
 	GlobalMemoryStatusEx(&status);
@@ -55,7 +55,7 @@ void MemoryManager::Initialize()
 
 	end = (char*)((char*)begin + reservedMemory);
 
-	uint64_t reservedQuarter = reservedMemory / 4ull;
+	u64 reservedQuarter = reservedMemory / 4ull;
 	
 	engineResource = MemoryRegion(nullptr, nullptr, begin, (char*)(begin + reservedQuarter));
 	projectResource = MemoryRegion(nullptr, nullptr, (char*)(begin + reservedQuarter), end);
@@ -76,15 +76,15 @@ void MemoryManager::Shutdown()
 	delete object;
 }
 
-bool MemoryManager::RequestResourceFromEngine(uint64_t size)
+bool MemoryManager::RequestResourceFromEngine(u64 size)
 {
 	return false;
 }
 
-bool MemoryManager::RequestResource(uint64_t size)
+bool MemoryManager::RequestResource(u64 size)
 {
 #ifdef MR_PLATFORM_WINDOWS
-	//if (!VirtualAlloc((uint64_t*)begin + offset, size, MEM_COMMIT, PAGE_READWRITE))
+	//if (!VirtualAlloc((u64*)begin + offset, size, MEM_COMMIT, PAGE_READWRITE))
 	{
 		DWORD a = GetLastError();
 
@@ -100,7 +100,7 @@ bool MemoryManager::RequestResource(uint64_t size)
 	return false;
 }
 
-constexpr uint64_t MemoryManager::CeilPow2(uint64_t x) noexcept
+constexpr u64 MemoryManager::CeilPow2(u64 x) noexcept
 {
 	if (x <= 1) return 1;
 	x--;
@@ -113,7 +113,7 @@ constexpr uint64_t MemoryManager::CeilPow2(uint64_t x) noexcept
 	return x + 1;
 }
 
-constexpr uint64_t MemoryManager::FloorPow2(uint64_t x) noexcept
+constexpr u64 MemoryManager::FloorPow2(u64 x) noexcept
 {
 	if (x == 0) return 0;
 	x |= x >> 1;
@@ -125,7 +125,7 @@ constexpr uint64_t MemoryManager::FloorPow2(uint64_t x) noexcept
 	return x - (x >> 1);
 }
 
-constexpr uint64_t MemoryManager::AlignUp(uint64_t x, uint64_t a) noexcept
+constexpr u64 MemoryManager::AlignUp(u64 x, u64 a) noexcept
 {
 	return (x + (a - 1)) & ~(a - 1);
 }

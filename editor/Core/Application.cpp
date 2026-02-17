@@ -18,16 +18,16 @@
 EditorApplication::EditorApplication() 
 	: Application()
 {
-	appName = TEXT("Meteor Editor");
-	appNameNoSpaces = TEXT("MeteorEditor");
-	appCodeName = TEXT("Astronaut");
 
 }
 
 void EditorApplication::Init()
 {
 	Application::Init();
-	
+
+	appName = TEXT("Meteor Editor");
+	appNameNoSpaces = TEXT("MeteorEditor");
+	appCodeName = TEXT("Astronaut");
 
 	Application::Run();
 }

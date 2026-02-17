@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <cstdint>
+#include <Platform/DataTypes.h>
 
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)
@@ -11,8 +11,8 @@
 
 struct CORE_API IResourceAllocator
 {
-	virtual char* Allocate(uint64_t byte) = 0;
-	virtual void Deallocate(uint64_t byte) = 0;
+	virtual char* Allocate(u64 byte) = 0;
+	virtual void Deallocate(u64 byte) = 0;
 
 	virtual ~IResourceAllocator() noexcept = default;
 };
