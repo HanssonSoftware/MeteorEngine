@@ -43,7 +43,7 @@ void MemoryManager::Initialize()
 		reservedMemory = 256ull * 1024ull * 1024ull;
 	}
 
-	begin = (char*)VirtualAlloc(nullptr, reservedMemory, MEM_COMMIT, PAGE_READWRITE);
+	begin = (char*)VirtualAlloc(nullptr, reservedMemory, MEM_RESERVE, PAGE_READWRITE);
 	if (!begin && reservedMemory != 0)
 	{
 		wchar_t chars[256] = { L'\0' };
@@ -84,7 +84,7 @@ bool MemoryManager::RequestResourceFromEngine(u64 size)
 bool MemoryManager::RequestResource(u64 size)
 {
 #ifdef MR_PLATFORM_WINDOWS
-	//if (!VirtualAlloc((u64*)begin + offset, size, MEM_COMMIT, PAGE_READWRITE))
+	if (!VirtualAlloc(nullptr, size, MEM_COMMIT, PAGE_READWRITE))
 	{
 		DWORD a = GetLastError();
 
@@ -98,6 +98,28 @@ bool MemoryManager::RequestResource(u64 size)
 #error MemoryManager class (RequestResource) is only implemented to windows.
 #endif // MR_PLATFORM_WINDOWS
 	return false;
+}
+
+void* MemoryManager::Allocate(u64 size)
+{
+	MR_ASSERT(projectResource.regionStart, "Reserved block for project is nowhere to be found (it's null), perhaps not initalized?");
+
+	void* currentlyAllocated = VirtualAlloc(projectResource.regionStart + projectResource.offset, size, MEM_COMMIT, PAGE_READWRITE);
+	if (!currentlyAllocated)
+	{
+		MR_ASSERT(false, "Implement invalid allocated part!");
+	}
+
+	memset(projectResource.regionStart + projectResource.offset, 0x9, size);
+
+	projectResource.offset += size;
+	return currentlyAllocated;
+}
+
+void MemoryManager::Deallocate(void* data, const u64 size)
+{
+	VirtualFree(data, size, MEM_DECOMMIT);
+	int j = 235;
 }
 
 constexpr u64 MemoryManager::CeilPow2(u64 x) noexcept

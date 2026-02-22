@@ -130,7 +130,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>MR_DEBUG;_CONSOLE;MR_PLATFORM_WINDOWS;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MR_DEBUG;_CONSOLE;MR_PLATFORM_WINDOWS;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)Source\;$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir)Source;$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate</AdditionalIncludeDirectories>
@@ -174,7 +174,7 @@
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)Source\;$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir);$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(CoreLibraryDependencies);MeteorEngine-Core.lib</AdditionalDependencies>
@@ -192,7 +192,6 @@
     <ClCompile Include="Source\Core\Utils.cpp" />
     <ClCompile Include="Source\Module\Project.cpp" />
     <ClCompile Include="Source\Module\Parser.cpp" />
-    <ClCompile Include="Source\Types\StringW.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Methods\BuildProjectMethod.h" />
@@ -206,7 +205,6 @@
     <ClInclude Include="Source\Module\Parser.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Source\Core\Utils.h" />
-    <ClInclude Include="Source\Types\StringW.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MeteorBuild.aps" />

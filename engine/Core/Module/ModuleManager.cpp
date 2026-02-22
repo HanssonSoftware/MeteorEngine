@@ -51,7 +51,7 @@ bool ModuleManager::LoadModule(const String& moduleName)
         return true;
 
 #ifdef MR_PLATFORM_WINDOWS
-    String libraryName = String::Format(L"%ls-%ls.dll", *GetApplication()->GetApplicationName(), moduleName.Chr());
+    String libraryName = String::Format("%s-%s.dll", GetApplication()->GetApplicationName(), moduleName);
 
     HMODULE module = LoadLibraryW(L"libraryName");
     if (module != nullptr)
@@ -72,7 +72,7 @@ bool ModuleManager::LoadModule(const String& moduleName)
     }
     else
     {
-        libraryName = String::Format(L"%ls-%ls.dll", defaultEngineName, moduleName.Chr());
+        libraryName = String::Format("%ls-%s.dll", defaultEngineName, moduleName.Chr());
 
         module = LoadLibraryW(L"libraryName");
         if (module != nullptr)

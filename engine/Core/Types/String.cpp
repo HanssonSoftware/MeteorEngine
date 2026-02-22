@@ -14,7 +14,7 @@ LOG_ADDCATEGORY(StringSet);
 String::~String() noexcept
 {
 	if (bIsUsingHeap && heapBuffer.ptr)
-		GetMemoryManager()->Deallocate(heapBuffer.ptr);
+		GetMemoryManager()->Deallocate(heapBuffer.ptr, heapBuffer.capacity);
 
 	NullOut();
 
@@ -23,17 +23,17 @@ String::~String() noexcept
 #endif // MR_DEBUG
 }
 
-String::String(const Char* Input)
+String::String(const char* Input)
 {
 	NullOut();
 
 	if (!Input || *Input == '\0')
 		return;
 
-	const u32 size = (u32)LENGTH(Input);
-	Char* target = DetermineLocation(size);
+	const u32 size = (u32)strlen(Input);
+	char* target = DetermineLocation(size);
 
-	STRCPY(target, Input, size);
+	strncpy(target, Input, size);
 
 #ifdef MR_DEBUG
 	bIsInited = true;
@@ -87,8 +87,8 @@ String::String(String&& other) noexcept
 		stackBuffer.length = other.stackBuffer.length;
 	}
 
-	Char* determined = DetermineLocation(Length());
-	MOVE(determined, other.Data(), Length());
+	char* determined = DetermineLocation(Length());
+	memmove(determined, other.Data(), Length());
 
 #ifdef MR_DEBUG
 	bIsInited = true;
@@ -105,17 +105,17 @@ String::String(const String& other)
 	{
 		heapBuffer.capacity = other.heapBuffer.capacity;
 		heapBuffer.length = other.heapBuffer.length;
-		heapBuffer.ptr = GetMemoryManager()->Allocate<Char>(heapBuffer.capacity * CharSize);
+		heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(heapBuffer.capacity);
 
-		CLEAN(heapBuffer.ptr, heapBuffer.capacity);
-		STRCPY(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
+		memset(heapBuffer.ptr, 0, heapBuffer.capacity);
+		strncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
 	}
 	else
 	{
 		stackBuffer.length = other.stackBuffer.length;
 
-		CLEAN(stackBuffer.ptr, stackBuffer.length);
-		STRCPY(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
+		memset(stackBuffer.ptr, 0, stackBuffer.length);
+		strncpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
 	}
 
 #ifdef MR_DEBUG
@@ -124,15 +124,15 @@ String::String(const String& other)
 #endif // MR_DEBUG
 }
 
-String::String(const Char* Input, u32 length)
+String::String(const char* Input, u32 length)
 {
 	NullOut();
 
 	if (!Input || *Input == '\0' || length <= 0)
 		return;
 
-	Char* direct = DetermineLocation(length);
-	STRCPY(direct, Input, length);
+	char* direct = DetermineLocation(length);
+	strncpy(direct, Input, length);
 
 #ifdef MR_DEBUG
 	bIsInited = true;
@@ -142,8 +142,8 @@ String::String(const Char* Input, u32 length)
 
 String String::operator+(const String& Other)
 {
-	//const Char* thisData = Data();
-	//const Char* otherData = Other.Chr();
+	//const char* thisData = Data();
+	//const char* otherData = Other.Chr();
 
 	//const uint32_t thisSize = LENGTH(thisData);
 	//const uint32_t otherSize = LENGTH(otherData);
@@ -152,7 +152,7 @@ String String::operator+(const String& Other)
 
 	//if (this->bIsUsingHeap)
 	//{
-	//	ScopedPtr<Char> newBuffer = GetMemoryManager()->Allocate<Char>(thisSize + otherSize + 1u);
+	//	ScopedPtr<char> newBuffer = (char*)GetMemoryManager()->Allocate(thisSize + otherSize + 1u);
 	//	memcpy(newBuffer.Get(), thisData, thisSize);
 	//	memcpy(newBuffer.Get() + thisSize, otherData, otherSize);
 
@@ -167,7 +167,7 @@ String String::operator+(const String& Other)
 	return *this;
 }
 
-String& String::operator+=(const Char* other)
+String& String::operator+=(const char* other)
 {
 	if (!other)
 		return *this;
@@ -181,21 +181,21 @@ String String::Format(const String& format, ...)
 	va_list a;
 	va_start(a, format.Chr());
 
-	const Char* formattingBuffer = format.Chr();
+	const char* formattingBuffer = format.Chr();
 
 	va_list a_cpy;
 	va_copy(a_cpy, a);
-	const int sizeForVA = VPRINTF(0, formattingBuffer, 0, a);
+	const int sizeForVA = vsnprintf(nullptr, 0, formattingBuffer, a);
 	va_end(a_cpy);
 
-	Char* newFormattedBuffer = GetMemoryManager()->Allocate<Char>(sizeForVA + 1);
+	char* newFormattedBuffer = (char*)GetMemoryManager()->Allocate(sizeForVA + 1);
 
-	const int result = VPRINTF(newFormattedBuffer, formattingBuffer, sizeForVA + 1, a);
+	const int result = vsnprintf(nullptr, sizeForVA + 1, formattingBuffer, a);
 	va_end(a);
 
 	String stringized(newFormattedBuffer);
 
-	GetMemoryManager()->Deallocate(newFormattedBuffer);
+	GetMemoryManager()->Deallocate(newFormattedBuffer, sizeForVA + 1);
 	return stringized;
 }
 
@@ -209,7 +209,7 @@ void String::NullOut()
 	heapBuffer.capacity = 0;
 	heapBuffer.length = 0;
 
-	CLEAN(stackBuffer.ptr, SSO_MAX_CHARS + 1);
+	memset(stackBuffer.ptr, 0, SSO_MAX_CHARS + 1);
 	stackBuffer.length = 0;
 
 #ifdef MR_DEBUG
@@ -217,16 +217,16 @@ void String::NullOut()
 #endif // MR_DEBUG
 }
 
-Char* String::DetermineLocation(u32 size)
+char* String::DetermineLocation(u32 size)
 {
 	bIsUsingHeap = size > SSO_MAX_CHARS;
 	if (bIsUsingHeap)
 	{
 		heapBuffer.capacity = size * 2;
-		heapBuffer.ptr = GetMemoryManager()->Allocate<Char>(heapBuffer.capacity * CharSize);
+		heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(heapBuffer.capacity);
 		heapBuffer.length = size;
 
-		CLEAN(heapBuffer.ptr, heapBuffer.capacity);
+		memset(heapBuffer.ptr, 0, heapBuffer.capacity);
 		return heapBuffer.ptr;
 	}
 
@@ -243,17 +243,17 @@ String& String::operator=(const String& other)
 		{
 			heapBuffer.capacity = other.heapBuffer.capacity;
 			heapBuffer.length = other.heapBuffer.length;
-			heapBuffer.ptr = GetMemoryManager()->Allocate<Char>(heapBuffer.capacity * CharSize);
+			heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(heapBuffer.capacity);
 
-			CLEAN(heapBuffer.ptr, heapBuffer.capacity);
-			STRCPY(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
+			memset(heapBuffer.ptr, 0, heapBuffer.capacity);
+			strncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
 		}
 		else
 		{
 			stackBuffer.length = other.stackBuffer.length;
 			
-			CLEAN(stackBuffer.ptr, stackBuffer.length);
-			STRCPY(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
+			memset(stackBuffer.ptr, 0, stackBuffer.length);
+			strncpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
 		}
 
 #ifdef MR_DEBUG
@@ -274,30 +274,30 @@ String& String::operator+=(const String& other)
 	const u32 otherLen = other.Length();
 	const u32 newLen = thisLen + otherLen;
 
-	const Char* otherData = other.bIsUsingHeap ? other.heapBuffer.ptr : other.stackBuffer.ptr;
+	const char* otherData = other.bIsUsingHeap ? other.heapBuffer.ptr : other.stackBuffer.ptr;
 
 	if (bIsUsingHeap)
 	{
 		if (heapBuffer.capacity <= newLen)
 		{
 			const u32 newCap = newLen * 2;
-			Char* newPtr = GetMemoryManager()->Allocate<Char>(newCap * CharSize);
-			CLEAN(newPtr, newCap);
+			char* newPtr = (char*)GetMemoryManager()->Allocate(newCap);
+			memset(newPtr, 0, newCap);
 
 			if (heapBuffer.ptr && thisLen > 0)
-				STRCPY(newPtr, heapBuffer.ptr, thisLen);
+				strncpy(newPtr, heapBuffer.ptr, thisLen);
 
-			STRCPY(newPtr + thisLen, otherData, otherLen);
+			strncpy(newPtr + thisLen, otherData, otherLen);
 
 			if (heapBuffer.ptr)
-				GetMemoryManager()->Deallocate(heapBuffer.ptr);
+				GetMemoryManager()->Deallocate(heapBuffer.ptr, heapBuffer.capacity);
 
 			heapBuffer.ptr = newPtr;
 			heapBuffer.capacity = newCap;
 		}
 		else
 		{
-			STRCPY(heapBuffer.ptr + thisLen, otherData, otherLen);
+			strncpy(heapBuffer.ptr + thisLen, otherData, otherLen);
 		}
 
 		heapBuffer.length = newLen;
@@ -307,20 +307,20 @@ String& String::operator+=(const String& other)
 	{
 		if (newLen <= SSO_MAX_CHARS)
 		{
-			STRCPY(stackBuffer.ptr + thisLen, otherData, otherLen);
+			strncpy(stackBuffer.ptr + thisLen, otherData, otherLen);
 			stackBuffer.length = newLen;
 			stackBuffer.ptr[newLen] = '\0';
 		}
 		else
 		{
 			const uint32_t newCap = newLen * 2;
-			Char* newPtr = GetMemoryManager()->Allocate<Char>(newCap * sizeof(Char));
-			CLEAN(newPtr, newCap);
+			char* newPtr = (char*)GetMemoryManager()->Allocate(newCap * sizeof(char));
+			memset(newPtr, 0, newCap);
 
 			if (thisLen > 0)
-				STRCPY(newPtr, stackBuffer.ptr, thisLen);
+				strncpy(newPtr, stackBuffer.ptr, thisLen);
 
-			STRCPY(newPtr + thisLen, otherData, otherLen);
+			strncpy(newPtr + thisLen, otherData, otherLen);
 
 			heapBuffer.ptr = newPtr;
 			heapBuffer.capacity = newCap;

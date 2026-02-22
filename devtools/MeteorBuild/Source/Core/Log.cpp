@@ -2,7 +2,7 @@
 
 #include "Log.h"
 #include "Application.h"
-#include <Types/StringW.h>
+#include <Types/String.h>
 #include <Application/Application.h>
 
 static LONG ExceptionHandler(EXCEPTION_POINTERS* ptr)
@@ -68,12 +68,12 @@ void BuildSystemLogger::Shutdown()
 	CloseHandle(hConsole);
 }
 
-static StringW fullMessage;
+static String fullMessage;
 void BuildSystemLogger::FormatLogMessage(const LogDescriptor* Descriptor)
 {
 	
 	
-	//MultiByteToWideChar(CP_UTF8, 0, Descriptor->message, -1, nullptr, 0);
+	//MultiByteToWidewchar_t(CP_UTF8, 0, Descriptor->message, -1, nullptr, 0);
 
 	//FormatConsoleColorBySeverity(Descriptor->severity);
 	//SendToOutputBuffer(nullptr);

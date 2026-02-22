@@ -2,11 +2,8 @@
 
 #pragma once
 
-#define _CRT_SECURE_NO_WARNINGS
 #include <string>
 #include <Platform/DataTypes.h>
-
-#include "StringMacros.inl"
 
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)
@@ -27,19 +24,19 @@ public:
 #endif // MR_DEBUG
 	}
 
-	virtual ~String() noexcept;
+	~String() noexcept;
 
-	String(const Char* Input);
+	String(const char* Input);
 
-	String(int Input);
+	explicit String(int Input);
 
-	String(float Input);
+	explicit String(float Input);
 
-	String(u32 Input);
+	explicit String(u32 Input);
 
 	String(const String& other);
 
-	String(const Char* string, u32 length);
+	String(const char* string, u32 length);
 
 	String(String&& other) noexcept;
 
@@ -49,17 +46,17 @@ public:
 
 	bool operator==(const String& Other) const
 	{
-		return COMPARE(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) == 0;
+		return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) == 0;
 	}
 
-	bool operator==(const Char* Other) const
+	bool operator==(const char* Other) const
 	{
-		return COMPARE(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other) == 0;
+		return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other) == 0;
 	}
 		
 	bool operator!=(const String& Other) const
 	{
-		return COMPARE(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
+		return strcmp(bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr, Other.bIsUsingHeap ? Other.heapBuffer.ptr : Other.stackBuffer.ptr) != 0;
 	}
 
 	bool operator!() const
@@ -67,26 +64,26 @@ public:
 		return bIsUsingHeap ? !heapBuffer.ptr : !stackBuffer.ptr;
 	}
 
-	operator bool() const
+	explicit operator bool() const
 	{
 		return Length() > 0;
 	}
 
 	String& operator+=(const String& other);
 
-	String& operator+=(const Char* other);
+	String& operator+=(const char* other);
 	
-	const Char* operator*() const
+	const char* operator*() const
 	{
 		return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr;
 	}
 
-	operator const Char*() const
+	operator const char*() const
 	{
 		return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr;
 	}
 
-	const Char* Chr() const
+	const char* Chr() const
 	{
 		return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr;
 	}
@@ -116,19 +113,19 @@ public:
 	/** */
 	static String Format(const String& format, ...);
 
-	Char* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
+	char* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
 
 private:
 
 	void NullOut();
 
-	Char* DetermineLocation(u32 size);
+	char* DetermineLocation(u32 size);
 
 	union
 	{
 		struct
 		{
-			Char* ptr = nullptr;
+			char* ptr = nullptr;
 			u32 length = 0;
 
 			u32 capacity = 0;
@@ -137,14 +134,14 @@ private:
 
 		struct
 		{
-			Char ptr[sizeof(heapBuffer) - sizeof(u32)] = {'\0'};
+			char ptr[sizeof(heapBuffer) - sizeof(u16)] = {'\0'};
 
-			u32 length = 0;
+			u16 length = 0;
 
 		} stackBuffer;
 	};
 
-	static constexpr u32 SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(u32) - 1;
+	static constexpr u32 SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(u16) - 1;
 
 	bool bIsUsingHeap = false;
 
@@ -159,7 +156,7 @@ struct StringView
 {
 	StringView() = delete;
 
-	StringView(const Char* data, u32 length)
+	StringView(const char* data, u32 length)
 		: ptr(data)
 		, size(length)
 	{
@@ -168,7 +165,7 @@ struct StringView
 
 	virtual ~StringView() noexcept = default;
 
-	const Char* ptr = nullptr;
+	const char* ptr = nullptr;
 
 	const u32 size = 0;
 };

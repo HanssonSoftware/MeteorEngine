@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
+﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
 
@@ -7,6 +7,7 @@
 
 #include <Logging/Log.h>
 // #include <CoreProxy.h>
+#undef T
 
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)

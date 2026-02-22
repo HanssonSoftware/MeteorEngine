@@ -1,8 +1,7 @@
-/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
+﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
-#define _CRT_SECURE_NO_WARNINGS
 #include "Utils.h"
-#include <Types/StringW.h>
+#include <Types/String.h>
 
 #include "Windows/WindowsPaths.h"
 #include <PathCch.h>
@@ -34,50 +33,13 @@ String Utils::GetLastError()
 
 	if (buffer)
 	{
-		String final;
 
-		char* finalBuffer = final.Data();
-		if (!WideCharToMultiByte(
-			/* UINT		CodePage */				CP_UTF8,
-			/* DWORD	dwFlags */				WC_NO_BEST_FIT_CHARS,
-			/* LPCWCH	lpWideCharStr */		buffer,
-			/* int		cchWideChar */			returned,
-			/* LPSTR	lpMultiByteStr */		finalBuffer,
-			/* int		cbMultiByte */			returned,
-			/* LPCCH	lpDefaultChar */		nullptr,
-			/* LPBOOL	lpUsedDefaultChar */	nullptr
-		))
-		{
-			switch (::GetLastError())
-			{
-				case ERROR_INSUFFICIENT_BUFFER:
-					MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: ERROR_INSUFFICIENT_BUFFER")
-					break;
-				case ERROR_INVALID_FLAGS:
-					MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: ERROR_INVALID_FLAGS")
-					break;
-				case ERROR_INVALID_PARAMETER:
-					MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: ERROR_INVALID_PARAMETER")
-					break;
-				case ERROR_NO_UNICODE_TRANSLATION:
-					MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: ERROR_NO_UNICODE_TRANSLATION")
-					break;
-
-				default:
-					MR_LOG(LogBuildSystemUtils, Error, "WideCharToMultiByte returned: Unknown")
-					break;
-			}
-
-		}
-
-		LocalFree(buffer);
-		return final;
 	}
 
 	return "";
 }
 
-void Utils::ListDirectory(wchar_t* name, Array<StringW>& container)
+void Utils::ListDirectory(wchar_t* name, Array<wchar_t*>& container)
 {
 	if (name != nullptr)
 	{
@@ -125,7 +87,7 @@ void Utils::ListDirectory(wchar_t* name, Array<StringW>& container)
 				{
 					wchar_t* tempName = new wchar_t[wcslen(name) + wcslen(foundFile.cFileName) + 10]();
 					StringCchPrintfW(tempName, STRSAFE_MAX_CCH, L"%ls\\%ls", name, foundFile.cFileName);
-					container.Add(tempName);
+					//container.Add(tempName);
 				
 					delete[] tempName;
 				}

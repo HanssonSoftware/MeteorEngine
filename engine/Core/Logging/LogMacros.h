@@ -3,6 +3,8 @@
 #pragma once
 #include <Resource/MemoryManager.h>
 #include <type_traits>
+#include <wchar.h>
+#include <stdarg.h>
 #include <Platform/DataTypes.h>
 
 #define MERGE(x, y) x##y
@@ -12,7 +14,7 @@
 
 struct LogAssertion
 {
-    constexpr LogAssertion(const char* inputFile, uint32_t inputLine, const char* statement)
+    constexpr LogAssertion(const Char* inputFile, u32 inputLine, const Char* statement)
         : assertLocationInFile(inputFile)
         , assertLineInFile(inputLine)
         , assertStatement(statement)
@@ -20,21 +22,25 @@ struct LogAssertion
 
     }
 
-    void SetMessage(const char* message, ...)
+    void SetMessage(const Char* message, ...)
     {
         va_list d = nullptr;
         va_start(d, message);
-        vsnprintf(this->message, bIsRunningDebugMode ? 256 : 128, message, d);
+#ifdef MR_PLATFORM_WINDOWS
+        vswprintf(this->message, bIsRunningDebugMode ? 512 : 128, message, d);
+#else
+        vsnprintf(this->message, bIsRunningDebugMode ? 512 : 128, message, d);
+#endif
         va_end(d);
     }
 
-    uint32_t assertLineInFile = 0;
+    u32 assertLineInFile = 0;
 
-    const char* assertLocationInFile = nullptr;
+    const Char* assertLocationInFile = nullptr;
 
-    const char* assertStatement = nullptr;
+    const Char* assertStatement = nullptr;
 
-    char message[bIsRunningDebugMode ? 256 : 128] = { '\0' };
+    Char message[bIsRunningDebugMode ? 256 : 128] = { '\0' };
 };
 
 enum LogSeverity
@@ -116,7 +122,6 @@ LOG_ADDCATEGORY(Temp);
 #define Lize(x) L##x
 
 #define MR_LOG(CategoryName, severity, message, ...) \
-	/*static_assert(!std::is_same<decltype(_exception::retval), const wchar_t*>::value, "Formatting must be either TEXT() or L'Text'"); */\
     static_assert(std::is_base_of<LogEntry, CategoryName>::value, "Category must inherit from LogEntry (Use LOG_ADDCATEGORY() macro)"); \
     if constexpr (bIsRunningDebugMode || severity != Fatal) \
     {\
@@ -141,7 +146,7 @@ LOG_ADDCATEGORY(Temp);
     do { \
         if (!(expression)) \
         {\
-            LogAssertion assertion = { __FILE__, (uint32_t)__LINE__, #expression }; assertion.SetMessage(message); Logger::Get()->TransmitAssertion(&assertion); \
+            LogAssertion assertion = { __FILEW__, (u32)__LINE__, TEXT(#expression) }; assertion.SetMessage(TEXT(message)); Logger::Get()->TransmitAssertion(&assertion); \
         }\
     } while (0)
 

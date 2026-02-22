@@ -15,13 +15,15 @@
 BuildSystemApplication::BuildSystemApplication()
 	: Application()
 {
-	appName = "Meteor Build";
-	appNameNoSpaces = "MeteorBuild";
-	appCodeName = "Apollo";
+
 }
 
 void BuildSystemApplication::Init()
 {
+	appName = "Meteor Build";
+	appNameNoSpaces = "MeteorBuild";
+	appCodeName = "Apollo";
+
 	if (!GetBuildSystem().InitFramework())
 	{
 		//MR_LOG(LogBuildSystemApplication, Fatal, "Build system error!");
@@ -37,7 +39,7 @@ void BuildSystemApplication::Run()
 	{
 		if (method->AcquireRequiredParameters())
 		{
-			method->BeginCreating();
+			method->StartMethod();
 			method->Finalize();
 		}
 	}

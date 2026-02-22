@@ -1,7 +1,7 @@
-/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
+﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "BuildSystem.h"
-#include <Types/StringW.h>
+#include <Types/String.h>
 #include <Core/Log.h>
 
 #include <Commandlet.h>
@@ -14,7 +14,7 @@
 #include <unordered_map>
 
 #include <PathCch.h>
-#include <Application.h>
+#include "Application.h"
 #include "Parser.h"
 
 #include <Shlobj.h>
@@ -45,18 +45,8 @@ bool BuildSystem::InitFramework()
 		return false;
 	}
 
-	if (Commandlet::Get().GetArgumentsCount() > 0)
-	{
-		if (!ReadArguments())
-		{
-			MessageBoxW(GetConsoleWindow(), L"No instruction parameter! Check help!", L"MeteorBuild(R) internal error!", MB_ICONERROR | MB_OK);
-			return false;
-		}
-	}
-	else
-	{
+	if (!ReadArguments())
 		SendHelpInfo();
-	}
 
 	return true;
 }
@@ -68,32 +58,19 @@ void BuildSystem::Shutdown()
 
 bool BuildSystem::ReadArguments()
 {
-	if (Commandlet::Get().Parse("-build", nullptr))
-	{
-		currentMethod = new BuildProjectMethod();
-		return true;
-	}
-	else if (Commandlet::Get().Parse("-rebuild", nullptr))
-	{
-		//currentMethod = new RebuildProjectMethod;
-	}
-	else if (Commandlet::Get().Parse("-compile", nullptr))
-	{
+	currentMethod = Commandlet::Get().Check("-build") ? new BuildProjectMethod() :
+		Commandlet::Get().Check("-rebuild") ? new BuildProjectMethod() :
+		Commandlet::Get().Check("-compile") ? new BuildProjectMethod() :
+		Commandlet::Get().Check("-clean") ? new BuildProjectMethod() : nullptr;
 
-	}
-	else if (Commandlet::Get().Parse("-clean", nullptr) || Commandlet::Get().Parse("-clear", nullptr))
-	{
-
-	}
-
-	return false;
+	return currentMethod ? true : false;
 }
 
 void BuildSystem::SendHelpInfo() const
 {
-	const bool bIsHelpRequested = Commandlet::Get().Parse("-help", nullptr) || 
-								  Commandlet::Get().Parse("-h", nullptr) || 
-								  Commandlet::Get().Parse("?", nullptr);
+	const bool bIsHelpRequested = Commandlet::Get().Check("-help") ||
+								  Commandlet::Get().Check("-h") ||
+								  Commandlet::Get().Check("?");
 
 	static constexpr const wchar_t helpA[] = L"\nDon\'t know what to do? List of options below.\n"
 		L"Instruction parameters:\n"

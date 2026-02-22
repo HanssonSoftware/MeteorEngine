@@ -166,7 +166,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;MR_CORE_ENABLED;MR_PLATFORM_WINDOWS;MR_CORE_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;MR_CORE_ENABLED;MR_PLATFORM_WINDOWS;MR_CORE_EXPORTS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -205,7 +205,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_CORE_ENABLED;MR_PLATFORM_WINDOWS;MR_CORE_EXPORTS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_CORE_ENABLED;MR_PLATFORM_WINDOWS;MR_CORE_EXPORTS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -261,7 +261,7 @@
     <ClCompile Include="engine\Core\Resource\MemoryAllocatorArena.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="engine\Core\Application\Configuration.h" />
+    <ClInclude Include="engine\Core\Common\Configuration.h" />
     <ClInclude Include="engine\Core\Common\Maths.h" />
     <ClInclude Include="engine\Core\Logging\Log.h" />
     <ClInclude Include="engine\Core\Logging\LogMacros.h" />
@@ -378,7 +378,6 @@
     <ClInclude Include="engine\Core\Resource\MemoryAllocatorArena.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="engine\Core\Types\StringMacros.inl" />
     <None Include="engine\Engine.mrbuild" />
     <None Include="engine\ThirdParty\assimp\color4.inl" />
     <None Include="engine\ThirdParty\assimp\material.inl" />

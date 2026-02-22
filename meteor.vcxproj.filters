@@ -407,7 +407,7 @@
     <ClInclude Include="engine\Core\Resource\MemoryAllocatorArena.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Application\Configuration.h">
+    <ClInclude Include="engine\Core\Common\Configuration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Platform\Platform.h">
@@ -446,9 +446,6 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="engine\Engine.mrbuild" />
-    <None Include="engine\Core\Types\StringMacros.inl">
-      <Filter>Header Files</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="engine\Core\Core.natvis" />

@@ -1,8 +1,10 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
+#define _CRT_NON_CONFORMING_SWPRINTFS
 #include "BuildProjectMethod.h"
 #include <Commandlet.h>
 #include <Core/Log.h>
+#include <Resource/MemoryManager.h>
 #include <Module/Parser.h>
 #include <Module/Module.h>
 #include <Module/Project.h>
@@ -58,108 +60,103 @@
 
 #pragma warning(disable : 6031)
 
-#define INSERT_SPECIFIER(x, statement) if (!strncmp(verb, x, length)) { statement return; }
+#define INSERT_SPECIFIER(x, statement) if (!wcscmp(verb, x)) { statement return; }
 
 BuildProjectMethod::BuildProjectMethod() : BaseBuildMethod()
 {
-    name = StringW(L"Build Project");
+    name = "Build Project";
 }
 
 bool BuildProjectMethod::AcquireRequiredParameters()
 {
-    uint32_t hasRequired = 0;
+    sourceDirectory = 
+        Commandlet::Get().Check("-source") ? Commandlet::Get().Parse("-source") : 
+        Commandlet::Get().Check("-src") ? Commandlet::Get().Parse("-src") : 
+        Commandlet::Get().Parse("-s") ? Commandlet::Get().Parse("-s") : String("");
 
-    String source, intermediate, solution;
-    if (Commandlet::Get().Parse("-source", &source) || Commandlet::Get().Parse("-src", &source) || Commandlet::Get().Parse("-s", &source))
-        hasRequired++;
-    
-    if (Commandlet::Get().Parse("-intermediate", &intermediate) || Commandlet::Get().Parse("-int", &intermediate))
-        hasRequired++;
+    intermediateDirectory = 
+        Commandlet::Get().Check("-intermediate") ? Commandlet::Get().Parse("-intermediate") :
+        Commandlet::Get().Check("-int") ? Commandlet::Get().Parse("-int") :
+        Commandlet::Get().Parse("-i") ? Commandlet::Get().Parse("-i") : String("");
 
-    if (Commandlet::Get().Parse("-solution", &solution) || Commandlet::Get().Parse("-sln", &solution))
-        alternativeSolutionDir = solution;
+    alternativeSolutionDir = 
+        Commandlet::Get().Check("-solution") ? Commandlet::Get().Parse("-solution") :
+        Commandlet::Get().Parse("-sln") ? Commandlet::Get().Parse("-sln") : String("");
 
-    sourceDirectory = source;
-    intermediateDirectory = intermediate;
-    return hasRequired == 2 ? true : false;
+    return sourceDirectory && intermediateDirectory;
 }
 
-void BuildProjectMethod::BeginCreating()
+void BuildProjectMethod::StartMethod()
 {
     LARGE_INTEGER lg;
     QueryPerformanceCounter(&lg);
     start = lg.QuadPart;
 
-    MR_ASSERT(sourceDirectory, "Source directory parameter missing!");
-
-    StringW formattedSourceDirectory = sourceDirectory;
-
-    Array<StringW> collectedSourcesWithScripts;
+    Array<wchar_t*> collectedSourcesWithScripts;
     Utils::ListDirectory(formattedSourceDirectory.Data(), collectedSourcesWithScripts);
 
-    for (auto& file : collectedSourcesWithScripts)
+    if (collectedSourcesWithScripts.GetSize() > 0)
     {
-        wchar_t* ptr = file.Data();
-        if (SUCCEEDED(PathCchFindExtension(file.Data(), file.Length() + 1, &ptr)) && !wcscmp(ptr, L".mrbuild"))
+        for (auto& file : collectedSourcesWithScripts)
         {
-            foundScripts.Add(file);
-            HANDLE script = CreateFileW(file, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
-            if (script != INVALID_HANDLE_VALUE)
+            wchar_t* ptr = file.Data();
+            if (SUCCEEDED(PathCchFindExtension(file.Data(), file.Length() + 1, &ptr)) && !wcscmp(ptr, L".mrbuild"))
             {
-                LARGE_INTEGER ld;
-                GetFileSizeEx(script, &ld);
-
-                DWORD readActually = 0;
-                char* buffer = new char[ld.QuadPart + 1]();
-                if (ReadFile(script, buffer, (DWORD)ld.QuadPart, &readActually, nullptr))
+                foundScripts.Add(file);
+                HANDLE script = CreateFileW(file, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
+                if (script != INVALID_HANDLE_VALUE)
                 {
-                    ::Module* actualModule = ParseModule(buffer);
-                    if (actualModule != nullptr)
-                    {
-                        actualModule->identification = GenerateGUID();
-                        actualModule->modulePath = ConvertPath(&file);
+                    LARGE_INTEGER ld;
+                    GetFileSizeEx(script, &ld);
 
-                        modules.Add(actualModule);
+                    DWORD readActually = 0;
+                    wchar_t* buffer = (wchar_t*)GetMemoryManager()->Allocate(ld.QuadPart + 1);
+                    if (ReadFile(script, buffer, (DWORD)ld.QuadPart, &readActually, nullptr))
+                    {
+                        ::Module* actualModule = ParseModule(buffer);
+                        if (actualModule != nullptr)
+                        {
+                            actualModule->identification = GenerateGUID();
+                            actualModule->modulePath = ConvertPath(&file);
+
+                            modules.Add(actualModule);
+                        }
                     }
+                    else
+                    {
+                        MR_LOG(LogTemp, Error, "Failed to read minimum amounts of bytes from file! %ls", *file);
+                    }
+
+                    delete[] buffer;
+                    CloseHandle(script);
                 }
                 else
                 {
-                    MR_LOG(LogTemp, Error, "Failed to read minimum amounts of bytes from file! %ls", *file);
+                    MR_LOG(LogTemp, Error, "Unable to open %ls script!", *file);
                 }
-
-                delete[] buffer;
-                FormatLogMessage(script);
-            }
-            else
-            {
-                MR_LOG(LogTemp, Error, "Unable to open %ls script!", *file);
             }
         }
-    }
-}
 
-void BuildProjectMethod::Finalize()
-{
-    if (BuildSystemLogger* bls = (BuildSystemLogger*)Logger::Get())
-    {
-        LARGE_INTEGER lg;
-        QueryPerformanceCounter(&lg);
-
-        LARGE_INTEGER frq;
-        QueryPerformanceFrequency(&frq);
-
-        wchar_t result[256] = {};
-        if (SUCCEEDED((result, 256, L"%s method is ran successfully in %.2f seconds!", *name, (lg.QuadPart - start) / (double)frq.QuadPart)))
+        if (BuildSystemLogger* bls = (BuildSystemLogger*)Logger::Get())
         {
-            DWORD actual = 0;
-            if (!WriteConsoleW(bls->GetOutputHandle(), result, 256, &actual, nullptr))
-            {
+            LARGE_INTEGER lgEnd;
+            QueryPerformanceCounter(&lgEnd);
 
+            LARGE_INTEGER frq;
+            QueryPerformanceFrequency(&frq);
+
+            wchar_t result[256] = {};
+            if (SUCCEEDED(swprintf(result, 256, L"%hs method is ran successfully in %.2f seconds!", *name, (lgEnd.QuadPart - lg.QuadPart) / (double)frq.QuadPart)))
+            {
+                DWORD actual = 0;
+                if (!WriteConsoleW(bls->GetOutputHandle(), result, 256, &actual, nullptr))
+                {
+
+                }
             }
         }
-    }
 
-    CleanUp();
+    }
 }
 
 void BuildProjectMethod::CleanUp()
@@ -169,20 +166,20 @@ void BuildProjectMethod::CleanUp()
 
 }
 
-Module* BuildProjectMethod::ParseModule(char* buffer)
+Module* BuildProjectMethod::ParseModule(wchar_t* buffer)
 {
     if (buffer != nullptr)
     {
-        int line = 1, character = 1;
+        int line = 1, wchar_tacter = 1;
 
-        char* begin = buffer;
-        char* end = begin;
+        wchar_t* begin = buffer;
+        wchar_t* end = begin;
 
         ::Module* newModule = new ::Module;
-        if (SkipWord(end, line, character))
+        if (SkipWord(end, line, wchar_tacter))
         {
             newModule->moduleName = GetQuotedWord(end);
-            if (!SkipCharacterType(end, Colon))
+            if (!SkipType(end, Colon))
             {
                 MR_LOG(LogTemp, Fatal, "Module is not associated with any project! %s", *newModule->moduleName);
                 
@@ -191,7 +188,7 @@ Module* BuildProjectMethod::ParseModule(char* buffer)
             }
 
             newModule->parent = GetQuotedWord(end);
-            if (!SkipCharacterType(end, OpenBrace))
+            if (!SkipType(end, OpenBrace))
             {
                 MR_LOG(LogTemp, Fatal, "Missing open statement!", );
 
@@ -199,23 +196,23 @@ Module* BuildProjectMethod::ParseModule(char* buffer)
                 return nullptr;
             }
 
-            while (GetCharacterType(end) != ClosedBrace)
+            while (GetType(end) != ClosedBrace)
             { 
-                char* actualLocation = end;
+                wchar_t* actualLocation = end;
 
                 const String word = GetWord(end);
-                if (word && SkipCharacterType(end, Colon) && SkipCharacterType(end, OpenBrace))
+                if (word && SkipType(end, Colon) && SkipType(end, OpenBrace))
                 {
-                    while (GetCharacterType(end) != ClosedBrace)
+                    while (GetType(end) != ClosedBrace)
                     {
                         const String entry = GetQuotedWord(end);
-                        SetSpecifierForModule(newModule, word, entry, entry.Length());
+                        //SetSpecifierForModule(newModule, word, entry, entry.Length());
 
-                        if (!SkipCharacterType(end, Comma))
+                        if (!SkipType(end, Comma))
                             break;
                     }
 
-                    SkipCharacterType(end, ClosedBrace);
+                    SkipType(end, ClosedBrace);
                 }
 
                 if (actualLocation == end)
@@ -225,7 +222,7 @@ Module* BuildProjectMethod::ParseModule(char* buffer)
                 }
             }
 
-            SkipCharacterType(end, ClosedBrace);
+            SkipType(end, ClosedBrace);
         }
 
         while (isspace(*end))
@@ -248,45 +245,44 @@ Module* BuildProjectMethod::ParseModule(char* buffer)
 inline String BuildProjectMethod::GenerateGUID() const
 {
     GUID id;
-    char guidBuffer[40] = { '\0' };
+    char guidBuffer[40] = { L'\0' };
 
     CoCreateGuid(&id);
-    sprintf(guidBuffer, "{%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}", id.Data1, id.Data2, id.Data3, id.Data4[0], id.Data4[1], id.Data4[2], id.Data4[3], id.Data4[4], id.Data4[5], id.Data4[6], id.Data4[7]);
-
+    snprintf(guidBuffer, 40, "{%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}", id.Data1, id.Data2, id.Data3, id.Data4[0], id.Data4[1], id.Data4[2], id.Data4[3], id.Data4[4], id.Data4[5], id.Data4[6], id.Data4[7]);
     return guidBuffer;
 }
 
-String BuildProjectMethod::ConvertPath(StringW* wideBuffer)
+String BuildProjectMethod::ConvertPath(String* wideBuffer)
 {
     if (!wideBuffer)
         return "";
 
-    wchar_t* wide = wideBuffer->Data();
+    //wchar_t* wide = wideBuffer->Data();
     
-    if (SUCCEEDED(PathCchRemoveFileSpec(wide, wideBuffer->Length())))
+    //if (SUCCEEDED(PathCchRemoveFileSpec(wide, wideBuffer->Length())))
     {
-        char* buffer = new char[wideBuffer->Length() + 1];
-        if (!WideCharToMultiByte(CP_UTF8, 0, wideBuffer->Chr(), wideBuffer->Length(), buffer, wideBuffer->Length() * sizeof(char), nullptr, nullptr))
-        {
-            int j = 532;
-        }
+        //wchar_t* buffer = (wchar_t*)GetMemoryManager()->Allocate(wideBuffer->Length() + 1);
+        //if (!Widewchar_tToMultiByte(CP_UTF8, 0, wideBuffer->Chr(), wideBuffer->Length(), buffer, wideBuffer->Length() * sizeof(wchar_t), nullptr, nullptr))
+        //{
+        //    int j = 532;
+        //}
 
-        String output = buffer;
+        //String output = buffer;
 
-        delete[] buffer;
-        return output;
+        //delete[] buffer;
+        //return wide;
     }
 
-    return String();
+    return "";
 }
 
-inline BuildProjectMethod::ScriptType BuildProjectMethod::DetectScriptType(const char* buffer, uint32_t length) const noexcept
+inline BuildProjectMethod::ScriptType BuildProjectMethod::DetectScriptType(const wchar_t* buffer, uint32_t length) const noexcept
 {
-    if (!strncmp(buffer, "Project", length))
+    if (!wcsncmp(buffer, L"Project", length))
     {
         return ScriptType::Project;
     }
-    else if (!strncmp(buffer, "Module", length))
+    else if (!wcsncmp(buffer, L"Module", length))
     {
         return ScriptType::Module;
     }
@@ -294,7 +290,7 @@ inline BuildProjectMethod::ScriptType BuildProjectMethod::DetectScriptType(const
     return ScriptType::None;
 }
 
-inline void BuildProjectMethod::SetSpecifierForModule(::Module* module, const char* verb, const char* verbEntry, uint32_t length) noexcept
+inline void BuildProjectMethod::SetSpecifierForModule(::Module* module, const wchar_t* verb, const wchar_t* verbEntry, uint32_t length) noexcept
 {
     MR_ASSERT(module != nullptr, "Module is invalid!");
 
@@ -304,10 +300,10 @@ inline void BuildProjectMethod::SetSpecifierForModule(::Module* module, const ch
         return;
     }
 
-    INSERT_SPECIFIER("IncludePath", module->includePaths.Add(verbEntry); );
+    //INSERT_SPECIFIER(L"IncludePath", module->includePaths.Add(verbEntry); );
 }
 
-inline void BuildProjectMethod::SetSpecifierForProject(::Project* project, const char* verb, const char* verbEntry, uint32_t length) noexcept
+inline void BuildProjectMethod::SetSpecifierForProject(::Project* project, const wchar_t* verb, const wchar_t* verbEntry, uint32_t length) noexcept
 {
     MR_ASSERT(project != nullptr, "Project is invalid!");
 

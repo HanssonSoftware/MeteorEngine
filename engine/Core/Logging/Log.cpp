@@ -1,6 +1,5 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
-#define _CRT_SECURE_NO_WARNINGS
 #include "Log.h"
 #include <Commandlet.h>
 #include <Types/String.h>
@@ -42,7 +41,6 @@ Logger::~Logger() noexcept
 
 void Logger::Shutdown()
 {
-    CloseHandle(instanceFile);
     CloseHandle(fileHandle);
     CloseHandle(consoleHandle);
 
@@ -52,7 +50,7 @@ void Logger::Shutdown()
 void Logger::Initialize()
 {
 #ifdef MR_PLATFORM_WINDOWS
-    if (!Commandlet::Get().Check(TEXT("-nofilelogging")))
+    if (!Commandlet::Get().Check("-nofilelogging"))
     {
         wchar_t* foundPath = nullptr;
 
@@ -64,21 +62,9 @@ void Logger::Initialize()
             static constexpr const wchar_t pathToCat[] = L"\\" WIDE_COMPANY_NAME L"\\";
             wcscat(path, pathToCat);
 
-            wcsncat(path, GetApplication()->GetApplicationNameNoSpaces(), GetApplication()->GetApplicationNameNoSpaces().Length());
+            //wcsncat(path, GetApplication()->GetApplicationNameNoSpaces(), GetApplication()->GetApplicationNameNoSpaces().Length());
 
             SHCreateDirectoryExW(nullptr, path, nullptr);
-
-            static constexpr const wchar_t instanceRunningFilePath[] = L"\\.livestatus";
-            wcsncat(path, instanceRunningFilePath, sizeof(instanceRunningFilePath) / sizeof(instanceRunningFilePath[0]));
-
-            instanceFile = CreateFileW(path, GENERIC_READ, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_TEMPORARY | FILE_FLAG_DELETE_ON_CLOSE, nullptr);
-            if (GetLastError() == ERROR_ALREADY_EXISTS)
-            {
-                static constexpr const wchar_t title[] = WIDE_ENGINE_NAME_SPACE L" - Info";
-                MessageBoxW(nullptr, L"This application does not shutdown correctly, enable safe mode?", title, MB_OKCANCEL | MB_ICONEXCLAMATION);
-            }
-
-            PathCchRemoveFileSpec(path, wcslen(path));
 
             static constexpr const wchar_t pathToCat2[] = L"\\" L"Logs" L"\\";
             wcsncat(path, pathToCat2, sizeof(pathToCat2) / sizeof(pathToCat2[0]));
@@ -160,7 +146,7 @@ void Logger::Initialize()
 
                 wchar_t title[256] = { L'\0' };
 
-                swprintf(title, 256, L"%ls developer console", GetApplication()->GetApplicationName().Chr());
+                swprintf(title, 256, L"%ls developer console", L"g");
                 SetConsoleTitleW(title);
             }
         }
@@ -226,11 +212,25 @@ u32 Logger::FormatLogMessage(Char* buffer, LogFormatting format, LogDescriptor* 
 
 void Logger::TransmitAssertion(const LogAssertion* Info)
 {
-	if (!Info) return;
+#ifdef MR_PLATFORM_WINDOWS
+    static constexpr const Char title[] = WIDE_ENGINE_NAME_SPACE L" - Assertion error";
+    MessageBoxW(nullptr, Info->message, title, MB_OK);
+#endif // MR_PLATFORM_WINDOWS
+
+    Char hitMessageBuffer[bIsRunningDebugMode ? 2048 : 1024] = { TEXT('\0') };
+
+    const u32 result = 
+#ifdef MR_PLATFORM_WINDOWS
+    (u32)swprintf(hitMessageBuffer, bIsRunningDebugMode ? 2048 : 1024, L"*** AN ASSERT WAS HIT! *** [%ls][%ls:%u]", Info->assertStatement, Info->assertLocationInFile, Info->assertLineInFile);
+#else
+    (u32)snprintf(hitMessageBuffer, bIsRunningDebugMode ? 2048 : 1024, "*** AN ASSERT WAS HIT! *** [%ls][%ls:%u]", Info->assertStatement, Info->assertLocationInFile, Info->assertLineInFile);
+#endif // MR_PLATFORM_WINDOWS
+    
+    SendToOutputBuffer(hitMessageBuffer, result);
 
 #ifdef MR_PLATFORM_WINDOWS
-    MessageBoxA(nullptr, Info->message, "Assertion failed!", MB_ICONEXCLAMATION | MB_OK);
-#endif // MR_PLATFORM_WINDOWS
+    DebugBreak();
+#endif
 }
 
 void Logger::SendToOutputBuffer(Char* buffer, const u32 count)

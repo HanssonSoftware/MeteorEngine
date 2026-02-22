@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <Platform/DataTypes.h>
+#include <Logging/Log.h>
 #include "MemoryRegion.h"
 #include "MemoryPackage.h"
 
@@ -19,6 +19,8 @@
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
 
+extern CORE_API MemoryManager* GetMemoryManager();
+
 class CORE_API MemoryManager
 {
 	friend class MemoryAllocatorArena;
@@ -32,38 +34,13 @@ public:
 	bool RequestResourceFromEngine(u64 size);
 	bool RequestResource(u64 size);
 
-	template<typename T>
-	MemoryPackage<T> Allocate(u64 size)
-	{
-		MemoryPackage<T> allocatedReady(this);
-		if (projectResource.regionStart)
-		{
-			T* found = (T*)(projectResource.regionStart + projectResource.offset);
-			if (!found)
-			{
-				return allocatedReady;
-			}
-
-			projectResource.offset += size;
-
-			allocatedReady.internalData = (T*)found;
-		}
-
-		return allocatedReady;
-	}
-
-	template<typename T>
-	void Deallocate(T* data)
-	{
-		
-	}
+	void* Allocate(u64 size);
+	void Deallocate(void* data, const u64 size);
 
 protected:
 	constexpr u64 CeilPow2(u64 x) noexcept;
 	constexpr u64 FloorPow2(u64 x) noexcept;
 	constexpr u64 AlignUp(u64 x, u64 a) noexcept;
-
-	u64 minimumStartingMemory = 0;
 
 	MemoryRegion engineResource;
 	MemoryRegion projectResource;
@@ -72,4 +49,4 @@ protected:
 	char* end = nullptr;
 };
 
-MemoryManager* GetMemoryManager();
+

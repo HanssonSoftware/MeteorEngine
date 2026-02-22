@@ -1,7 +1,7 @@
-/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
+﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Types/StringW.h>
+#include <Types/String.h>
 
 class BaseBuildMethod
 {
@@ -10,16 +10,12 @@ public:
 
 	virtual ~BaseBuildMethod() noexcept = default;
 
-	virtual bool AcquireRequiredParameters() = 0;
-
-	virtual void BeginCreating() = 0;
-
-	virtual void Finalize() = 0;
+	virtual void StartMethod() = 0;
 
 	virtual void CleanUp() = 0;
 
 protected:
-	StringW name;
+	String name;
 
 	uint64_t start = 0;
 	uint64_t end = 0;

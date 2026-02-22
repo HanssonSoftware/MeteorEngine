@@ -1,7 +1,7 @@
-/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
+﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Application.h>
+#include <Application/Application.h>
 #include <Logging/LogMacros.h> 
 
 #include "BuildSystem.h"

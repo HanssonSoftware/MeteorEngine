@@ -1,4 +1,4 @@
-/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
+﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "Module.h"
 #include <Platform/FileManager.h>
@@ -97,13 +97,13 @@ LOG_ADDCATEGORY(Parser);
 //	"\t<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\" Label=\"Configuration\">\n"
 //	"\t\t<ConfigurationType>DynamicLibrary</ConfigurationType>\n"
 //	"\t\t<PlatformToolset>v145</PlatformToolset>\n"
-//	"\t\t<CharacterSet>Unicode</CharacterSet>\n"
+//	"\t\t<wchar_tacterSet>Unicode</wchar_tacterSet>\n"
 //	"\t\t<UseDebugLibraries>true</UseDebugLibraries>\n"
 //	"\t</PropertyGroup>\n"
 //	"\t<PropertyGroup Condition = \"'$(Configuration)|$(Platform)'=='Shipping|x64'\" Label = \"Configuration\">\n"
 //	"\t\t<ConfigurationType>DynamicLibrary</ConfigurationType>\n"
 //	"\t\t<PlatformToolset>v145</PlatformToolset>\n"
-//	"\t\t<CharacterSet>Unicode</CharacterSet>\n"
+//	"\t\t<wchar_tacterSet>Unicode</wchar_tacterSet>\n"
 //	"\t\t<WholeProgramOptimization>true</WholeProgramOptimization>\n"
 //	"\t</PropertyGroup>\n"
 //
