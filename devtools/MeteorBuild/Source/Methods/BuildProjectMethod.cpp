@@ -93,8 +93,8 @@ void BuildProjectMethod::StartMethod()
     start = lg.QuadPart;
 
     Array<wchar_t*> collectedSourcesWithScripts;
-    Utils::ListDirectory(formattedSourceDirectory.Data(), collectedSourcesWithScripts);
-
+    //Utils::ListDirectory(formattedSourceDirectory.Data(), collectedSourcesWithScripts);
+#if 0
     if (collectedSourcesWithScripts.GetSize() > 0)
     {
         for (auto& file : collectedSourcesWithScripts)
@@ -157,6 +157,7 @@ void BuildProjectMethod::StartMethod()
         }
 
     }
+#endif
 }
 
 void BuildProjectMethod::CleanUp()

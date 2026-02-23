@@ -24,26 +24,24 @@ void BuildSystemApplication::Init()
 	appNameNoSpaces = "MeteorBuild";
 	appCodeName = "Apollo";
 
+	Application::Init();
+
 	if (!GetBuildSystem().InitFramework())
 	{
 		//MR_LOG(LogBuildSystemApplication, Fatal, "Build system error!");
 	}
-	
 
-	Application::Init();
 }
 
 void BuildSystemApplication::Run()
 {
 	if (BaseBuildMethod* method = GetBuildSystem().GetCurrentMethod())
 	{
-		if (method->AcquireRequiredParameters())
-		{
-			method->StartMethod();
-			method->Finalize();
-		}
+		method->StartMethod();
+		method->CleanUp();
 	}
 
+	Sleep(60 * 1000);
 	Application::RequestExit(0);
 }
 

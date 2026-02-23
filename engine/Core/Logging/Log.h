@@ -40,13 +40,15 @@ public:
 	virtual void Initialize();
 	virtual void Shutdown();
 
-	virtual u32 FormatLogMessage(Char* buffer, LogFormatting format, LogDescriptor* descriptor);
+	virtual u32 FormatLogMessage(char* buffer, LogFormatting format, LogDescriptor* descriptor);
 	virtual void TransmitAssertion(const LogAssertion* Info);
-	virtual void SendToOutputBuffer(Char* buffer, const u32 count);
+	virtual void SendToOutputBuffer(char* buffer, const u32 count);
 	virtual void HandleFatal(LogDescriptor* Descriptor);
 
 protected:
 	bool bIsInitialized = false;
+
+	void StartMemoryLeakLoggingThread();
 private:
 	static inline Logger* instance = nullptr;
 };

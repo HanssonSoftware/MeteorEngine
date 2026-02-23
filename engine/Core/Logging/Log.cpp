@@ -25,6 +25,7 @@ static HANDLE instanceFile;
 static HANDLE fileHandle;
 
 static bool bIsDebuggerAttached = false;
+#pragma warning(disable : 6386)
 #endif // MR_PLATFORM_WINDOWS
 
 
@@ -39,10 +40,29 @@ Logger::~Logger() noexcept
 }
 
 
+#ifdef MR_PLATFORM_WINDOWS
+static HANDLE thread;
+volatile bool bRunMemoryLogger = false;
+static DWORD WINAPI MemoryLoggingProc(void* lpParameter)
+{
+    bRunMemoryLogger = true;
+    while (bRunMemoryLogger)
+    {
+        Sleep(30 * 1000);
+
+        _CrtDumpMemoryLeaks();
+    }
+
+    return 0;
+}
+#endif // MR_PLATFORM_WINDOWS
+
 void Logger::Shutdown()
 {
     CloseHandle(fileHandle);
     CloseHandle(consoleHandle);
+
+    bRunMemoryLogger = false;
 
     bIsInitialized = false;
 }
@@ -62,7 +82,22 @@ void Logger::Initialize()
             static constexpr const wchar_t pathToCat[] = L"\\" WIDE_COMPANY_NAME L"\\";
             wcscat(path, pathToCat);
 
-            //wcsncat(path, GetApplication()->GetApplicationNameNoSpaces(), GetApplication()->GetApplicationNameNoSpaces().Length());
+            const u32 appNameLength = GetApplication()->GetApplicationNameNoSpaces().Length();
+            const bool bIsUsingHeap = appNameLength > 256 ? true : false;
+            wchar_t appNameStack[256 + 1] = { L'\0' };
+
+            wchar_t* appName = bIsUsingHeap ? (wchar_t*)GetMemoryManager()->Allocate((appNameLength + 1) * sizeof(wchar_t)) : appNameStack;
+
+            if (!MultiByteToWideChar(CP_UTF8, 0, GetApplication()->GetApplicationNameNoSpaces().Chr(), appNameLength, appName, appNameLength))
+            {
+                wchar_t chars[256] = { L'\0' };
+
+                chars[FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, GetLastError(), LANG_USER_DEFAULT, chars, 256, nullptr) - 2] = L'\0';
+
+                MR_LOG(LogTemp, Error, "%ls", chars);
+            }
+
+            wcsncat(path, appName, appNameLength);
 
             SHCreateDirectoryExW(nullptr, path, nullptr);
 
@@ -97,7 +132,6 @@ void Logger::Initialize()
             FlushFileBuffers(fileHandle);
 
             CoTaskMemFree(foundPath);
-
         }
     }
     
@@ -132,8 +166,6 @@ void Logger::Initialize()
             {
                 SetConsoleOutputCP(CP_UTF8);
 
-                //SetConsoleCP(CP_UTF8);
-
                 CONSOLE_CURSOR_INFO cf;
                 GetConsoleCursorInfo(consoleHandle, &cf);
                 cf.bVisible = false;
@@ -151,9 +183,10 @@ void Logger::Initialize()
             }
         }
     }
-    //SetUnhandledExceptionFilter(ExceptionHandler);
 
 #endif // MR_PLATFORM_WINDOWS
+
+    StartMemoryLeakLoggingThread();
 }
 
 void Logger::HandleFatal(LogDescriptor* Descriptor)
@@ -161,14 +194,21 @@ void Logger::HandleFatal(LogDescriptor* Descriptor)
     
 }
 
-u32 Logger::FormatLogMessage(Char* buffer, LogFormatting format, LogDescriptor* descriptor)
+void Logger::StartMemoryLeakLoggingThread()
+{
+#ifdef MR_PLATFORM_WINDOWS
+    thread = CreateThread(nullptr, 512 * 1024, MemoryLoggingProc, nullptr, 0, nullptr);
+#endif // MR_PLATFORM_WINDOWS
+}
+
+u32 Logger::FormatLogMessage(char* buffer, LogFormatting format, LogDescriptor* descriptor)
 {
     switch (format)
     {
         case LogFormatting::Category:
         {
 #ifdef MR_PLATFORM_WINDOWS
-            return (u32)swprintf(buffer, 64, L"[%ls] ", descriptor->team);
+            return (u32)snprintf(buffer, 64, "[%s] ", descriptor->team);
 #endif // MR_PLATFORM_WINDOWS
         }
         case LogFormatting::Time:
@@ -189,20 +229,20 @@ u32 Logger::FormatLogMessage(Char* buffer, LogFormatting format, LogDescriptor* 
                 }
             }
 
-            return (u32)swprintf(buffer, 32, L"[%02u-%02u-%02u %02u:%02u:%02u]", (u16)st.wYear, (u16)st.wMonth, (u16)st.wDay, (u16)st.wHour, (u16)st.wMinute, (u16)st.wSecond);
+            return (u32)snprintf(buffer, 32, "[%02u-%02u-%02u %02u:%02u:%02u]", (u16)st.wYear, (u16)st.wMonth, (u16)st.wDay, (u16)st.wHour, (u16)st.wMinute, (u16)st.wSecond);
 #endif // MR_PLATFORM_WINDOWS
         }
         case LogFormatting::Severity:
         {
 #ifdef MR_PLATFORM_WINDOWS
-            return (u32)swprintf(buffer, 8, L"%ls: \0", descriptor->severity);
+            return (u32)snprintf(buffer, 8, "%s: \0", descriptor->severity);
 #endif // MR_PLATFORM_WINDOWS
         }
         case LogFormatting::Message:
         {
 #ifdef MR_PLATFORM_WINDOWS
-            static constexpr const Char val[] = TEXT("\n\0");
-            return (u32)swprintf(buffer, (bIsRunningDebugMode ? 512 : 128) + 3, L"%ls\n\0", descriptor->message);
+            static constexpr const char val[] = "\n\0";
+            return (u32)snprintf(buffer, (bIsRunningDebugMode ? 512 : 128) + 3, "%s\n\0", descriptor->message);
 #endif // MR_PLATFORM_WINDOWS
         }
     }
@@ -213,19 +253,17 @@ u32 Logger::FormatLogMessage(Char* buffer, LogFormatting format, LogDescriptor* 
 void Logger::TransmitAssertion(const LogAssertion* Info)
 {
 #ifdef MR_PLATFORM_WINDOWS
-    static constexpr const Char title[] = WIDE_ENGINE_NAME_SPACE L" - Assertion error";
-    MessageBoxW(nullptr, Info->message, title, MB_OK);
+    static constexpr const wchar_t title[] = WIDE_ENGINE_NAME_SPACE L" - Assertion error";
+    wchar_t fixed[bIsRunningDebugMode ? 256 : 128] = { L'\0' };
+    MultiByteToWideChar(CP_UTF8, 0, Info->message, bIsRunningDebugMode ? 256 : 128, fixed, bIsRunningDebugMode ? 256 : 128);
+
+    MessageBoxW(nullptr, fixed, title, MB_OK);
 #endif // MR_PLATFORM_WINDOWS
 
-    Char hitMessageBuffer[bIsRunningDebugMode ? 2048 : 1024] = { TEXT('\0') };
+    char hitMessageBuffer[bIsRunningDebugMode ? 2048 : 1024] = { '\0' };
 
-    const u32 result = 
-#ifdef MR_PLATFORM_WINDOWS
-    (u32)swprintf(hitMessageBuffer, bIsRunningDebugMode ? 2048 : 1024, L"*** AN ASSERT WAS HIT! *** [%ls][%ls:%u]", Info->assertStatement, Info->assertLocationInFile, Info->assertLineInFile);
-#else
-    (u32)snprintf(hitMessageBuffer, bIsRunningDebugMode ? 2048 : 1024, "*** AN ASSERT WAS HIT! *** [%ls][%ls:%u]", Info->assertStatement, Info->assertLocationInFile, Info->assertLineInFile);
-#endif // MR_PLATFORM_WINDOWS
-    
+    const u32 result = (u32)snprintf(hitMessageBuffer, bIsRunningDebugMode ? 2048 : 1024, "*** AN ASSERT WAS HIT! *** [%s][%s:%u]", Info->assertStatement, Info->assertLocationInFile, Info->assertLineInFile);
+   
     SendToOutputBuffer(hitMessageBuffer, result);
 
 #ifdef MR_PLATFORM_WINDOWS
@@ -233,18 +271,28 @@ void Logger::TransmitAssertion(const LogAssertion* Info)
 #endif
 }
 
-void Logger::SendToOutputBuffer(Char* buffer, const u32 count)
+void Logger::SendToOutputBuffer(char* buffer, const u32 count)
 {
 #if defined(MR_PLATFORM_WINDOWS) && defined(MR_DEBUG)
 
+    bool bShouldUseAllocator = count >= 256 ? true : false;
+    wchar_t fixedBuffer[256 + 1] = { L'\0' };
+    
+    wchar_t* fixBuffer = bShouldUseAllocator ? (wchar_t*)GetMemoryManager()->Allocate((count + 1) * sizeof(wchar_t)) : fixedBuffer;
+
+    if (!MultiByteToWideChar(CP_UTF8, 0, buffer, count * sizeof(char), fixBuffer, count))
+    {
+        MR_ASSERT(false, "fs");
+    }
+
     if (bIsDebuggerAttached)
     {
-        OutputDebugStringW(buffer);
+        OutputDebugStringW(fixBuffer);
     }
     else if (consoleHandle)
     {
         DWORD written = 0;
-        WriteConsoleW(consoleHandle, (Char*)buffer, (DWORD)count, &written, nullptr);
+        WriteConsoleW(consoleHandle, (wchar_t*)fixBuffer, (DWORD)count, &written, nullptr);
     }
     else
     {
@@ -253,14 +301,10 @@ void Logger::SendToOutputBuffer(Char* buffer, const u32 count)
 
     if (fileHandle)
     {
-        char fixBuffer[bIsRunningDebugMode ? 512 : 128] = {};
-
         static u32 bytes = 0;
         DWORD written = 0;
 
-        WideCharToMultiByte(CP_UTF8, 0, buffer, count, fixBuffer, count * sizeof(char), nullptr, nullptr);
-
-        if (!WriteFile(fileHandle, fixBuffer, count, &written, nullptr))
+        if (!WriteFile(fileHandle, buffer, count, &written, nullptr))
             return;
 
         bytes += (u32)written;
@@ -271,10 +315,7 @@ void Logger::SendToOutputBuffer(Char* buffer, const u32 count)
         }
     }
 
-    wmemset(buffer, L'\0', count);
-
-#else
-    memset(buffer, 0, count);
+    if (bShouldUseAllocator) GetMemoryManager()->Deallocate(fixBuffer, (count + 1) * sizeof(wchar_t));
 #endif // MR_PLATFORM_WINDOWS && MR_DEBUG
 
 }

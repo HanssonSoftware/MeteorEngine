@@ -3,8 +3,8 @@
 #pragma once
 #include <Resource/MemoryManager.h>
 #include <type_traits>
-#include <wchar.h>
 #include <stdarg.h>
+#include <stdio.h>
 #include <Platform/DataTypes.h>
 
 #define MERGE(x, y) x##y
@@ -14,7 +14,7 @@
 
 struct LogAssertion
 {
-    constexpr LogAssertion(const Char* inputFile, u32 inputLine, const Char* statement)
+    constexpr LogAssertion(const char* inputFile, u32 inputLine, const char* statement)
         : assertLocationInFile(inputFile)
         , assertLineInFile(inputLine)
         , assertStatement(statement)
@@ -22,25 +22,21 @@ struct LogAssertion
 
     }
 
-    void SetMessage(const Char* message, ...)
+    void SetMessage(const char* message, ...)
     {
         va_list d = nullptr;
         va_start(d, message);
-#ifdef MR_PLATFORM_WINDOWS
-        vswprintf(this->message, bIsRunningDebugMode ? 512 : 128, message, d);
-#else
-        vsnprintf(this->message, bIsRunningDebugMode ? 512 : 128, message, d);
-#endif
+        vsnprintf(this->message, bIsRunningDebugMode ? 256 : 128, message, d);
         va_end(d);
     }
 
     u32 assertLineInFile = 0;
 
-    const Char* assertLocationInFile = nullptr;
+    const char* assertLocationInFile = nullptr;
 
-    const Char* assertStatement = nullptr;
+    const char* assertStatement = nullptr;
 
-    Char message[bIsRunningDebugMode ? 256 : 128] = { '\0' };
+    char message[bIsRunningDebugMode ? 256 : 128] = { '\0' };
 };
 
 enum LogSeverity
@@ -62,7 +58,7 @@ enum LogFormatting
 
 struct LogDescriptor
 {
-    constexpr LogDescriptor(const Char* category, const Char* severity, const u32 severityNum, const Char* function, const Char* file, int line)
+    constexpr LogDescriptor(const char* category, const char* severity, const u32 severityNum, const char* function, const char* file, int line)
         : team(category), severity(severity), severityNum(severityNum), function(function), file(file), line(line)
     {
 
@@ -70,7 +66,7 @@ struct LogDescriptor
 
     ~LogDescriptor() = default;
 
-    constexpr void SetValues(const Char* category,const Char* severity, const Char* function, const Char* file, const u32 line) noexcept
+    constexpr void SetValues(const char* category,const char* severity, const char* function, const char* file, const u32 line) noexcept
     {
         this->line = line;
         this->severity = severity;
@@ -79,31 +75,27 @@ struct LogDescriptor
         this->team = category;
     }
 
-    void SetMessage(const Char* message, ...)
+    void SetMessage(const char* message, ...)
     {
         va_list d = nullptr;
         va_start(d, message);
-#ifdef MR_PLATFORM_WINDOWS
-        vswprintf(this->message, bIsRunningDebugMode ? 512 : 128, message, d);
-#else
         vsnprintf(this->message, bIsRunningDebugMode ? 512 : 128, message, d);
-#endif
         va_end(d);
     }
 
-    const Char* severity;
+    const char* severity;
     u32 severityNum;
 
     u32 line;
 
-    const Char* team;
+    const char* team;
 
 #ifdef MR_DEBUG
-    const Char* function;
-    const Char* file;
+    const char* function;
+    const char* file;
 #endif // MR_DEBUG
 
-    Char message[bIsRunningDebugMode ? 512 : 128] = { '\0' };
+    char message[bIsRunningDebugMode ? 512 : 128] = { '\0' };
 };
 
 
@@ -127,11 +119,11 @@ LOG_ADDCATEGORY(Temp);
     {\
         do \
         { \
-             LogDescriptor descriptor = { TEXT(#CategoryName), TEXT(#severity), severity, __FUNCTIONW__, __FILEW__, __LINE__ };\
-             descriptor.SetMessage(TEXT(message), __VA_ARGS__);\
+             LogDescriptor descriptor = { #CategoryName, #severity, severity, __FUNCTION__, __FILE__, __LINE__ };\
+             descriptor.SetMessage(message, __VA_ARGS__);\
              if constexpr (severity != Fatal) \
              { \
-                Char buffer[1024] = {'\0'};\
+                char buffer[1024] = {'\0'};\
                 Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Time, &descriptor));\
                 Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Category, &descriptor));\
                 Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Severity, &descriptor));\
@@ -146,7 +138,7 @@ LOG_ADDCATEGORY(Temp);
     do { \
         if (!(expression)) \
         {\
-            LogAssertion assertion = { __FILEW__, (u32)__LINE__, TEXT(#expression) }; assertion.SetMessage(TEXT(message)); Logger::Get()->TransmitAssertion(&assertion); \
+            LogAssertion assertion = { __FILE__, (u32)__LINE__, #expression }; assertion.SetMessage(message); Logger::Get()->TransmitAssertion(&assertion); \
         }\
     } while (0)
 
@@ -155,9 +147,6 @@ LOG_ADDCATEGORY(Temp);
 #else
 #define MR_ASSERT(...) //* This function does nothing, if you want something, switch to Debug!
 #endif // DEBUG
-
-
-
 
 #define CONCATTYPENAME(x) \
     L#x
