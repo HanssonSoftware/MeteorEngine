@@ -41,7 +41,7 @@ void BuildSystemApplication::Run()
 		method->CleanUp();
 	}
 
-	Sleep(60 * 1000);
+	//Sleep(60 * 1000); // debug
 	Application::RequestExit(0);
 }
 

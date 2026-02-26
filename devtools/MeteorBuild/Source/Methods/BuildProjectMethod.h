@@ -5,6 +5,8 @@
 #include <Types/Array.h>
 #include <Types/String.h>
 
+#include <Resource/MemoryAllocatorArena.h>
+
 class Project;
 class Module;
 
@@ -50,5 +52,7 @@ protected:
 	Array<String> foundScripts;
 
 	Array<::Module*> modules;
+
+	MemoryAllocatorArena methodArena;
 };
 

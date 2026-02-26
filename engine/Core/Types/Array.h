@@ -6,8 +6,6 @@
 #include <stdint.h>
 
 #include <Logging/Log.h>
-// #include <CoreProxy.h>
-#undef T
 
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)

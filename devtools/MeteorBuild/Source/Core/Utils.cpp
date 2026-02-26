@@ -39,7 +39,7 @@ String Utils::GetLastError()
 	return "";
 }
 
-void Utils::ListDirectory(wchar_t* name, Array<wchar_t*>& container)
+void Utils::ListDirectory(wchar_t* name, wchar_t*& container)
 {
 	if (name != nullptr)
 	{

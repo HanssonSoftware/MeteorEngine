@@ -5,6 +5,7 @@
 #include <Commandlet.h>
 #include <Core/Log.h>
 #include <Resource/MemoryManager.h>
+#include <Resource/MemoryAllocatorArena.h>
 #include <Module/Parser.h>
 #include <Module/Module.h>
 #include <Module/Project.h>
@@ -65,6 +66,7 @@
 BuildProjectMethod::BuildProjectMethod() : BaseBuildMethod()
 {
     name = "Build Project";
+    methodArena = MemoryAllocatorArena(UINT64_MAX);
 }
 
 bool BuildProjectMethod::AcquireRequiredParameters()
@@ -92,8 +94,8 @@ void BuildProjectMethod::StartMethod()
     QueryPerformanceCounter(&lg);
     start = lg.QuadPart;
 
-    Array<wchar_t*> collectedSourcesWithScripts;
-    //Utils::ListDirectory(formattedSourceDirectory.Data(), collectedSourcesWithScripts);
+
+    Utils::ListDirectory(formattedSourceDirectory.Data(), collectedSourcesWithScripts);
 #if 0
     if (collectedSourcesWithScripts.GetSize() > 0)
     {
