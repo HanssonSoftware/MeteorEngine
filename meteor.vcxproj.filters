@@ -27,9 +27,6 @@
     <ClCompile Include="engine\Core\Types\Vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Object\Object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Module\ModuleManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -54,7 +51,13 @@
     <ClCompile Include="engine\Core\Platform\Platform_Win32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Memory\MemoryAllocator.cpp">
+    <ClCompile Include="engine\Core\Memory\MemoryHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Memory\MemoryRegion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\Memory\MemoryBlockArena.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -332,9 +335,6 @@
     <ClInclude Include="engine\Core\Common\Conversions.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Object\Object.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Layers\ThreadPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -389,7 +389,13 @@
     <ClInclude Include="engine\Core\Platform\DataTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Memory\MemoryAllocator.h">
+    <ClInclude Include="engine\Core\Memory\MemoryHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Memory\MemoryRegion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Memory\MemoryBlockArena.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

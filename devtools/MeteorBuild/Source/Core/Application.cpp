@@ -2,7 +2,7 @@
 
 #include "Application.h"
 #include <Types/String.h>
-#include <Resource/MemoryManager.h>
+#include <Memory/MemoryHandler.h>
 #include <Platform/FileManager.h>
 
 #include <Methods/BaseBuildMethod.h>

@@ -152,6 +152,8 @@ private:
 #endif // MR_DEBUG
 };
 
+
+
 struct StringView
 {
 	StringView() = delete;

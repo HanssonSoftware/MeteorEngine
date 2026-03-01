@@ -3,12 +3,14 @@
 #include "String.h"
 #include <Logging/Log.h>
 
-#include <Resource/MemoryManager.h>
+#include <Memory/MemoryHandler.h>
 
 #pragma warning(disable : 26495)
 #pragma warning(disable : 5082) // second argument to 'va_start' is not the last named parameter
 
 LOG_ADDCATEGORY(StringSet);
+
+// BE ADVISED!	Allocate/Deallocate asks for bytes, well char size is 1 byte everywhere I think?
 
 
 String::~String() noexcept
@@ -181,21 +183,17 @@ String String::Format(const String& format, ...)
 	va_list a;
 	va_start(a, format.Chr());
 
-	const char* formattingBuffer = format.Chr();
+	const int sizeForVA = vsnprintf(nullptr, 0, format, a);
 
-	va_list a_cpy;
-	va_copy(a_cpy, a);
-	const int sizeForVA = vsnprintf(nullptr, 0, formattingBuffer, a);
-	va_end(a_cpy);
+	char fixedFormattingBuffer[256 + 1] = {'\0'};
+	char* formattedBuffer = sizeForVA <= 256 ? fixedFormattingBuffer : (char*)GetMemoryManager()->Allocate(sizeForVA + 1);
 
-	char* newFormattedBuffer = (char*)GetMemoryManager()->Allocate(sizeForVA + 1);
-
-	const int result = vsnprintf(nullptr, sizeForVA + 1, formattingBuffer, a);
+	const int result = vsnprintf(formattedBuffer, sizeForVA + 1, format, a);
 	va_end(a);
 
-	String stringized(newFormattedBuffer);
+	String stringized(formattedBuffer);
 
-	GetMemoryManager()->Deallocate(newFormattedBuffer, sizeForVA + 1);
+	if (sizeForVA > 256 ) GetMemoryManager()->Deallocate(formattedBuffer, sizeForVA + 1);
 	return stringized;
 }
 

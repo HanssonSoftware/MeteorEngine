@@ -2,7 +2,6 @@
 
 #pragma once
 #include "Window.h"
-#include <Object/Object.h>
 #include <Logging/Log.h>
 #include <Types/Array.h>
 

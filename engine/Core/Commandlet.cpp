@@ -11,7 +11,7 @@
 #define NLS
 #include <Windows/Windows.h>
 
-#include <Resource/MemoryManager.h>
+#include <Memory/MemoryHandler.h>
 
 #pragma warning(disable : 6031)
 

@@ -21,13 +21,25 @@
 
 #ifdef MR_PLATFORM_WINDOWS
 static HANDLE consoleHandle;
-static HANDLE instanceFile;
 static HANDLE fileHandle;
 
 static bool bIsDebuggerAttached = false;
 #pragma warning(disable : 6386)
 #endif // MR_PLATFORM_WINDOWS
 
+LOG_ADDCATEGORY(ging); // Log(ging)
+
+static Logger* instance = nullptr;
+
+Logger* Logger::Get()
+{
+    if (!instance)
+    {
+        instance = new Logger;
+    }
+
+    return instance;
+}
 
 Logger::Logger(Logger* newInstance)
 {
@@ -70,25 +82,29 @@ void Logger::Shutdown()
 void Logger::Initialize()
 {
 #ifdef MR_PLATFORM_WINDOWS
+    LARGE_INTEGER begin, freq, end;
+    QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&begin);
+
     if (!Commandlet::Get().Check("-nofilelogging"))
     {
         wchar_t* foundPath = nullptr;
 
         if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &foundPath)))
         {
-            wchar_t path[512] = { L'\0' };
+            wchar_t path[512 + 1] = { L'\0' };
             wcscpy(path, foundPath);
 
             static constexpr const wchar_t pathToCat[] = L"\\" WIDE_COMPANY_NAME L"\\";
             wcscat(path, pathToCat);
 
-            const u32 appNameLength = GetApplication()->GetApplicationNameNoSpaces().Length();
+            const u32 appNameLength = (u32)strlen(GetApplication()->GetApplicationNameNoSpaces());
             const bool bIsUsingHeap = appNameLength > 256 ? true : false;
             wchar_t appNameStack[256 + 1] = { L'\0' };
 
             wchar_t* appName = bIsUsingHeap ? (wchar_t*)GetMemoryManager()->Allocate((appNameLength + 1) * sizeof(wchar_t)) : appNameStack;
 
-            if (!MultiByteToWideChar(CP_UTF8, 0, GetApplication()->GetApplicationNameNoSpaces().Chr(), appNameLength, appName, appNameLength))
+            if (!MultiByteToWideChar(CP_UTF8, 0, GetApplication()->GetApplicationNameNoSpaces(), appNameLength, appName, appNameLength))
             {
                 wchar_t chars[256] = { L'\0' };
 
@@ -178,12 +194,14 @@ void Logger::Initialize()
 
                 wchar_t title[256] = { L'\0' };
 
-                swprintf(title, 256, L"%ls developer console", L"g");
+                swprintf(title, 256, L"%ls developer console", L"FILL THIS SWPRINTF PARAMETER!!!");
                 SetConsoleTitleW(title);
             }
         }
     }
 
+    QueryPerformanceCounter(&end);
+    MR_LOG(Logging, Log, "Logger system is instantiated in %.2f seconds!", (end.QuadPart - begin.QuadPart) / (freq.QuadPart / 100.0));
 #endif // MR_PLATFORM_WINDOWS
 
     StartMemoryLeakLoggingThread();
@@ -262,7 +280,7 @@ void Logger::TransmitAssertion(const LogAssertion* Info)
 
     char hitMessageBuffer[bIsRunningDebugMode ? 2048 : 1024] = { '\0' };
 
-    const u32 result = (u32)snprintf(hitMessageBuffer, bIsRunningDebugMode ? 2048 : 1024, "*** AN ASSERT WAS HIT! *** [%s][%s:%u]", Info->assertStatement, Info->assertLocationInFile, Info->assertLineInFile);
+    const u32 result = (u32)snprintf(hitMessageBuffer, bIsRunningDebugMode ? 2048 : 1024, "*** AN ASSERT WAS HIT! *** [%s][%s:%u]\n", Info->assertStatement, Info->assertLocationInFile, Info->assertLineInFile);
    
     SendToOutputBuffer(hitMessageBuffer, result);
 
@@ -275,7 +293,7 @@ void Logger::SendToOutputBuffer(char* buffer, const u32 count)
 {
 #if defined(MR_PLATFORM_WINDOWS) && defined(MR_DEBUG)
 
-    bool bShouldUseAllocator = count >= 256 ? true : false;
+    bool bShouldUseAllocator = count > 256 ? true : false;
     wchar_t fixedBuffer[256 + 1] = { L'\0' };
     
     wchar_t* fixBuffer = bShouldUseAllocator ? (wchar_t*)GetMemoryManager()->Allocate((count + 1) * sizeof(wchar_t)) : fixedBuffer;

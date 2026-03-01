@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Resource/MemoryManager.h>
+#include <Memory/MemoryHandler.h>
 #include <type_traits>
 #include <stdarg.h>
 #include <stdio.h>

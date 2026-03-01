@@ -242,7 +242,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="engine\Core\Logging\Log.cpp" />
-    <ClCompile Include="engine\Core\Object\Object.cpp" />
     <ClCompile Include="engine\Core\Application\Application.cpp" />
     <ClCompile Include="engine\Core\Commandlet.cpp" />
     <ClCompile Include="engine\Core\Platform\Platform_Win32.cpp" />
@@ -254,7 +253,9 @@
     <ClCompile Include="engine\Core\Special\LaunchMeteorSuite.h" />
     <ClCompile Include="engine\Core\Types\Map.cpp" />
     <ClCompile Include="engine\Core\Types\NameCollection.cpp" />
-    <ClCompile Include="engine\Core\Memory\MemoryAllocator.cpp" />
+    <ClCompile Include="engine\Core\Memory\MemoryHandler.cpp" />
+    <ClCompile Include="engine\Core\Memory\MemoryRegion.cpp" />
+    <ClCompile Include="engine\Core\Memory\MemoryBlockArena.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Common\Configuration.h" />
@@ -262,7 +263,6 @@
     <ClInclude Include="engine\Core\Logging\Log.h" />
     <ClInclude Include="engine\Core\Logging\LogMacros.h" />
     <ClInclude Include="engine\Core\Common\Conversions.h" />
-    <ClInclude Include="engine\Core\Object\Object.h" />
     <ClInclude Include="engine\Core\Application\Application.h" />
     <ClInclude Include="engine\Core\Commandlet.h" />
     <ClInclude Include="engine\Core\Platform\Platform.h" />
@@ -367,7 +367,9 @@
     <ClInclude Include="engine\Platform\WindowManager\WindowExtender.h" />
     <ClInclude Include="engine\Core\Types\Map.h" />
     <ClInclude Include="engine\Core\Types\NameCollection.h" />
-    <ClInclude Include="engine\Core\Memory\MemoryAllocator.h" />
+    <ClInclude Include="engine\Core\Memory\MemoryHandler.h" />
+    <ClInclude Include="engine\Core\Memory\MemoryRegion.h" />
+    <ClInclude Include="engine\Core\Memory\MemoryBlockArena.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="engine\Engine.mrbuild" />

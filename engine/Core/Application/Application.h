@@ -19,7 +19,7 @@ struct CORE_API Application
 {
 	enum class ECurrentApplicationState { NONE, STARTUP, RUNNING, RESTARTING, SHUTDOWN, DEAD };
 
-	Application();
+	Application() { appFramework = this; };
 
 	Application(const Application&) = delete;
 
@@ -31,11 +31,11 @@ struct CORE_API Application
 
 	virtual void Shutdown();
 
-	const String GetApplicationName() const { return appName; };
+	const char* GetApplicationName() const { return appName; };
 
-	const String GetApplicationCodeName() const { return appCodeName; };
+	const char* GetApplicationCodeName() const { return appCodeName; };
 
-	const String GetApplicationNameNoSpaces() const { return appNameNoSpaces; };
+	const char* GetApplicationNameNoSpaces() const { return appNameNoSpaces; };
 
 	static void RequestExit(int Code);
 
@@ -50,11 +50,11 @@ protected:
 	struct
 	{
 		/** Application name, this would be appearing on the created window. */
-		String appName;
-		String appNameNoSpaces;
+		const char* appName = nullptr;
+		const char* appNameNoSpaces = nullptr;
 
 		/** Useful for directories. */
-		String appCodeName;
+		const char* appCodeName = nullptr;
 	};
 
 	int exitCode = 0;

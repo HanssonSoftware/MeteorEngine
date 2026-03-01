@@ -1,7 +1,7 @@
-/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
+﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include "Resource/MemoryManager.h"
+#include "Memory/MemoryHandler.h"
 // #include <CoreProxy.h>
 /**
  * ScopedPtr owns a pointer, so you don't have to think about deleting it.

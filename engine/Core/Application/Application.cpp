@@ -4,7 +4,7 @@
 #include <WindowManager/WindowManager.h>
 #include <Platform/FileManager.h>
 
-#include <Resource/MemoryManager.h>
+#include <Memory/MemoryHandler.h>
 #include "Commandlet.h"
 
 #ifdef MR_DEBUG
@@ -18,11 +18,6 @@
 
 #include <Platform/PerformanceTimer.h>
 #include <Module/ModuleManager.h>
-
-Application::Application()
-{
-    appFramework = this;
-}
 
 void Application::RequestExit(int Code)
 {
@@ -38,11 +33,7 @@ void Application::Init()
     
     Logger::Get()->Initialize();
 
-    MR_LOG(LogApplication, Log, "Initializing application.");
-
     SetAppState(ECurrentApplicationState::RUNNING);
-    
-    Application::Run();
 }
 
 void Application::Run()
@@ -69,7 +60,7 @@ void Application::Shutdown()
 
         Logger::Get()->Shutdown();
 
-        GetMemoryManager()->Shutdown();
+        //GetMemoryManager()->Shutdown();
     }
 
 #ifdef MR_DEBUG
@@ -87,7 +78,7 @@ extern "C" __declspec(dllexport) int LaunchApplication(Application* instance, in
     if (instance != nullptr)
     {
         Commandlet::Get().Initialize(argc, argv);
-        GetMemoryManager()->Initialize();
+        GetMemoryManager()->Initialise();
         instance->Init();
         returnCode = instance->GetRequestExitCode();
         Commandlet::Get().Shutdown();

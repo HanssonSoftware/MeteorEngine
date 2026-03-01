@@ -28,10 +28,7 @@ struct LogEntry {};
 class CORE_API Logger
 {
 public:
-	static Logger* Get()
-	{
-		return instance ? instance : new Logger;
-	};
+	static Logger* Get();
 
 	Logger() = default;
 	Logger(Logger* newInstance);

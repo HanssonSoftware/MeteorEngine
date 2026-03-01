@@ -4,7 +4,7 @@
 #include "BuildProjectMethod.h"
 #include <Commandlet.h>
 #include <Core/Log.h>
-#include <Resource/MemoryManager.h>
+#include <Memory/MemoryHandler.h>
 #include <Resource/MemoryAllocatorArena.h>
 #include <Module/Parser.h>
 #include <Module/Module.h>
