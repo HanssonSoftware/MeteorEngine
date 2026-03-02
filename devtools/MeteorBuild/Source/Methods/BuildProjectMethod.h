@@ -5,7 +5,7 @@
 #include <Types/Array.h>
 #include <Types/String.h>
 
-#include <Resource/MemoryAllocatorArena.h>
+#include <Memory/MemoryBlockArena.h>
 
 class Project;
 class Module;
@@ -53,6 +53,6 @@ protected:
 
 	Array<::Module*> modules;
 
-	MemoryAllocatorArena methodArena;
+	MemoryBlockArena methodArena;
 };
 

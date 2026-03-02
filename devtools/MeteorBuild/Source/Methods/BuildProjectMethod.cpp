@@ -66,7 +66,7 @@
 BuildProjectMethod::BuildProjectMethod() : BaseBuildMethod()
 {
     name = "Build Project";
-    methodArena = MemoryAllocatorArena(UINT64_MAX);
+    //methodArena = MemoryAllocatorArena(UINT64_MAX);
 }
 
 bool BuildProjectMethod::AcquireRequiredParameters()
