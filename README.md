@@ -1,6 +1,6 @@
 # Meteor Engine
 
-Meteor Engine is a modular C++ game engine designed for fast development and extensibility.
+Meteor Engine is a modular C++ game engine designed for using in-house made games (on one day).
 
 ---
 
@@ -26,4 +26,4 @@ See the [LICENSE](LICENSE) file for details.
 
 Developer: Levente Farkas
 Email: farkaslevente200608@gmail.com
-GitHub: [https://github.com/HanssonSoftware/meteor-engine](https://github.com/HanssonSoftware/meteor-engine)
+GitHub: https://github.com/HanssonSoftware/MeteorEngine
