@@ -14,7 +14,7 @@
 #endif // MR_CORE_EXPORTS
 
 template <typename T>
-class /*CORE_API*/ Array
+class CORE_API Array
 {
 public:
 	Array()
@@ -23,11 +23,11 @@ public:
 		Reserve(2);
 	}
 
-	Array(uint32_t count)
+	Array(u32 count)
 		: container(nullptr), size(0), capacity(0)
 	{
 		Reserve(count);
-		for (uint32_t i = 0; i < count; ++i) container[i] = T{};
+		for (u32 i = 0; i < count; ++i) container[i] = T{};
 		size = count;
 	}
 
@@ -35,7 +35,7 @@ public:
 		: container(nullptr), size(0), capacity(0)
 	{
 		Reserve(other.size);
-		for (uint32_t i = 0; i < other.size; ++i) container[i] = other.container[i];
+		for (u32 i = 0; i < other.size; ++i) container[i] = other.container[i];
 		size = other.size;
 	}
 
@@ -71,16 +71,16 @@ public:
 		container[size++] = std::move(elem);
 	}
 
-	void Add(const T& elem, uint32_t at)
+	void Add(const T& elem, u32 at)
 	{
 		MR_ASSERT(at <= size, "");
 		if (size >= capacity) Reserve(capacity ? capacity + RESIZE_PAD : 2);
-		for (uint32_t i = size; i > at; --i) container[i] = std::move(container[i - 1]);
+		for (u32 i = size; i > at; --i) container[i] = std::move(container[i - 1]);
 		container[at] = elem;
 		++size;
 	}
 
-	void Swap(uint32_t from, uint32_t to)
+	void Swap(u32 from, u32 to)
 	{
 		if (from < capacity || to < capacity)
 		{
@@ -92,76 +92,76 @@ public:
 		}
 	}
 
-	void Remove(uint32_t at)
+	void Remove(u32 at)
 	{
 		MR_ASSERT(at < size, "");
 		container[at] = T{};
 	}
 
-	void Pop(uint32_t at)
+	void Pop(u32 at)
 	{
 		MR_ASSERT(at < size, "");
-		for (uint32_t i = at; i + 1 < size; ++i) container[i] = std::move(container[i + 1]);
+		for (u32 i = at; i + 1 < size; ++i) container[i] = std::move(container[i + 1]);
 		container[size - 1].~T();
 		--size;
 	}
 
-	void Resize(uint32_t newSize)
+	void Resize(u32 newSize)
 	{
 		if (newSize > capacity) Reserve(newSize);
 		if (newSize > size)
 		{
-			for (uint32_t i = size; i < newSize; ++i) container[i] = T{};
+			for (u32 i = size; i < newSize; ++i) container[i] = T{};
 		}
 		else
 		{
-			for (uint32_t i = newSize; i < size; ++i) container[i].~T();
+			for (u32 i = newSize; i < size; ++i) container[i].~T();
 		}
 		size = newSize;
 	}
 
-	void Reserve(uint32_t newCap)
+	void Reserve(u32 newCap)
 	{
 		if (newCap <= capacity) return;
-		T* dst = new T[newCap];
-		for (uint32_t i = 0; i < size; ++i) dst[i] = std::move(container[i]);
-		delete[] container;
+		T* dst = GetMemoryManager()->Allocate(newCap * sizeof(T));
+		for (u32 i = 0; i < size; ++i) dst[i] = std::move(container[i]);
+		GetMemoryManager()->Deallocate(container);
 		container = dst;
 		capacity = newCap;
 	}
 
 	void Reset()
 	{
-		for (uint32_t i = 0; i < size; ++i) container[i] = T{};
+		for (u32 i = 0; i < size; ++i) container[i] = T{};
 	}
 
 	void Clear()
 	{
-		for (uint32_t i = 0; i < size; ++i) container[i].~T();
+		for (u32 i = 0; i < size; ++i) container[i].~T();
 		size = 0;
 	}
 
 	T* Data() { return container; }
 	const T* Data() const { return container; }
 
-	uint32_t GetSize() const { return size; }
-	uint32_t GetCapacity() const { return capacity; }
+	u32 GetSize() const { return size; }
+	u32 GetCapacity() const { return capacity; }
 
-	T& operator[](uint32_t index)
+	T& operator[](u32 index)
 	{
 		MR_ASSERT(index < size, "");
 		return container[index];
 	}
 
-	const T& operator[](uint32_t index) const
+	const T& operator[](u32 index) const
 	{
 		MR_ASSERT(index < size, "");
 		return container[index];
 	}
 
-	operator bool() const { return size > 0; }
+	explicit operator bool() const { return size > 0; }
 
-	T* operator&(uint32_t index)
+	T* operator&(u32 index)
 	{
 		MR_ASSERT(index < size, "");
 		return &container[index];
@@ -180,11 +180,11 @@ public:
 	}
 
 private:
-	static constexpr uint32_t RESIZE_PAD = 4;
+	u32 RESIZE_PAD = size * 0.5f;
 
 	T* container;
 
-	uint32_t size;
+	u32 size;
 
-	uint32_t capacity;
+	u32 capacity;
 }; 
