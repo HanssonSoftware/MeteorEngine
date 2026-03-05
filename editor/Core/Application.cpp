@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include <Special/LaunchMeteorSuite.h>
+#include <Memory/MemoryBlockArena.h>
 
 EditorApplication::EditorApplication() 
 	: Application()
@@ -14,7 +15,13 @@ EditorApplication::EditorApplication()
 void EditorApplication::Init()
 {
 	Application::Init();
+	MemoryBlockArena<int> ar = {16 * 1024 * 1024 };
 
+	int* j = (int*)ar.Allocate(sizeof(int));
+
+	*j = 16;
+
+	ar.Reset();
 }
 
 void EditorApplication::Run()

@@ -78,7 +78,7 @@ extern "C" __declspec(dllexport) int LaunchApplication(Application* instance, in
     if (instance != nullptr)
     {
         Commandlet::Get().Initialize(argc, argv);
-        GetMemoryManager()->Initialise();
+        GetMemoryManager()->Initialize();
         instance->Init();
         returnCode = instance->GetRequestExitCode();
         Commandlet::Get().Shutdown();

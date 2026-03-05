@@ -3,7 +3,13 @@
 #pragma once
 #include <Platform/DataTypes.h>
 
-class MemoryRegion
+#ifdef MR_CORE_EXPORTS
+#define CORE_API __declspec(dllexport)
+#else
+#define CORE_API __declspec(dllimport)
+#endif // MR_CORE_EXPORTS
+
+class CORE_API MemoryRegion
 {
 	friend class MemoryHandler;
 public:
