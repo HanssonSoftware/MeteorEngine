@@ -4,9 +4,10 @@
 #include <Logging/Log.h>
 #include <new>
 
-#include <Windows/Windows.h>
+//#include <Platform/Windows.h>
 
 #include "MemoryRegion.h"
+#include <memoryapi.h>
 
 LOG_ADDCATEGORY(Memory);
 
@@ -85,6 +86,11 @@ void* MemoryHandler::Allocate(const u64 byte)
 
 void MemoryHandler::Deallocate(void* location, const u64 byte)
 {
+    if (byte == 0)
+    {
+        return;
+    }
+
     memset(location, 0, byte);
     //VirtualFree(location, byte, MEM_DECOMMIT);
 }

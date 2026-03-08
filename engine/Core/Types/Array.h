@@ -3,39 +3,35 @@
 #pragma once
 
 #include "Iterator.h"
-#include <stdint.h>
+#include <Memory/MemoryHandler.h>
 
 #include <Logging/Log.h>
 
-#ifdef MR_CORE_EXPORTS
-#define CORE_API __declspec(dllexport)
-#else
-#define CORE_API __declspec(dllimport)
-#endif // MR_CORE_EXPORTS
-
 template <typename T>
-class CORE_API Array
+class Array final
 {
 public:
 	Array()
-		: container(nullptr), size(0), capacity(0)
 	{
 		Reserve(2);
 	}
 
+	~Array()
+	{
+		Clear();
+	}
+
 	Array(u32 count)
-		: container(nullptr), size(0), capacity(0)
 	{
 		Reserve(count);
-		for (u32 i = 0; i < count; ++i) container[i] = T{};
+		for (uint32_t i = 0; i < count; ++i) container[i] = T{};
 		size = count;
 	}
 
 	Array(const Array& other)
-		: container(nullptr), size(0), capacity(0)
 	{
 		Reserve(other.size);
-		for (u32 i = 0; i < other.size; ++i) container[i] = other.container[i];
+		for (uint32_t i = 0; i < other.size; ++i) container[i] = other.container[i];
 		size = other.size;
 	}
 
@@ -53,34 +49,31 @@ public:
 		return *this;
 	}
 
-	~Array()
-	{
-		Clear();
-		//delete[] container;
-	}
-
 	void Add(const T& elem)
 	{
-		if (size >= capacity) Reserve(capacity ? capacity + RESIZE_PAD : 2);
+		if (size >= capacity) 
+			Reserve(RecalculateCapacity(capacity));
+
 		container[size++] = elem;
 	}
 
 	void Add(T&& elem)
 	{
-		if (size >= capacity) Reserve(capacity ? capacity + RESIZE_PAD : 2);
-		container[size++] = std::move(elem);
+		if (size >= capacity) 
+			Reserve(RecalculateCapacity(capacity));
+			
+		memmove(&container[size++], &elem, sizeof(elem));
 	}
 
-	void Add(const T& elem, u32 at)
+	void Add(const T& elem, uint32_t at)
 	{
-		MR_ASSERT(at <= size, "");
-		if (size >= capacity) Reserve(capacity ? capacity + RESIZE_PAD : 2);
-		for (u32 i = size; i > at; --i) container[i] = std::move(container[i - 1]);
+		MR_ASSERT(at <= size, "Your index value is pointing out of the array!");
+		if (size >= capacity) Reserve(RecalculateCapacity(capacity));
+		for (uint32_t i = size; i > at; --i) container[i] = std::move(container[i - 1]);
 		container[at] = elem;
-		++size;
 	}
 
-	void Swap(u32 from, u32 to)
+	void Swap(uint32_t from, uint32_t to)
 	{
 		if (from < capacity || to < capacity)
 		{
@@ -92,23 +85,23 @@ public:
 		}
 	}
 
-	void Remove(u32 at)
+	void Remove(uint32_t at)
 	{
 		MR_ASSERT(at < size, "");
 		container[at] = T{};
 	}
 
-	void Pop(u32 at)
+	void Pop(uint32_t at)
 	{
 		MR_ASSERT(at < size, "");
-		for (u32 i = at; i + 1 < size; ++i) container[i] = std::move(container[i + 1]);
+		for (uint32_t i = at; i + 1 < size; ++i) container[i] = std::move(container[i + 1]);
 		container[size - 1].~T();
 		--size;
 	}
 
 	void Resize(u32 newSize)
 	{
-		if (newSize > capacity) Reserve(newSize);
+		if (newSize > capacity) Reserve(RecalculateCapacity(newSize));
 		if (newSize > size)
 		{
 			for (u32 i = size; i < newSize; ++i) container[i] = T{};
@@ -122,48 +115,57 @@ public:
 
 	void Reserve(u32 newCap)
 	{
-		if (newCap <= capacity) return;
-		T* dst = GetMemoryManager()->Allocate(newCap * sizeof(T));
-		for (u32 i = 0; i < size; ++i) dst[i] = std::move(container[i]);
-		GetMemoryManager()->Deallocate(container);
+		if (newCap < capacity) 
+			return;
+
+		T* dst = (T*)GetMemoryManager()->Allocate(newCap * sizeof(T));
+
+		for (u32 i = 0; i < size; ++i) 
+			memmove(&dst[i], &container[i], sizeof(T));
+
+		GetMemoryManager()->Deallocate(container, capacity);
 		container = dst;
 		capacity = newCap;
 	}
 
 	void Reset()
 	{
-		for (u32 i = 0; i < size; ++i) container[i] = T{};
+		for (u32 i = 0; i < size; ++i) 
+			container[i] = T{};
 	}
 
 	void Clear()
 	{
-		for (u32 i = 0; i < size; ++i) container[i].~T();
+		for (u32 i = 0; i < size; ++i)
+		{
+			container[i].~T(); // don't mind int/float/bool??/etc. types, they do not have user defined destructor
+		}
 		size = 0;
 	}
 
-	T* Data() { return container; }
-	const T* Data() const { return container; }
+	T* Data() noexcept { return container; }
+	const T* Data() const noexcept { return container; }
 
 	u32 GetSize() const { return size; }
 	u32 GetCapacity() const { return capacity; }
 
+	explicit operator bool() const { return size > 0; }
+
 	T& operator[](u32 index)
 	{
-		MR_ASSERT(index < size, "");
+		MR_ASSERT(index < capacity, "Index out of range! Your pointed: %u  Border: %u", index, capacity);
 		return container[index];
 	}
 
 	const T& operator[](u32 index) const
 	{
-		MR_ASSERT(index < size, "");
+		MR_ASSERT(index < capacity, "Index out of range! Your pointed: %u  Border: %u", index, capacity);
 		return container[index];
 	}
 
-	explicit operator bool() const { return size > 0; }
-
 	T* operator&(u32 index)
 	{
-		MR_ASSERT(index < size, "");
+		MR_ASSERT(index < capacity, "");
 		return &container[index];
 	}
 
@@ -174,17 +176,28 @@ public:
 
 	void swap(Array& other) noexcept
 	{
-		std::swap(container, other.container);
-		std::swap(size, other.size);
-		std::swap(capacity, other.capacity);
+		if (*this/* == other*/)
+		{
+
+		}
+
+
 	}
 
 private:
-	u32 RESIZE_PAD = size * 0.5f;
+	inline u32 RecalculateCapacity(u32 newSize) noexcept
+	{
+		u32 finalValue, oldValue;
+		finalValue = oldValue = newSize;
 
-	T* container;
+		finalValue = finalValue * 2;
 
-	u32 size;
+		return finalValue == oldValue ? finalValue * 3 : finalValue;
+	}
 
-	u32 capacity;
+	T* container = nullptr;
+
+	u32 size = 0;
+
+	u32 capacity = 0; // capacity = capacity + (capacity / 0.3)
 }; 

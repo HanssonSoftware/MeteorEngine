@@ -4,14 +4,11 @@
 #include <Commandlet.h>
 #include <Types/String.h>
 
-
 #include <Application/Application.h>
 #include <Special/EngineConstants.h>
-#include <wchar.h>
+//#include <wchar.h>
 
-#define USER
-#define MB
-#include <Windows/Windows.h>
+#include <Platform/Windows.h>
 #include <Shlobj.h>
 #include <shlwapi.h>
 #include <pathcch.h>
@@ -51,30 +48,11 @@ Logger::~Logger() noexcept
 
 }
 
-
-#ifdef MR_PLATFORM_WINDOWS
-static HANDLE thread;
-volatile bool bRunMemoryLogger = false;
-static DWORD WINAPI MemoryLoggingProc(void* lpParameter)
-{
-    bRunMemoryLogger = true;
-    while (bRunMemoryLogger)
-    {
-        Sleep(30 * 1000);
-
-        _CrtDumpMemoryLeaks();
-    }
-
-    return 0;
-}
-#endif // MR_PLATFORM_WINDOWS
-
 void Logger::Shutdown()
 {
     CloseHandle(fileHandle);
     CloseHandle(consoleHandle);
 
-    bRunMemoryLogger = false;
 
     bIsInitialized = false;
 }
@@ -204,19 +182,11 @@ void Logger::Initialize()
     MR_LOG(Logging, Log, "Logger system is instantiated in %.2f seconds!", (end.QuadPart - begin.QuadPart) / (freq.QuadPart / 100.0));
 #endif // MR_PLATFORM_WINDOWS
 
-    StartMemoryLeakLoggingThread();
 }
 
 void Logger::HandleFatal(LogDescriptor* Descriptor)
 {
     
-}
-
-void Logger::StartMemoryLeakLoggingThread()
-{
-#ifdef MR_PLATFORM_WINDOWS
-    thread = CreateThread(nullptr, 512 * 1024, MemoryLoggingProc, nullptr, 0, nullptr);
-#endif // MR_PLATFORM_WINDOWS
 }
 
 u32 Logger::FormatLogMessage(char* buffer, LogFormatting format, LogDescriptor* descriptor)

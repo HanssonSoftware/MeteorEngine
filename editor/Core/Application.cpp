@@ -2,7 +2,10 @@
 
 #include "Application.h"
 #include <Special/LaunchMeteorSuite.h>
-#include <Memory/MemoryBlockArena.h>
+
+
+#include <Types/Array.h>
+//#include <Memory/MemoryBlockArena.h>
 
 EditorApplication::EditorApplication() 
 	: Application()
@@ -15,13 +18,27 @@ EditorApplication::EditorApplication()
 void EditorApplication::Init()
 {
 	Application::Init();
-	MemoryBlockArena<int> ar = {16 * 1024 * 1024 };
 
-	int* j = (int*)ar.Allocate(sizeof(int));
+	String a = "kurvsyékddfága";
 
-	*j = 16;
 
-	ar.Reset();
+	Array<int> valami;
+
+	for (int i = 0; i < 10; i++)
+	{
+		valami.Add(i + 4);
+	}
+	
+	//MemoryBlockArena<int> ar = {16 * 1024 * 1024 };
+
+	//int* j = (int*)ar.Allocate(sizeof(int));
+
+	//*j = 16;
+
+	//ar.Reset();
+
+	for (int& a : valami)
+		printf("%d", a);
 }
 
 void EditorApplication::Run()

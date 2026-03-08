@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Types/Delegate.h>
+//#include <Types/Delegate.h>
 #include <Platform/DataTypes.h>
 
 #ifdef MR_DEBUG
@@ -21,7 +21,7 @@ struct LogAssertion;
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
 
-CREATE_DELEGATE(LoggerInitialize);
+//CREATE_DELEGATE(LoggerInitialize);
 
 struct LogEntry {};
 
@@ -45,7 +45,6 @@ public:
 protected:
 	bool bIsInitialized = false;
 
-	void StartMemoryLeakLoggingThread();
 private:
 	static inline Logger* instance = nullptr;
 };

@@ -86,16 +86,16 @@
     <OutDir>$(SolutionDir)Product\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
     <TargetName>MeteorEngine-Core</TargetName>
-    <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
     <OutDir>$(SolutionDir)Product\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
     <TargetName>MeteorEngine-Core</TargetName>
-    <IncludePath>$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -241,9 +241,9 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="engine\Core\Logging\Log.cpp" />
     <ClCompile Include="engine\Core\Application\Application.cpp" />
     <ClCompile Include="engine\Core\Commandlet.cpp" />
+    <ClCompile Include="engine\Core\Logging\Log.cpp" />
     <ClCompile Include="engine\Core\Platform\Platform_Win32.cpp" />
     <ClCompile Include="engine\Core\Types\Name.cpp" />
     <ClCompile Include="engine\Core\Types\String.cpp" />
@@ -266,8 +266,8 @@
     <ClInclude Include="engine\Core\Application\Application.h" />
     <ClInclude Include="engine\Core\Commandlet.h" />
     <ClInclude Include="engine\Core\Platform\Platform.h" />
+    <ClInclude Include="engine\Core\Platform\Windows.h" />
     <ClInclude Include="engine\Core\Special\EngineConstants.h" />
-    <ClInclude Include="engine\Core\TEMPIMPORT.h" />
     <ClInclude Include="engine\Core\Types\Array.h" />
     <ClInclude Include="engine\Core\Platform\DataTypes.h" />
     <ClInclude Include="engine\Core\Types\Delegate.h" />
@@ -275,96 +275,11 @@
     <ClInclude Include="engine\Core\Types\String.h" />
     <ClInclude Include="engine\Core\Types\Traits.h" />
     <ClInclude Include="engine\Core\Types\Vector.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\aabb.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\ai_assert.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\anim.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\Base64.hpp" />
-    <ClInclude Include="engine\ThirdParty\assimp\BaseImporter.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\Bitmap.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\BlobIOSystem.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\ByteSwapper.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\camera.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\cexport.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\cfileio.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\cimport.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\ColladaMetaData.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\color4.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\commonMetaData.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\Compiler\poppack1.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\Compiler\pstdint.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\Compiler\pushpack1.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\config.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\CreateAnimMesh.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\DefaultIOStream.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\DefaultIOSystem.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\DefaultLogger.hpp" />
-    <ClInclude Include="engine\ThirdParty\assimp\defs.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\Exceptional.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\Exporter.hpp" />
-    <ClInclude Include="engine\ThirdParty\assimp\fast_atof.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\GenericProperty.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\GltfMaterial.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\Hash.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\Importer.hpp" />
-    <ClInclude Include="engine\ThirdParty\assimp\importerdesc.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\IOStream.hpp" />
-    <ClInclude Include="engine\ThirdParty\assimp\IOStreamBuffer.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\IOSystem.hpp" />
-    <ClInclude Include="engine\ThirdParty\assimp\light.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\LineSplitter.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\LogAux.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\Logger.hpp" />
-    <ClInclude Include="engine\ThirdParty\assimp\LogStream.hpp" />
-    <ClInclude Include="engine\ThirdParty\assimp\material.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\MathFunctions.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\matrix3x3.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\matrix4x4.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\MemoryIOWrapper.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\mesh.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\metadata.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\NullLogger.hpp" />
-    <ClInclude Include="engine\ThirdParty\assimp\ObjMaterial.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\ParsingUtils.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\pbrmaterial.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\port\AndroidJNI\AndroidJNIIOSystem.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\port\AndroidJNI\BundledAssetIOSystem.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\postprocess.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\Profiler.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\ProgressHandler.hpp" />
-    <ClInclude Include="engine\ThirdParty\assimp\qnan.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\quaternion.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\RemoveComments.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\scene.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\SceneCombiner.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\SGSpatialSort.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\SkeletonMeshBuilder.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\SmallVector.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\SmoothingGroups.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\SpatialSort.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\StandardShapes.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\StreamReader.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\StreamWriter.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\StringComparison.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\StringUtils.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\Subdivision.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\texture.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\TinyFormatter.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\types.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\vector2.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\vector3.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\version.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\Vertex.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\XmlParser.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\XMLTools.h" />
-    <ClInclude Include="engine\ThirdParty\assimp\ZipArchiveIOSystem.h" />
     <ClInclude Include="engine\Core\Special\Version.h" />
     <ClInclude Include="engine\Core\Types\Pointers.h" />
     <ClInclude Include="engine\Core\Module\ModuleManager.h" />
     <ClInclude Include="engine\Core\Types\Iterator.h" />
     <ClInclude Include="engine\Core\Module\Module.h" />
-    <ClInclude Include="engine\Core\Layers\ThreadPool.h" />
-    <ClInclude Include="engine\Platform\WindowManager\WindowMenu.h" />
-    <ClInclude Include="engine\Platform\WindowManager\WindowExtender.h" />
     <ClInclude Include="engine\Core\Types\Map.h" />
     <ClInclude Include="engine\Core\Types\NameCollection.h" />
     <ClInclude Include="engine\Core\Memory\MemoryHandler.h" />
@@ -373,14 +288,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="engine\Engine.mrbuild" />
-    <None Include="engine\ThirdParty\assimp\color4.inl" />
-    <None Include="engine\ThirdParty\assimp\material.inl" />
-    <None Include="engine\ThirdParty\assimp\matrix3x3.inl" />
-    <None Include="engine\ThirdParty\assimp\matrix4x4.inl" />
-    <None Include="engine\ThirdParty\assimp\quaternion.inl" />
-    <None Include="engine\ThirdParty\assimp\SmoothingGroups.inl" />
-    <None Include="engine\ThirdParty\assimp\vector2.inl" />
-    <None Include="engine\ThirdParty\assimp\vector3.inl" />
     <None Include="Resources\d1.bin" />
   </ItemGroup>
   <ItemGroup>

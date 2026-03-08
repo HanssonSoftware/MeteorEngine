@@ -15,14 +15,14 @@
 BuildSystemApplication::BuildSystemApplication()
 	: Application()
 {
-
+	appName = "Meteor Build";
+	appNameNoSpaces = "MeteorBuild";
+	appCodeName = "Apollo";
 }
 
 void BuildSystemApplication::Init()
 {
-	appName = "Meteor Build";
-	appNameNoSpaces = "MeteorBuild";
-	appCodeName = "Apollo";
+
 
 	Application::Init();
 

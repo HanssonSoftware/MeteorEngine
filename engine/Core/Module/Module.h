@@ -2,9 +2,9 @@
 
 #pragma once
 #include <Types/String.h>
-#include <type_traits>
+//#include <type_traits>
 
-#include <Windows/Windows.h>
+#include <Platform/Windows.h>
 // #include <CoreProxy.h>
 
 #ifdef MR_CORE_EXPORTS

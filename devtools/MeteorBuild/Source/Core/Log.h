@@ -2,6 +2,7 @@
 
 #pragma once
 #include <Logging/Log.h>
+#include <Platform/Windows.h>
 
 class BuildSystemLogger : public Logger
 {

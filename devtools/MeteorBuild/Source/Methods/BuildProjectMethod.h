@@ -53,6 +53,6 @@ protected:
 
 	Array<::Module*> modules;
 
-	MemoryBlockArena methodArena;
+	//MemoryBlockArena methodArena;
 };
 

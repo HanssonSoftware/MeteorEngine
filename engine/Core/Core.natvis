@@ -1,14 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-
 	<Type Name="String">
+		<DisplayString Condition="bIsUsingHeap">{{ptr={heapBuffer.ptr} size={heapBuffer.length} cap={heapBuffer.capacity}}}</DisplayString>
+		<DisplayString Condition="!bIsUsingHeap">{{ptr={stackBuffer.ptr} size={stackBuffer.length}}}</DisplayString>
 		<Expand>
-			<Item Name="Size">length</Item>
-			<DisplayString Condition="bIsUsingHeap">"trie"</DisplayString>
-			<Expand>
-				<Item Name="Capacity">capacity</Item>
-			</Expand>
-			<Item Name="Heap?">bIsUsingHeap</Item>
+			<Item Name="Using">bIsUsingHeap</Item>
+			<Item Name="Length">bIsUsingHeap ? (heapBuffer.length): (stackBuffer.length) </Item>
+			<Item Name="Capacity" IncludeView="bIsUsingHeap">(heapBuffer.capacity)</Item>
+			<ArrayItems>
+				<Size>bIsUsingHeap ? (heapBuffer.length) : (stackBuffer.length)</Size>
+				<ValuePointer>bIsUsingHeap ? (heapBuffer.ptr) : (stackBuffer.ptr)</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+	
+	<Type Name="Array&lt;*&gt;">
+		<DisplayString>{{ptr={container + capacity} size={size} cap={capacity}}}</DisplayString>
+		<Expand>
+			<ArrayItems>
+				<Size>size</Size>
+				<ValuePointer>container</ValuePointer>
+			</ArrayItems>
 		</Expand>
 	</Type>
 </AutoVisualizer>

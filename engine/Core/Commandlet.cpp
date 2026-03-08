@@ -6,10 +6,8 @@
 #include <Types/Array.h>
 #include <Platform/Platform.h>
 
-#define MB
-#define KERNEL
-#define NLS
-#include <Windows/Windows.h>
+//#include <Platform/Windows.h>
+#include <processenv.h>
 
 #include <Memory/MemoryHandler.h>
 
@@ -55,7 +53,7 @@ String Commandlet::Parse(const String& inParam)
 				end++;
 
 			char fixBufferForOutputParameter[128] = { '\0' };
-			Platform::ConvertToNarrow(fixBufferForOutputParameter, end - found, found);
+			Platform::ConvertToNarrow(fixBufferForOutputParameter, (u32)(end - found), found);
 
 			return String(fixBufferForOutputParameter, (u32)(end - found));
 		}

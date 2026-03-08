@@ -1,9 +1,6 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "Application.h"
-#include <WindowManager/WindowManager.h>
-#include <Platform/FileManager.h>
-
 #include <Memory/MemoryHandler.h>
 #include "Commandlet.h"
 
@@ -11,12 +8,6 @@
 #include <crtdbg.h>
 #endif // MR_DEBUG
 
-#ifdef MR_PLATFORM_WINDOWS
-#include <winsock.h>
-#endif // MR_PLATFORM_WINDOWS
-
-
-#include <Platform/PerformanceTimer.h>
 #include <Module/ModuleManager.h>
 
 void Application::RequestExit(int Code)
