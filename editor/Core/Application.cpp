@@ -5,7 +5,7 @@
 
 
 #include <Types/Array.h>
-//#include <Memory/MemoryBlockArena.h>
+#include <Memory/MemoryBlockArena.h>
 
 EditorApplication::EditorApplication() 
 	: Application()
@@ -20,25 +20,14 @@ void EditorApplication::Init()
 	Application::Init();
 
 	String a = "kurvsyékddfága";
-
-
-	Array<int> valami;
-
-	for (int i = 0; i < 10; i++)
-	{
-		valami.Add(i + 4);
-	}
 	
-	//MemoryBlockArena<int> ar = {16 * 1024 * 1024 };
+	MemoryBlockArena<int> ar = {16 * 1024 * 1024 };
 
-	//int* j = (int*)ar.Allocate(sizeof(int));
+	int* j = (int*)ar.Allocate(sizeof(int));
 
-	//*j = 16;
+	*j = 16;
 
 	//ar.Reset();
-
-	for (int& a : valami)
-		printf("%d", a);
 }
 
 void EditorApplication::Run()

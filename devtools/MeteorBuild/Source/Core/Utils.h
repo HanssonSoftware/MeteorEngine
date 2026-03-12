@@ -5,7 +5,9 @@
 
 struct Utils
 {
-	static void ListDirectory(wchar_t* name, wchar_t*& container);
+	static void ListDirectory(String* name, Array<wchar_t*>& container);
+
+	static void ListDirectory(String* name, Array<char*>& container);
 
 	static String GetLastError();
 };

@@ -4,7 +4,7 @@
 #include <Platform/Platform.h>
 #include <Application/Application.h>
 
-#include <Platform/Windows.h>
+#include <Platform/Winapi.h>
 #include <libloaderapi.h>
 
 #pragma warning(disable : 6387)
@@ -29,7 +29,7 @@ ModuleManager::~ModuleManager() noexcept
         module->ShutdownModule(); 
 
 #ifdef MR_PLATFORM_WINDOWS   
-        if (!FreeLibrary(module->library))
+        //if (!FreeLibrary(module->library))
         {
             MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", L""/**Platform::GetError()*/, module->GetName().Chr());
             continue;
@@ -60,7 +60,7 @@ bool ModuleManager::LoadModule(const String& moduleName)
         {
             Module* newModule = moduleInstantiation();
             newModule->name = moduleName;
-            newModule->library = module;
+            //newModule->library = module;
             newModule->StartupModule();
 
             modules.Add(newModule);
@@ -81,7 +81,7 @@ bool ModuleManager::LoadModule(const String& moduleName)
             {
                 Module* newModule = moduleInstantiation();
                 newModule->name = moduleName;
-                newModule->library = module;
+                //newModule->library = module;
                 newModule->StartupModule();
 
                 modules.Add(newModule);
@@ -112,7 +112,7 @@ bool ModuleManager::UnloadModule(const String& moduleName)
             module->ShutdownModule();
 
 #ifdef MR_PLATFORM_WINDOWS
-            if (!FreeLibrary(module->library))
+            //if (!FreeLibrary(module->library))
             {
                 MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", L"" /**Platform::GetError()*/, moduleName.Chr());
                 return false;

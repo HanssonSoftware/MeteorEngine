@@ -4,8 +4,6 @@
 #include <Logging/Log.h>
 #include <Types/String.h>
 
-class String;
-
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)
 #else

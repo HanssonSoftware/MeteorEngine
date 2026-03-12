@@ -8,7 +8,7 @@
 #include <Special/EngineConstants.h>
 //#include <wchar.h>
 
-#include <Platform/Windows.h>
+#include <Platform/Winapi.h>
 #include <Shlobj.h>
 #include <shlwapi.h>
 #include <pathcch.h>

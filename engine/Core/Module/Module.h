@@ -4,7 +4,7 @@
 #include <Types/String.h>
 //#include <type_traits>
 
-#include <Platform/Windows.h>
+#include <Platform/Winapi.h>
 // #include <CoreProxy.h>
 
 #ifdef MR_CORE_EXPORTS
@@ -36,7 +36,7 @@ public:
 
 protected:
 #ifdef MR_PLATFORM_WINDOWS
-	HMODULE library;
+	//HMODULE library;
 #endif // MR_PLATFORM_WINDOWS
 
 	ELoadState moduleState;

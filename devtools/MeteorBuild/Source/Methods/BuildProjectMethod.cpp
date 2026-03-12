@@ -5,7 +5,6 @@
 #include <Commandlet.h>
 #include <Core/Log.h>
 #include <Memory/MemoryHandler.h>
-#include <Resource/MemoryAllocatorArena.h>
 #include <Module/Parser.h>
 #include <Module/Module.h>
 #include <Module/Project.h>
@@ -48,7 +47,7 @@
 #define NOPROFILER 
 #define NODEFERWINDOWPOS 
 #define NOMCX                                                                                                      
-#include <Windows.h>
+#include <Winapi.h>
 
 #include <shlwapi.h>
 #include <Objbase.h>
@@ -94,72 +93,70 @@ void BuildProjectMethod::StartMethod()
     QueryPerformanceCounter(&lg);
     start = lg.QuadPart;
 
+    if (!AcquireRequiredParameters())
+        return;
 
-    Utils::ListDirectory(formattedSourceDirectory.Data(), collectedSourcesWithScripts);
-#if 0
-    if (collectedSourcesWithScripts.GetSize() > 0)
+    Array<wchar_t*> files;
+    
+    Utils::ListDirectory(&sourceDirectory, files);
+    for (auto& file : files)
     {
-        for (auto& file : collectedSourcesWithScripts)
+        wchar_t* fileWithExtension = nullptr;
+        if (SUCCEEDED(PathCchFindExtension(file, wcslen(file), &fileWithExtension)) && !wcscmp(fileWithExtension, L".mrbuild"))
         {
-            wchar_t* ptr = file.Data();
-            if (SUCCEEDED(PathCchFindExtension(file.Data(), file.Length() + 1, &ptr)) && !wcscmp(ptr, L".mrbuild"))
+            //foundScripts.Add(file);
+            HANDLE script = CreateFileW(file, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
+            if (script != INVALID_HANDLE_VALUE)
             {
-                foundScripts.Add(file);
-                HANDLE script = CreateFileW(file, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
-                if (script != INVALID_HANDLE_VALUE)
+                LARGE_INTEGER ld;
+                GetFileSizeEx(script, &ld);
+
+                DWORD readActually = 0;
+                wchar_t* buffer = (wchar_t*)GetMemoryManager()->Allocate(ld.QuadPart + 1);
+                if (ReadFile(script, buffer, (DWORD)ld.QuadPart, &readActually, nullptr))
                 {
-                    LARGE_INTEGER ld;
-                    GetFileSizeEx(script, &ld);
-
-                    DWORD readActually = 0;
-                    wchar_t* buffer = (wchar_t*)GetMemoryManager()->Allocate(ld.QuadPart + 1);
-                    if (ReadFile(script, buffer, (DWORD)ld.QuadPart, &readActually, nullptr))
+                    ::Module* actualModule = ParseModule(buffer);
+                    if (actualModule != nullptr)
                     {
-                        ::Module* actualModule = ParseModule(buffer);
-                        if (actualModule != nullptr)
-                        {
-                            actualModule->identification = GenerateGUID();
-                            actualModule->modulePath = ConvertPath(&file);
+                        actualModule->identification = GenerateGUID();
+                        //actualModule->modulePath = ConvertPath(&file);
 
-                            modules.Add(actualModule);
-                        }
+                        modules.Add(actualModule);
                     }
-                    else
-                    {
-                        MR_LOG(LogTemp, Error, "Failed to read minimum amounts of bytes from file! %ls", *file);
-                    }
-
-                    delete[] buffer;
-                    CloseHandle(script);
                 }
                 else
                 {
-                    MR_LOG(LogTemp, Error, "Unable to open %ls script!", *file);
+                    MR_LOG(LogTemp, Error, "Failed to read minimum amounts of bytes from file! %ls", file);
                 }
+
+                delete[] buffer;
+                CloseHandle(script);
             }
-        }
-
-        if (BuildSystemLogger* bls = (BuildSystemLogger*)Logger::Get())
-        {
-            LARGE_INTEGER lgEnd;
-            QueryPerformanceCounter(&lgEnd);
-
-            LARGE_INTEGER frq;
-            QueryPerformanceFrequency(&frq);
-
-            wchar_t result[256] = {};
-            if (SUCCEEDED(swprintf(result, 256, L"%hs method is ran successfully in %.2f seconds!", *name, (lgEnd.QuadPart - lg.QuadPart) / (double)frq.QuadPart)))
+            else
             {
-                DWORD actual = 0;
-                if (!WriteConsoleW(bls->GetOutputHandle(), result, 256, &actual, nullptr))
-                {
-
-                }
+                MR_LOG(LogTemp, Error, "Unable to open %ls script!", file);
             }
         }
-
     }
-#endif
+
+    if (BuildSystemLogger* bls = (BuildSystemLogger*)Logger::Get())
+    {
+        LARGE_INTEGER lgEnd;
+        QueryPerformanceCounter(&lgEnd);
+
+        LARGE_INTEGER frq;
+        QueryPerformanceFrequency(&frq);
+
+        wchar_t result[256] = {};
+        if (SUCCEEDED(swprintf(result, 256, L"%hs method is ran successfully in %.2f seconds!", *name, (lgEnd.QuadPart - lg.QuadPart) / (double)frq.QuadPart)))
+        {
+            DWORD actual = 0;
+            if (!WriteConsoleW(bls->GetOutputHandle(), result, 256, &actual, nullptr))
+            {
+
+            }
+        }
+    }
 }
 
 void BuildProjectMethod::CleanUp()

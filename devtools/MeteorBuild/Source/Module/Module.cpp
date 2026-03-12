@@ -1,8 +1,6 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "Module.h"
-#include <Platform/FileManager.h>
-#include <Platform/File.h>
 #include <Core/Utils.h>
 #include <Core/Application.h>
 #include "Project.h"

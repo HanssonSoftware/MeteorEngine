@@ -4,12 +4,11 @@
 #include <Module/Module.h>
 #include <Module/Project.h>
 
-#include <Platform/FileManager.h>
-#include <Platform/File.h>
 #include <Types/Pointers.h>
 
+#include <Platform/Winapi.h>
 #include <PathCch.h>
-#include <rpc.h>
+//#include <rpc.h>
 #include <Objbase.h>
 
 LOG_ADDCATEGORY(Parser);

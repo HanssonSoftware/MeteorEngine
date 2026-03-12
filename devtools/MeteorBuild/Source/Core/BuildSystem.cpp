@@ -5,10 +5,7 @@
 #include <Core/Log.h>
 
 #include <Commandlet.h>
-#include <Platform/FileManager.h>
 
-#include "Utils.h"
-#include <Platform/Paths.h>
 #include <Platform/Platform.h>
 
 #include <unordered_map>
@@ -27,7 +24,7 @@
 LOG_ADDCATEGORY(BuildSystemFramework);
 LOG_ADDCATEGORY(Assembler);
 
-bool BuildSystem::InitFramework()
+bool BuildSystem::UseBuildSystem()
 {
 	BuildSystemLogger* bl = new BuildSystemLogger;
 	*Logger::Get() = Logger(bl);
@@ -48,6 +45,7 @@ bool BuildSystem::InitFramework()
 	if (!ReadArguments())
 		SendHelpInfo();
 
+	currentMethod->StartMethod();
 	return true;
 }
 
@@ -92,8 +90,8 @@ void BuildSystem::SendHelpInfo() const
 		L"  -source // -src // -s\t\t-  Sets the source directory, where your code lives and to search for .mrbuild scripts recursively.\n"
 		L"  -solution // -sln\t\t-  Sets an alternative solution directory, when selected instruction is done your solution will be copied into that path.\n";
 
-	static constexpr const uint32_t helpASize = sizeof(helpA) / sizeof(helpA[0]);
-	static constexpr const uint32_t helpBSize = sizeof(helpB) / sizeof(helpB[0]);
+	static constexpr const u32 helpASize = sizeof(helpA) / sizeof(helpA[0]);
+	static constexpr const u32 helpBSize = sizeof(helpB) / sizeof(helpB[0]);
 
 	DWORD written = 0;
 	if (!WriteConsoleW(hConsoleRef, bIsHelpRequested ? helpA : helpB, bIsHelpRequested ? helpASize : helpBSize, &written, nullptr))

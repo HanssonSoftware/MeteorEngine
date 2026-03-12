@@ -4,7 +4,7 @@
 #include <Logging/Log.h>
 #include <new>
 
-//#include <Platform/Windows.h>
+#include <Platform/Winapi.h>
 
 #include "MemoryRegion.h"
 #include <memoryapi.h>

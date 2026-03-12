@@ -2,7 +2,7 @@
 
 #include "Platform.h"
 #include <Logging/Log.h>
-#include <Platform/Windows.h>
+#include <Platform/Winapi.h>
 #include <stringapiset.h>
 
 LOG_ADDCATEGORY(Platform);

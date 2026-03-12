@@ -1,16 +1,14 @@
 /* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Types/Array.h>
-#include <Types/String.h>
-#include <Module/Module.h>
+#include <Platform/Winapi.h>
 
 class BaseBuildMethod;
 
 class BuildSystem
 {
 public:
-	bool InitFramework();
+	bool UseBuildSystem();
 
 	template<typename T = BaseBuildMethod>
 	T* GetCurrentMethod() const { return (T*)currentMethod; }

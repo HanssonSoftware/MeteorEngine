@@ -3,7 +3,6 @@
 #include "Application.h"
 #include <Types/String.h>
 #include <Memory/MemoryHandler.h>
-#include <Platform/FileManager.h>
 
 #include <Methods/BaseBuildMethod.h>
 #include <Special/LaunchMeteorSuite.h>
@@ -22,11 +21,9 @@ BuildSystemApplication::BuildSystemApplication()
 
 void BuildSystemApplication::Init()
 {
-
-
 	Application::Init();
 
-	if (!GetBuildSystem().InitFramework())
+	if (!GetBuildSystem().UseBuildSystem())
 	{
 		//MR_LOG(LogBuildSystemApplication, Fatal, "Build system error!");
 	}
@@ -35,11 +32,11 @@ void BuildSystemApplication::Init()
 
 void BuildSystemApplication::Run()
 {
-	if (BaseBuildMethod* method = GetBuildSystem().GetCurrentMethod())
-	{
-		method->StartMethod();
-		method->CleanUp();
-	}
+	//if (BaseBuildMethod* method = GetBuildSystem().GetCurrentMethod())
+	//{
+	//	method->StartMethod();
+	//	method->CleanUp();
+	//}
 
 	//Sleep(60 * 1000); // debug
 	Application::RequestExit(0);

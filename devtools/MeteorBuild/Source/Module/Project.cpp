@@ -2,9 +2,6 @@
 
 #include "Project.h"
 #include <Core/Utils.h>
-#include <Platform/FileManager.h>
-#include <Platform/File.h>
-
 #include "Module.h"
 #include <Core/Application.h>
 

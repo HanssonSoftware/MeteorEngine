@@ -3,11 +3,12 @@
 #include "Utils.h"
 #include <Types/String.h>
 
-#include "Windows/WindowsPaths.h"
+#include <Platform/Winapi.h>
 #include <PathCch.h>
 
 #include <shlwapi.h>
 #include <strsafe.h>
+#include <Platform.h>
 #pragma comment(lib, "Shlwapi.lib")
 
 
@@ -39,35 +40,37 @@ String Utils::GetLastError()
 	return "";
 }
 
-void Utils::ListDirectory(wchar_t* name, wchar_t*& container)
+void Utils::ListDirectory(String* name, Array<char*>& container)
+{
+	MR_ASSERT(false, "Not implemented!");
+}
+
+void Utils::ListDirectory(String* name, Array<wchar_t*>& container)
 {
 	if (name != nullptr)
 	{
-		if (PathIsRelativeW(name))
+		wchar_t fixed[256 + 1] = {};
+		wchar_t* charBuffer = name->Length() > 256 ? (wchar_t*)GetMemoryManager()->Allocate(name->Length() * sizeof(wchar_t)) : fixed;
+		Platform::ConvertToWide(charBuffer, name->Length(), **name);
+
+		if (PathIsRelativeW(charBuffer))
 		{
 			wchar_t exeDir[512] = {};
-			if (!GetModuleFileNameW(nullptr, exeDir, 512))
+			if (DWORD moduleFileName = GetModuleFileNameW(nullptr, exeDir, 512))
 			{
-				MR_LOG(LogBuildSystemUtils, Error, "GetModuleFileNameW returned: %s", *Utils::GetLastError());
-				return;
+				PathCchRemoveFileSpec(exeDir, moduleFileName);
+				int J = 75;
+				
 			}
 
-			DWORD length = (DWORD)wcslen(exeDir);
-			PathCchRemoveFileSpec(exeDir, length);
-
-			PWSTR combinedPathNonCanonicalized = nullptr;
-			PathAllocCombine(exeDir, name, PATHCCH_ALLOW_LONG_PATHS, &combinedPathNonCanonicalized);
-
-			wcscpy(name, combinedPathNonCanonicalized);
-			LocalFree(combinedPathNonCanonicalized);
 		}
 
-		wcscat(name, L"\\*");
+		wcscat(charBuffer, L"\\*");
 
 		WIN32_FIND_DATAW foundFile;
-		HANDLE fileHandle = FindFirstFileW(name, &foundFile);
+		HANDLE fileHandle = FindFirstFileW(charBuffer, &foundFile);
 
-		PathCchRemoveFileSpec(name, wcslen(name));
+		PathCchRemoveFileSpec(charBuffer, wcslen(charBuffer));
 		if (fileHandle != INVALID_HANDLE_VALUE)
 		{
 			do
@@ -77,16 +80,14 @@ void Utils::ListDirectory(wchar_t* name, wchar_t*& container)
 
 				if (foundFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 				{
-					wchar_t* tempName = new wchar_t[wcslen(name) + wcslen(foundFile.cFileName) + 10]();
-					StringCchPrintfW(tempName, STRSAFE_MAX_CCH, L"%ls\\%ls", name, foundFile.cFileName);
-					ListDirectory(tempName, container);
-
-					delete[] tempName;
+					//wchar_t* tempName = new wchar_t[wcslen(charBuffer) + wcslen(foundFile.cFileName) + 10]();
+					//snprintf("");
+					//ListDirectory(tempName, container);
 				}
 				else if (foundFile.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
 				{
-					wchar_t* tempName = new wchar_t[wcslen(name) + wcslen(foundFile.cFileName) + 10]();
-					StringCchPrintfW(tempName, STRSAFE_MAX_CCH, L"%ls\\%ls", name, foundFile.cFileName);
+					wchar_t* tempName = new wchar_t[wcslen(charBuffer) + wcslen(foundFile.cFileName) + 10]();
+					StringCchPrintfW(tempName, STRSAFE_MAX_CCH, L"%ls\\%ls", charBuffer, foundFile.cFileName);
 					//container.Add(tempName);
 				
 					delete[] tempName;
