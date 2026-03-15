@@ -25,9 +25,9 @@ public:
 
 	virtual void* Allocate(const u64 bytes)
 	{
-		if (ptr && ptr + bytes)
+		if (ptr && (u64)(ptr + offset + bytes) <= (u64)(ptr + size))
 		{
-			void* result = ptr + bytes;
+			void* result = ptr + offset;
 
 			offset += bytes;
 			return result;

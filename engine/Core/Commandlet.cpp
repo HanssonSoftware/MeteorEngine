@@ -41,6 +41,7 @@ String Commandlet::Parse(const String& inParam)
 		while (*end && !isspace(*end))
 			end++;
 
+		end++;
 		found = end;
 
 		// to second word

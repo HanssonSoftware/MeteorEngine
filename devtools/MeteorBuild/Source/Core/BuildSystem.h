@@ -10,8 +10,7 @@ class BuildSystem
 public:
 	bool UseBuildSystem();
 
-	template<typename T = BaseBuildMethod>
-	T* GetCurrentMethod() const { return (T*)currentMethod; }
+	BaseBuildMethod* GetCurrentMethod() const { return currentMethod; }
 
 	//bool GenerateImportExportDefinitions(String* path);
 

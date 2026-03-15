@@ -2,6 +2,7 @@
 
 #pragma once
 #include <Types/String.h>
+#include <Platform/DataTypes.h>
 
 class BaseBuildMethod
 {
@@ -17,7 +18,7 @@ public:
 protected:
 	String name;
 
-	uint64_t start = 0;
-	uint64_t end = 0;
+	u64 start = 0;
+	u64 end = 0;
 };
 

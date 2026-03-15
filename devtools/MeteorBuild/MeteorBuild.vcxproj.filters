@@ -24,7 +24,7 @@
     <ClCompile Include="Source\Module\Module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Core\Utils.cpp">
+    <ClCompile Include="Source\Core\Utils_Win32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Module\Project.cpp">

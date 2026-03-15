@@ -130,7 +130,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>MR_DEBUG;_CONSOLE;MR_PLATFORM_WINDOWS;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MR_DEBUG;_CONSOLE;MR_PLATFORM_WINDOWS;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)Source\;$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir)Source;$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate</AdditionalIncludeDirectories>
@@ -174,7 +174,7 @@
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)Source\;$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir);$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(CoreLibraryDependencies);MeteorEngine-Core.lib</AdditionalDependencies>
@@ -189,7 +189,7 @@
     <ClCompile Include="Source\Core\Application.cpp" />
     <ClCompile Include="Source\Module\Launcher.cpp" />
     <ClCompile Include="Source\Module\Module.cpp" />
-    <ClCompile Include="Source\Core\Utils.cpp" />
+    <ClCompile Include="Source\Core\Utils_Win32.cpp" />
     <ClCompile Include="Source\Module\Project.cpp" />
     <ClCompile Include="Source\Module\Parser.cpp" />
   </ItemGroup>

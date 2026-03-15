@@ -5,6 +5,7 @@
 #include "Iterator.h"
 #include <Memory/MemoryHandler.h>
 
+#include <cstring>
 #include <Logging/Log.h>
 
 template <typename T>

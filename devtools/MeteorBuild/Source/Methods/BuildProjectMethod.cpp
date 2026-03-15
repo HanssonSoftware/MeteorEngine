@@ -1,6 +1,5 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
-#define _CRT_NON_CONFORMING_SWPRINTFS
 #include "BuildProjectMethod.h"
 #include <Commandlet.h>
 #include <Core/Log.h>
@@ -54,6 +53,7 @@
 #include <strsafe.h>
 #include <PathCch.h>
 #include <Core/Utils.h>
+#include <Platform.h>
 
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "Pathcch.lib")
@@ -98,11 +98,14 @@ void BuildProjectMethod::StartMethod()
 
     Array<wchar_t*> files;
     
-    Utils::ListDirectory(&sourceDirectory, files);
+    wchar_t convertedSourceDir[128] = {};
+    Platform::ConvertToWide(convertedSourceDir, 128 - 1, sourceDirectory);
+
+    Utils::ListDirectory(convertedSourceDir, files);
     for (auto& file : files)
     {
-        wchar_t* fileWithExtension = nullptr;
-        if (SUCCEEDED(PathCchFindExtension(file, wcslen(file), &fileWithExtension)) && !wcscmp(fileWithExtension, L".mrbuild"))
+        wchar_t* fileWithExtension = file;
+        if (SUCCEEDED(PathCchFindExtension(file, wcslen(file) + 1, &fileWithExtension)) && !wcscmp(fileWithExtension, L".mrbuild"))
         {
             //foundScripts.Add(file);
             HANDLE script = CreateFileW(file, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
@@ -112,7 +115,7 @@ void BuildProjectMethod::StartMethod()
                 GetFileSizeEx(script, &ld);
 
                 DWORD readActually = 0;
-                wchar_t* buffer = (wchar_t*)GetMemoryManager()->Allocate(ld.QuadPart + 1);
+                char* buffer = (char*)GetMemoryManager()->Allocate(ld.QuadPart + 1);
                 if (ReadFile(script, buffer, (DWORD)ld.QuadPart, &readActually, nullptr))
                 {
                     ::Module* actualModule = ParseModule(buffer);

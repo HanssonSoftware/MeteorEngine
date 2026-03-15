@@ -70,35 +70,37 @@ void BuildSystem::SendHelpInfo() const
 								  Commandlet::Get().Check("-h") ||
 								  Commandlet::Get().Check("?");
 
-	static constexpr const wchar_t helpA[] = L"\nDon\'t know what to do? List of options below.\n"
-		L"Instruction parameters:\n"
-		L"  -build\t\t-  Performs a build project method, requires a source, intermediate parameter!\n"
-		L"  -rebuild\t\t-  Performs a full rebuild method, requires the same parameters as the -build, but it deletes everything.\n"
-		L"\nOrdionary parameters:\n"
-		L"  -help // -h // ?\t\t-  Brings up help (this pane).\n"
-		L"  -intermediate // -int\t\t-  Sets the intermediate directory, for your generated project files.\n"
-		L"  -source // -src // -s\t\t-  Sets the source directory, where your code lives and to search for .mrbuild scripts recursively.\n"
-		L"  -solution // -sln\t\t-  Sets an alternative solution directory, when selected instruction is done your solution will be copied into that path.\n";
+	static constexpr const char helpBuffer[] = "\nNo parameters in input. Don\'t know what to do? Little help.\n"
+		"Instruction parameters:\n"
+		"  -build\t\t-  Performs a build project method, requires a source, intermediate parameter.\n"
+		"  -rebuild\t\t-  Performs a full rebuild method, requires the same parameters as the -build, but it deletes everything.\n"
+		"\nOrdionary parameters:\n"
+		"  -help // -h // ?\t\t-  Brings up help (this pane).\n"
+		"  -intermediate // -int\t\t-  Sets the intermediate directory, for your generated project files.\n"
+		"  -source // -src // -s\t\t-  Sets the source directory, where your code lives and to search for .mrbuild scripts recursively.\n"
+		"  -solution // -sln\t\t-  Sets an alternative solution directory, when selected instruction is done your solution will be copied into that path.\n";
 
-	static constexpr const wchar_t helpB[] = L"\nNo parameters in input. Don\'t know what to do? Little help.\n"
-		L"Instruction parameters:\n"
-		L"  -build\t\t-  Performs a build project method, requires a source, intermediate parameter.\n"
-		L"  -rebuild\t\t-  Performs a full rebuild method, requires the same parameters as the -build, but it deletes everything.\n"
-		L"\nOrdionary parameters:\n"
-		L"  -help // -h // ?\t\t-  Brings up help (this pane).\n"
-		L"  -intermediate // -int\t\t-  Sets the intermediate directory, for your generated project files.\n"
-		L"  -source // -src // -s\t\t-  Sets the source directory, where your code lives and to search for .mrbuild scripts recursively.\n"
-		L"  -solution // -sln\t\t-  Sets an alternative solution directory, when selected instruction is done your solution will be copied into that path.\n";
+	static constexpr const u32 helpSize = sizeof(helpBuffer) / sizeof(helpBuffer[0]);
 
-	static constexpr const u32 helpASize = sizeof(helpA) / sizeof(helpA[0]);
-	static constexpr const u32 helpBSize = sizeof(helpB) / sizeof(helpB[0]);
+#ifdef MR_PLATFORM_WINDOWS
 
-	DWORD written = 0;
-	if (!WriteConsoleW(hConsoleRef, bIsHelpRequested ? helpA : helpB, bIsHelpRequested ? helpASize : helpBSize, &written, nullptr))
+	wchar_t fixedBufferForConverting[helpSize] = {};
+	if (MultiByteToWideChar(CP_UTF8, 0, helpBuffer, helpSize, fixedBufferForConverting, helpSize))
 	{
-		MessageBoxW(GetConsoleWindow(), L"Failed to write help!", L"MeteorBuild(R) internal error!", MB_ICONERROR | MB_OK);
+		DWORD written = 0;
+		if (!WriteConsoleW(hConsoleRef, fixedBufferForConverting, helpSize, &written, nullptr))
+		{
+			MessageBoxW(GetConsoleWindow(), L"Failed to write help!", L"MeteorBuild(R) internal error!", MB_ICONERROR | MB_OK);
+			return;
+		}
+	}
+	else
+	{
+		MessageBoxW(GetConsoleWindow(), L"MultiByteToWideChar", L"MeteorBuild(R) internal error!", MB_ICONERROR | MB_OK);
 		return;
 	}
+#else 
+#endif // MR_PLATFORM_WINDOWS
 }
 
 bool BuildSystem::BuildProjectFiles()
