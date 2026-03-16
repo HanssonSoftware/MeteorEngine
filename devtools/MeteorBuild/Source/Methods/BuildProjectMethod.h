@@ -24,7 +24,7 @@ public:
 protected:
 	virtual ~BuildProjectMethod() noexcept = default;
 
-	virtual Module* ParseModule(wchar_t* buffer);
+	virtual Module* ParseModule(char* buffer);
 
 	virtual inline String GenerateGUID() const;
 
@@ -37,11 +37,11 @@ protected:
 		Project
 	};
 
-	inline BuildProjectMethod::ScriptType DetectScriptType(const wchar_t* buffer, uint32_t length) const noexcept;
+	inline BuildProjectMethod::ScriptType DetectScriptType(const char* buffer, u32 length) const noexcept;
 
-	inline void SetSpecifierForModule(::Module* module, const wchar_t* verb, const wchar_t* verbEntry, uint32_t length) noexcept;
+	inline void SetSpecifierForModule(::Module* module, const char* verb, const char* verbEntry, u32 length) noexcept;
 
-	inline void SetSpecifierForProject(::Project* project, const wchar_t* verb, const wchar_t* verbEntry, uint32_t length) noexcept;
+	inline void SetSpecifierForProject(::Project* project, const char* verb, const char* verbEntry, u32 length) noexcept;
 
 	String sourceDirectory;
 
@@ -49,7 +49,7 @@ protected:
 
 	String alternativeSolutionDir;
 
-	Array<String> foundScripts;
+	Array<wchar_t*> foundScripts;
 
 	Array<::Module*> modules;
 

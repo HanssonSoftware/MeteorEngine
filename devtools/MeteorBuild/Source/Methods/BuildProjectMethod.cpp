@@ -60,7 +60,7 @@
 
 #pragma warning(disable : 6031)
 
-#define INSERT_SPECIFIER(x, statement) if (!wcscmp(verb, x)) { statement return; }
+#define INSERT_SPECIFIER(x, statement) if (!strcmp(verb, x)) { statement return; }
 
 BuildProjectMethod::BuildProjectMethod() : BaseBuildMethod()
 {
@@ -107,7 +107,7 @@ void BuildProjectMethod::StartMethod()
         wchar_t* fileWithExtension = file;
         if (SUCCEEDED(PathCchFindExtension(file, wcslen(file) + 1, &fileWithExtension)) && !wcscmp(fileWithExtension, L".mrbuild"))
         {
-            //foundScripts.Add(file);
+            foundScripts.Add(file);
             HANDLE script = CreateFileW(file, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
             if (script != INVALID_HANDLE_VALUE)
             {
@@ -122,7 +122,7 @@ void BuildProjectMethod::StartMethod()
                     if (actualModule != nullptr)
                     {
                         actualModule->identification = GenerateGUID();
-                        //actualModule->modulePath = ConvertPath(&file);
+                        //actualModule->modulePath = ConvertPath(file);
 
                         modules.Add(actualModule);
                     }
@@ -132,7 +132,7 @@ void BuildProjectMethod::StartMethod()
                     MR_LOG(LogTemp, Error, "Failed to read minimum amounts of bytes from file! %ls", file);
                 }
 
-                delete[] buffer;
+                GetMemoryManager()->Deallocate(buffer, ld.QuadPart);
                 CloseHandle(script);
             }
             else
@@ -169,20 +169,20 @@ void BuildProjectMethod::CleanUp()
 
 }
 
-Module* BuildProjectMethod::ParseModule(wchar_t* buffer)
+Module* BuildProjectMethod::ParseModule(char* buffer)
 {
     if (buffer != nullptr)
     {
-        int line = 1, wchar_tacter = 1;
+        int line = 1, current = 1;
 
-        wchar_t* begin = buffer;
-        wchar_t* end = begin;
+        char* begin = buffer;
+        char* end = begin;
 
         ::Module* newModule = new ::Module;
-        if (SkipWord(end, line, wchar_tacter))
+        if (Parsing::SkipWord(end, line, current))
         {
-            newModule->moduleName = GetQuotedWord(end);
-            if (!SkipType(end, Colon))
+            newModule->moduleName = Parsing::GetQuotedWord(end);
+            if (!Parsing::SkipType(end, Parsing::Colon))
             {
                 MR_LOG(LogTemp, Fatal, "Module is not associated with any project! %s", *newModule->moduleName);
                 
@@ -190,8 +190,8 @@ Module* BuildProjectMethod::ParseModule(wchar_t* buffer)
                 return nullptr;
             }
 
-            newModule->parent = GetQuotedWord(end);
-            if (!SkipType(end, OpenBrace))
+            newModule->parent = Parsing::GetQuotedWord(end);
+            if (!Parsing::SkipType(end, Parsing::OpenBrace))
             {
                 MR_LOG(LogTemp, Fatal, "Missing open statement!", );
 
@@ -199,23 +199,23 @@ Module* BuildProjectMethod::ParseModule(wchar_t* buffer)
                 return nullptr;
             }
 
-            while (GetType(end) != ClosedBrace)
+            while (Parsing::GetType(end) != Parsing::ClosedBrace)
             { 
-                wchar_t* actualLocation = end;
+                char* actualLocation = end;
 
-                const String word = GetWord(end);
-                if (word && SkipType(end, Colon) && SkipType(end, OpenBrace))
+                const String word = Parsing::GetWord(end);
+                if (word && Parsing::SkipType(end, Parsing::Colon) && Parsing::SkipType(end, Parsing::OpenBrace))
                 {
-                    while (GetType(end) != ClosedBrace)
+                    while (Parsing::GetType(end) != Parsing::ClosedBrace)
                     {
-                        const String entry = GetQuotedWord(end);
+                        const String entry = Parsing::GetQuotedWord(end);
                         //SetSpecifierForModule(newModule, word, entry, entry.Length());
 
-                        if (!SkipType(end, Comma))
+                        if (!Parsing::SkipType(end, Parsing::Comma))
                             break;
                     }
 
-                    SkipType(end, ClosedBrace);
+                    Parsing::SkipType(end, Parsing::ClosedBrace);
                 }
 
                 if (actualLocation == end)
@@ -225,7 +225,7 @@ Module* BuildProjectMethod::ParseModule(wchar_t* buffer)
                 }
             }
 
-            SkipType(end, ClosedBrace);
+            Parsing::SkipType(end, Parsing::ClosedBrace);
         }
 
         while (isspace(*end))
@@ -251,6 +251,7 @@ inline String BuildProjectMethod::GenerateGUID() const
     char guidBuffer[40] = { L'\0' };
 
     CoCreateGuid(&id);
+
     snprintf(guidBuffer, 40, "{%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}", id.Data1, id.Data2, id.Data3, id.Data4[0], id.Data4[1], id.Data4[2], id.Data4[3], id.Data4[4], id.Data4[5], id.Data4[6], id.Data4[7]);
     return guidBuffer;
 }
@@ -279,13 +280,13 @@ String BuildProjectMethod::ConvertPath(String* wideBuffer)
     return "";
 }
 
-inline BuildProjectMethod::ScriptType BuildProjectMethod::DetectScriptType(const wchar_t* buffer, uint32_t length) const noexcept
+inline BuildProjectMethod::ScriptType BuildProjectMethod::DetectScriptType(const char* buffer, u32 length) const noexcept
 {
-    if (!wcsncmp(buffer, L"Project", length))
+    if (!strncmp(buffer, "Project", length))
     {
         return ScriptType::Project;
     }
-    else if (!wcsncmp(buffer, L"Module", length))
+    else if (!strncmp(buffer, "Module", length))
     {
         return ScriptType::Module;
     }
@@ -293,7 +294,7 @@ inline BuildProjectMethod::ScriptType BuildProjectMethod::DetectScriptType(const
     return ScriptType::None;
 }
 
-inline void BuildProjectMethod::SetSpecifierForModule(::Module* module, const wchar_t* verb, const wchar_t* verbEntry, uint32_t length) noexcept
+inline void BuildProjectMethod::SetSpecifierForModule(::Module* module, const char* verb, const char* verbEntry, u32 length) noexcept
 {
     MR_ASSERT(module != nullptr, "Module is invalid!");
 
@@ -306,7 +307,7 @@ inline void BuildProjectMethod::SetSpecifierForModule(::Module* module, const wc
     //INSERT_SPECIFIER(L"IncludePath", module->includePaths.Add(verbEntry); );
 }
 
-inline void BuildProjectMethod::SetSpecifierForProject(::Project* project, const wchar_t* verb, const wchar_t* verbEntry, uint32_t length) noexcept
+inline void BuildProjectMethod::SetSpecifierForProject(::Project* project, const char* verb, const char* verbEntry, u32 length) noexcept
 {
     MR_ASSERT(project != nullptr, "Project is invalid!");
 

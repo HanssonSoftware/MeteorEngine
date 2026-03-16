@@ -13,23 +13,26 @@
 
 LOG_ADDCATEGORY(Parser);
 
-static bool AddVerbDetail(Module* moduleToWrite, const String& verb, const String& value)
+namespace Parsing
 {
-	//if (verb == "IncludePath" || verb == "IncludePaths") { moduleToWrite->includePaths.Add(value); return true; }
-	//if (verb == "Dependencies") { moduleToWrite->requires.Add(value); return true; }
 
-	//MR_LOG(LogParser, Error, "Unknown verb: %ls", *verb);
-	return false;
-}
+	static bool AddVerbDetail(Module* moduleToWrite, const String& verb, const String& value)
+	{
+		//if (verb == "IncludePath" || verb == "IncludePaths") { moduleToWrite->includePaths.Add(value); return true; }
+		//if (verb == "Dependencies") { moduleToWrite->requires.Add(value); return true; }
 
-static bool AddVerbDetail(Project* projectToWrite, const String& verb, const String& value)
-{
-	//if (verb == "GlobalDefine" || verb == "GlobalDefines") { projectToWrite->globalDefines.Add(value); return true; }
-	//if (verb == "Executable") { projectToWrite->launcher = value; return true; }
+		//MR_LOG(LogParser, Error, "Unknown verb: %ls", *verb);
+		return false;
+	}
 
-	//MR_LOG(LogParser, Error, "Unknown verb: %ls", *verb);
-	return false;
-}
+	static bool AddVerbDetail(Project* projectToWrite, const String& verb, const String& value)
+	{
+		//if (verb == "GlobalDefine" || verb == "GlobalDefines") { projectToWrite->globalDefines.Add(value); return true; }
+		//if (verb == "Executable") { projectToWrite->launcher = value; return true; }
+
+		//MR_LOG(LogParser, Error, "Unknown verb: %ls", *verb);
+		return false;
+	}
 
 
 	//ScopedPtr<IFile> module = FileManager::CreateFileOperation(moduleName, FileAccessMode::OPENMODE_READ, FileShareMode::SHAREMODE_READ, OVERRIDERULE_OPEN_ONLY_IF_EXISTS);
@@ -37,7 +40,7 @@ static bool AddVerbDetail(Project* projectToWrite, const String& verb, const Str
 	//{
 	//	module->Read();
 
-	//	const wchar_t* buffer = module->GetBuffer();
+	//	const char* buffer = module->GetBuffer();
 	//	if (GetWord(buffer, false) == "Module")
 	//	{
 	//		PathCchRemoveFileSpec(moduleName->Data(), moduleName->Length());
@@ -52,29 +55,29 @@ static bool AddVerbDetail(Project* projectToWrite, const String& verb, const Str
 
 	//		newModule->moduleName = GetWord(buffer, true);
 
-	//		if (Getwchar_tacterType(buffer) == Colon)
+	//		if (GetcharacterType(buffer) == Colon)
 	//		{
-	//			Skipwchar_tacterType(buffer, Colon);
+	//			SkipcharacterType(buffer, Colon);
 	//			newModule->dependsOn = GetWord(buffer, true);
 
-	//			if (Getwchar_tacterType(buffer) == OpenBrace)
+	//			if (GetcharacterType(buffer) == OpenBrace)
 	//			{
-	//				Skipwchar_tacterType(buffer, OpenBrace);
+	//				SkipcharacterType(buffer, OpenBrace);
 
 	//				while (*buffer != '\0')
 	//				{
-	//					while (Getwchar_tacterType(buffer) != ClosedBrace
-	//						&& Getwchar_tacterType(buffer) != None)
+	//					while (GetcharacterType(buffer) != ClosedBrace
+	//						&& GetcharacterType(buffer) != None)
 	//					{
 	//						const String flagWord = GetWord(buffer, true);
-	//						if (flagWord && Getwchar_tacterType(buffer) == Colon)
+	//						if (flagWord && GetcharacterType(buffer) == Colon)
 	//						{
-	//							Skipwchar_tacterType(buffer, Colon);
+	//							SkipcharacterType(buffer, Colon);
 
-	//							if (Getwchar_tacterType(buffer) == OpenBrace)
+	//							if (GetcharacterType(buffer) == OpenBrace)
 	//							{
-	//								Skipwchar_tacterType(buffer, OpenBrace);
-	//								while (Getwchar_tacterType(buffer) != ClosedBrace)
+	//								SkipcharacterType(buffer, OpenBrace);
+	//								while (GetcharacterType(buffer) != ClosedBrace)
 	//								{
 	//									const String value = GetWord(buffer, true);
 	//									if (value)
@@ -83,12 +86,12 @@ static bool AddVerbDetail(Project* projectToWrite, const String& verb, const Str
 	//											MR_LOG(LogParser, Log, "Added %ls property to %ls", *value, *flagWord);
 	//									}
 
-	//									if (Getwchar_tacterType(buffer) == Comma)
-	//										Skipwchar_tacterType(buffer, Comma);
+	//									if (GetcharacterType(buffer) == Comma)
+	//										SkipcharacterType(buffer, Comma);
 	//								}
 	//							}
 	//						}
-	//						else if (Getwchar_tacterType(buffer) != Colon)
+	//						else if (GetcharacterType(buffer) != Colon)
 	//						{
 	//							MR_LOG(LogParser, Fatal, "Missing colon after word %ls!", flagWord.Chr());
 	//						}
@@ -98,7 +101,7 @@ static bool AddVerbDetail(Project* projectToWrite, const String& verb, const Str
 	//						}
 	//					}
 
-	//					Skipwchar_tacterType(buffer, ClosedBrace);
+	//					SkipcharacterType(buffer, ClosedBrace);
 	//				}
 
 	//				if (*buffer == '\0')
@@ -106,7 +109,7 @@ static bool AddVerbDetail(Project* projectToWrite, const String& verb, const Str
 	//					GUID id;
 	//					if (SUCCEEDED(CoCreateGuid(&id)))
 	//					{
-	//						wwchar_t_t buffer[64];
+	//						wchar_t buffer[64];
 	//						if (!StringFromGUID2(id, buffer, 64))
 	//						{
 	//							module->Close();
@@ -122,7 +125,7 @@ static bool AddVerbDetail(Project* projectToWrite, const String& verb, const Str
 	//				newModule->SetIsParsed(true);
 
 	//				newModule->defineName = *newModule->moduleName;
-	//				for (wwchar_t_t* ptr = newModule->defineName.Data(); *ptr; ptr++)
+	//				for (wchar_t* ptr = newModule->defineName.Data(); *ptr; ptr++)
 	//					*ptr = towupper(*ptr);
 
 	//				return newModule;
@@ -155,7 +158,7 @@ static bool AddVerbDetail(Project* projectToWrite, const String& verb, const Str
 
 	//	module->Read();
 
-	//	const wchar_t* buffer = module->GetBuffer();
+	//	const char* buffer = module->GetBuffer();
 
 	//	bool bHasBeenParsedOneWordAtLeast = false;
 	//	if (GetWord(buffer, false) == "Project")
@@ -169,24 +172,24 @@ static bool AddVerbDetail(Project* projectToWrite, const String& verb, const Str
 
 	//		newProject->projectName = GetWord(buffer, true);
 
-	//		if (Getwchar_tacterType(buffer) == OpenBrace)
+	//		if (GetcharacterType(buffer) == OpenBrace)
 	//		{
-	//			Skipwchar_tacterType(buffer, OpenBrace);
+	//			SkipcharacterType(buffer, OpenBrace);
 
 	//			while (*buffer != '\0')
 	//			{
-	//				while (Getwchar_tacterType(buffer) != ClosedBrace
-	//					&& Getwchar_tacterType(buffer) != None)
+	//				while (GetcharacterType(buffer) != ClosedBrace
+	//					&& GetcharacterType(buffer) != None)
 	//				{
 	//					const String flagWord = GetWord(buffer, true);
-	//					if (flagWord && Getwchar_tacterType(buffer) == Colon)
+	//					if (flagWord && GetcharacterType(buffer) == Colon)
 	//					{
-	//						Skipwchar_tacterType(buffer, Colon);
+	//						SkipcharacterType(buffer, Colon);
 
-	//						if (Getwchar_tacterType(buffer) == OpenBrace)
+	//						if (GetcharacterType(buffer) == OpenBrace)
 	//						{
-	//							Skipwchar_tacterType(buffer, OpenBrace);
-	//							while (Getwchar_tacterType(buffer) != ClosedBrace)
+	//							SkipcharacterType(buffer, OpenBrace);
+	//							while (GetcharacterType(buffer) != ClosedBrace)
 	//							{
 	//								const String value = GetWord(buffer, true);
 	//								if (value)
@@ -197,12 +200,12 @@ static bool AddVerbDetail(Project* projectToWrite, const String& verb, const Str
 	//									MR_LOG(LogParser, Log, "Adding %ls property to %ls", *value, *flagWord);
 	//								}
 
-	//								if (Getwchar_tacterType(buffer) == Comma)
-	//									Skipwchar_tacterType(buffer, Comma);
+	//								if (GetcharacterType(buffer) == Comma)
+	//									SkipcharacterType(buffer, Comma);
 	//							}
 	//						}
 	//					}
-	//					else if (Getwchar_tacterType(buffer) != Colon)
+	//					else if (GetcharacterType(buffer) != Colon)
 	//					{
 	//						MR_LOG(LogParser, Fatal, "Missing colon after word! %ls", flagWord.Chr());
 	//					}
@@ -212,7 +215,7 @@ static bool AddVerbDetail(Project* projectToWrite, const String& verb, const Str
 	//					}
 	//				}
 
-	//				Skipwchar_tacterType(buffer, ClosedBrace);
+	//				SkipcharacterType(buffer, ClosedBrace);
 	//			}
 	//		}
 
@@ -224,177 +227,178 @@ static bool AddVerbDetail(Project* projectToWrite, const String& verb, const Str
 	//	return nullptr;
 	//}
 
-Ewchar_tacterType GetType(wchar_t*& str)
-{
-	if (!str) return None;
+	static ECharacterType GetType(char*& str)
+	{
+		if (!str) return Parsing::None;
 
-	while (isspace(*str))
-		str++;
+		while (isspace(*str))
+			str++;
 
-	const wchar_t* constStr = str;
-	if (iswalpha(*constStr))
-	{
-		while (!iswspace(*constStr))
-			constStr++;
-
-		return Word;
-	}
-
-	if (*constStr == TEXT('{'))
-	{
-		return OpenBrace;
-	}
-	else if (*constStr == TEXT('}'))
-	{
-		return ClosedBrace;
-	}
-	else if (*constStr == TEXT(','))
-	{
-		return Comma;
-	}
-	else if (*constStr == ';')
-	{
-		return SemiColon;
-	}
-	else if (*constStr == TEXT(':'))
-	{
-		return Colon;
-	}
-	else if (*constStr == TEXT('\0'))
-	{
-		return EndOfFile;
-	}
-
-	return None;
-}
-
-bool SkipType(wchar_t*& str, Ewchar_tacterType type)
-{
-	if (str)
-	{
-		switch (type)
+		const char* constStr = str;
+		if (isalpha(*constStr))
 		{
-		case Word:
+			while (!isspace(*constStr))
+				constStr++;
+
+			return Word;
+		}
+
+		if (*constStr == '{')
 		{
-			if (isalpha(*str))
+			return OpenBrace;
+		}
+		else if (*constStr == '}')
+		{
+			return ClosedBrace;
+		}
+		else if (*constStr == ',')
+		{
+			return Comma;
+		}
+		else if (*constStr == ';')
+		{
+			return SemiColon;
+		}
+		else if (*constStr == ':')
+		{
+			return Colon;
+		}
+		else if (*constStr == '\0')
+		{
+			return EndOfFile;
+		}
+
+		return None;
+	}
+
+	bool SkipType(char*& str, ECharacterType type)
+	{
+		if (str)
+		{
+			switch (type)
 			{
-				while (!isspace(*str))
+			case Word:
+			{
+				if (isalpha(*str))
+				{
+					while (!isspace(*str))
+						str++;
+
+					return true;
+				}
+				break;
+			}
+			default:
+				if (GetType(str) == type)
+				{
 					str++;
+					return true;
+				}
+				break;
+			}
+		}
 
-				return true;
-			}
-			break;
-		}
-		default:
-			if (GetType(str) == type)
-			{
-				str++;
-				return true;
-			}
-			break;
-		}
+		return false;
 	}
 
-	return false;
-}
-
-String GetWord(wchar_t*& in, bool bStep)
-{
-	while (isspace(*in))
-		in++;
-
-	wchar_t* begin = in;
-	wchar_t* end = nullptr;
-	uint32_t wchar_ts = 0;
-
-	//if (*begin == '"')
-	//{
-	//	begin++; // "
-	//	end = begin;
-
-	//	while (*end && /*isalpha(*end)*/ *end != '"')
-	//	{
-	//		wchar_ts++;
-	//		end++;
-	//	}
-
-	//	end++;
-	//}
-	if (*begin == '$')
+	String GetWord(char*& in, bool bStep)
 	{
-		end = begin;
+		while (isspace(*in))
+			in++;
 
-		end++;
-		if (isspace(*end))
+		char* begin = in;
+		char* end = nullptr;
+		u32 chars = 0;
+
+		//if (*begin == '"')
+		//{
+		//	begin++; // "
+		//	end = begin;
+
+		//	while (*end && /*isalpha(*end)*/ *end != '"')
+		//	{
+		//		chars++;
+		//		end++;
+		//	}
+
+		//	end++;
+		//}
+		if (*begin == '$')
 		{
-			while (*end && !isspace(*end)) end++;
-			wchar_ts = (uint32_t)(end - begin);
+			end = begin;
+
+			end++;
+			if (isspace(*end))
+			{
+				while (*end && !isspace(*end)) end++;
+				chars = (uint32_t)(end - begin);
+			}
+			else
+			{
+
+			}
 		}
 		else
 		{
+			end = in;
+			while (*end && !isspace(*end) && !ispunct(*end)) end++;
 
+			chars = (uint32_t)(end - begin);
 		}
-	}
-	else
-	{
-		end = in;
-		while (*end && !isspace(*end) && !ispunct(*end)) end++;
 
-		wchar_ts = (uint32_t)(end - begin);
+		//String returned(begin, chars);
+		if (bStep) in = end;
+
+		return "returned";
 	}
 
-	//String returned(begin, wchar_ts);
-	if (bStep) in = end;
-
-	return "returned";
-}
-
-String GetQuotedWord(wchar_t*& in, bool bStep)
-{
-	while (isspace(*in))
-		in++;
-
-	in++; // "
-
-	wchar_t* begin = in;
-	wchar_t* end = nullptr;
-	uint32_t wchar_ts = 0;
-
-	if (/**begin == '$'*/false)
+	static String GetQuotedWord(char*& in, bool bStep)
 	{
- 	//	end = begin;
-		//end++;
-
-		//while (*end != ')' && isalpha(*end)) end++;
-		//wchar_ts = (uint32_t)(end - begin);
-	}
-	else
-	{
-		end = begin;
-
-		while (*end != '"') end++;
-		wchar_ts = (uint32_t)(end - begin);
-	}
-
-	end++; // "
-
-	//String returned(begin, wchar_ts);
-	if (bStep) in = end;
-
-	return "returned";
-}
-
-bool SkipWord(wchar_t*& in, int& line, int& wchar_tacter)
-{
-	if (in)
-	{
-		while (*in && !isspace(*in))
-		{
+		while (isspace(*in))
 			in++;
+
+		in++; // "
+
+		char* begin = in;
+		char* end = nullptr;
+		u32 chars = 0;
+
+		if (/**begin == '$'*/false)
+		{
+			//	end = begin;
+				//end++;
+
+				//while (*end != ')' && isalpha(*end)) end++;
+				//chars = (uint32_t)(end - begin);
 		}
-		
-		return true;
+		else
+		{
+			end = begin;
+
+			while (*end != '"') end++;
+			chars = (uint32_t)(end - begin);
+		}
+
+		end++; // "
+
+		//String returned(begin, chars);
+		if (bStep) in = end;
+
+		return "returned";
 	}
 
-	return false;
+	static bool SkipWord(char*& in, int& line, int& character)
+	{
+		if (in)
+		{
+			while (*in && !isspace(*in))
+			{
+				in++;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
 }

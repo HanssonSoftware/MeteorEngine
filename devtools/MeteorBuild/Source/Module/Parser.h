@@ -6,29 +6,29 @@
 class Module;
 class Project;
 
-enum Ewchar_tacterType
+namespace Parsing
 {
-	None,
-	Word,
-	Colon,
-	SemiColon,
-	Comma,
-	OpenBrace,
-	ClosedBrace,
-	EndOfFile
-};
+	enum ECharacterType
+	{
+		None,
+		Word,
+		Colon,
+		SemiColon,
+		Comma,
+		OpenBrace,
+		ClosedBrace,
+		EndOfFile
+	};
 
 
-Ewchar_tacterType GetType(wchar_t*& str);
+	static ECharacterType GetType(char*& str);
 
-bool SkipType(wchar_t*& str, Ewchar_tacterType type);
+	static bool SkipType(char*& str, ECharacterType type);
 
-String GetWord(wchar_t*& in, bool bStep = true);
+	static String GetWord(char*& in, bool bStep = true);
 
-String GetQuotedWord(wchar_t*& in, bool bStep = true);
+	static String GetQuotedWord(char*& in, bool bStep = true);
 
-bool SkipWord(wchar_t*& in, int& line, int& wchar_tacter);
+	static bool SkipWord(char*& in, int& line, int& character);
 
-bool IsSpace(const wchar_t* buffer);
-
-
+}
