@@ -31,6 +31,6 @@ protected:
 
 	Array<String> requires; // Dependency modules: Core, Platform, etc.
 
-	String identification; // Guid
+	char identification[38 + 1] = { '\0' }; // Guid
 };
 

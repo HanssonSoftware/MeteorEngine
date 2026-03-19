@@ -42,6 +42,7 @@ struct LogAssertion
 enum LogSeverity
 {
     Log      = 1,
+    Info      = Log,
     Verbose,
     Warn,
     Error,

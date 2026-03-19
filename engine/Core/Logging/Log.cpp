@@ -8,6 +8,7 @@
 #include <Special/EngineConstants.h>
 //#include <wchar.h>
 
+#ifdef MR_PLATFORM_WINDOWS
 #include <Platform/Winapi.h>
 #include <Shlobj.h>
 #include <shlwapi.h>
@@ -16,7 +17,6 @@
 #pragma comment(lib, "OneCore.Lib")
 #pragma comment(lib, "Pathcch.lib")
 
-#ifdef MR_PLATFORM_WINDOWS
 static HANDLE consoleHandle;
 static HANDLE fileHandle;
 
@@ -179,7 +179,7 @@ void Logger::Initialize()
     }
 
     QueryPerformanceCounter(&end);
-    MR_LOG(Logging, Log, "Logger system is instantiated in %.2f seconds!", (end.QuadPart - begin.QuadPart) / (freq.QuadPart / 100.0));
+    MR_LOG(Logging, Info, "Logger system is instantiated in %.2f seconds!", (end.QuadPart - begin.QuadPart) / (freq.QuadPart / 100.0));
 #endif // MR_PLATFORM_WINDOWS
 
 }

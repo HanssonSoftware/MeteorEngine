@@ -227,7 +227,7 @@ namespace Parsing
 	//	return nullptr;
 	//}
 
-	static ECharacterType GetType(char*& str)
+	ECharacterType GetType(char*& str)
 	{
 		if (!str) return Parsing::None;
 
@@ -331,7 +331,7 @@ namespace Parsing
 			if (isspace(*end))
 			{
 				while (*end && !isspace(*end)) end++;
-				chars = (uint32_t)(end - begin);
+				chars = (u32)(end - begin);
 			}
 			else
 			{
@@ -343,16 +343,16 @@ namespace Parsing
 			end = in;
 			while (*end && !isspace(*end) && !ispunct(*end)) end++;
 
-			chars = (uint32_t)(end - begin);
+			chars = (u32)(end - begin);
 		}
 
-		//String returned(begin, chars);
+		String returned(begin, chars);
 		if (bStep) in = end;
 
-		return "returned";
+		return returned;
 	}
 
-	static String GetQuotedWord(char*& in, bool bStep)
+	String GetQuotedWord(char*& in, bool bStep = true)
 	{
 		while (isspace(*in))
 			in++;
@@ -376,25 +376,23 @@ namespace Parsing
 			end = begin;
 
 			while (*end != '"') end++;
-			chars = (uint32_t)(end - begin);
+			chars = (u32)(end - begin);
 		}
 
 		end++; // "
 
-		//String returned(begin, chars);
+		String returned(begin, chars);
 		if (bStep) in = end;
 
-		return "returned";
+		return returned;
 	}
 
-	static bool SkipWord(char*& in, int& line, int& character)
+	bool SkipWord(char*& in, int& line, int& character)
 	{
 		if (in)
 		{
 			while (*in && !isspace(*in))
-			{
 				in++;
-			}
 
 			return true;
 		}

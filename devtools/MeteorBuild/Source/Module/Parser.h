@@ -21,14 +21,13 @@ namespace Parsing
 	};
 
 
-	static ECharacterType GetType(char*& str);
+	ECharacterType GetType(char*& str);
 
-	static bool SkipType(char*& str, ECharacterType type);
+	bool SkipType(char*& str, ECharacterType type);
 
-	static String GetWord(char*& in, bool bStep = true);
+	String GetWord(char*& in, bool bStep = true);
 
-	static String GetQuotedWord(char*& in, bool bStep = true);
+	String GetQuotedWord(char*& in, bool bStep);
 
-	static bool SkipWord(char*& in, int& line, int& character);
-
+	bool SkipWord(char*& in, int& line, int& character);
 }

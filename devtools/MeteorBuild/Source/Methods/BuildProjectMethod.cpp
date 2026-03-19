@@ -121,7 +121,7 @@ void BuildProjectMethod::StartMethod()
                     ::Module* actualModule = ParseModule(buffer);
                     if (actualModule != nullptr)
                     {
-                        actualModule->identification = GenerateGUID();
+                        GenerateGUID(actualModule->identification);
                         //actualModule->modulePath = ConvertPath(file);
 
                         modules.Add(actualModule);
@@ -181,7 +181,7 @@ Module* BuildProjectMethod::ParseModule(char* buffer)
         ::Module* newModule = new ::Module;
         if (Parsing::SkipWord(end, line, current))
         {
-            newModule->moduleName = Parsing::GetQuotedWord(end);
+            newModule->moduleName = Parsing::GetQuotedWord(end, true);
             if (!Parsing::SkipType(end, Parsing::Colon))
             {
                 MR_LOG(LogTemp, Fatal, "Module is not associated with any project! %s", *newModule->moduleName);
@@ -190,7 +190,7 @@ Module* BuildProjectMethod::ParseModule(char* buffer)
                 return nullptr;
             }
 
-            newModule->parent = Parsing::GetQuotedWord(end);
+            newModule->parent = Parsing::GetQuotedWord(end, true);
             if (!Parsing::SkipType(end, Parsing::OpenBrace))
             {
                 MR_LOG(LogTemp, Fatal, "Missing open statement!", );
@@ -208,7 +208,7 @@ Module* BuildProjectMethod::ParseModule(char* buffer)
                 {
                     while (Parsing::GetType(end) != Parsing::ClosedBrace)
                     {
-                        const String entry = Parsing::GetQuotedWord(end);
+                        const String entry = Parsing::GetQuotedWord(end, true);
                         //SetSpecifierForModule(newModule, word, entry, entry.Length());
 
                         if (!Parsing::SkipType(end, Parsing::Comma))
@@ -245,15 +245,12 @@ Module* BuildProjectMethod::ParseModule(char* buffer)
     return nullptr;
 }
 
-inline String BuildProjectMethod::GenerateGUID() const
+inline void BuildProjectMethod::GenerateGUID(char* output)
 {
     GUID id;
-    char guidBuffer[40] = { L'\0' };
-
     CoCreateGuid(&id);
 
-    snprintf(guidBuffer, 40, "{%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}", id.Data1, id.Data2, id.Data3, id.Data4[0], id.Data4[1], id.Data4[2], id.Data4[3], id.Data4[4], id.Data4[5], id.Data4[6], id.Data4[7]);
-    return guidBuffer;
+    snprintf(output, 39, "{%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X}", id.Data1, id.Data2, id.Data3, id.Data4[0], id.Data4[1], id.Data4[2], id.Data4[3], id.Data4[4], id.Data4[5], id.Data4[6], id.Data4[7]);
 }
 
 String BuildProjectMethod::ConvertPath(String* wideBuffer)

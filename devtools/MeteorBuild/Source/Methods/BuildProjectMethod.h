@@ -26,7 +26,7 @@ protected:
 
 	virtual Module* ParseModule(char* buffer);
 
-	virtual inline String GenerateGUID() const;
+	virtual inline void GenerateGUID(char* output);
 
 	String ConvertPath(String* wideBuffer);
 
