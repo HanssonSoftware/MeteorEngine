@@ -1,8 +1,11 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "Application.h"
-#include <Special/LaunchMeteorSuite.h>
 
+#include <Platform/Winapi.h>
+#include <uxtheme.h>
+#pragma comment(lib, "User32.lib")
+#pragma comment(lib, "UxTheme.lib")
 
 #include <Types/Array.h>
 #include <Memory/MemoryBlockArena.h>
@@ -26,8 +29,6 @@ void EditorApplication::Init()
 	int* j = (int*)ar.Allocate(sizeof(int));
 
 	*j = 16;
-
-	//ar.Reset();
 }
 
 void EditorApplication::Run()
@@ -37,7 +38,10 @@ void EditorApplication::Run()
 
 void EditorApplication::Shutdown()
 {
+
 	Application::Shutdown();
 }
+
+#include <Special/LaunchMeteorSuite.h>
 
 IMPLEMENT_WINDOWS_STARTUP("MeteorEngine-Core", EditorApplication);

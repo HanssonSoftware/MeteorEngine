@@ -49,7 +49,7 @@ extern "C" __declspec(dllimport) int LaunchApplication(Application* instance, in
 #define NOPROFILER
 #define NODEFERWINDOWPOS
 #define NOMCX
-#include <Winapi.h>
+#include <Windows.h>
 #include <PathCch.h>
 #include <winuser.h>
 #pragma comment (lib, "Pathcch.lib")                                                                     

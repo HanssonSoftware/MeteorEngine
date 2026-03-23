@@ -41,7 +41,7 @@ struct CORE_API Application
 
 	int GetRequestExitCode() const { return appFramework->exitCode; };
 
-	ECurrentApplicationState GetAppState() const { return state; };
+	inline ECurrentApplicationState GetAppState() const { return state; };
 
 	void SetAppState(const ECurrentApplicationState& newState) { state = newState; };
 

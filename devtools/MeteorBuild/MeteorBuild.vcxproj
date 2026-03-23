@@ -184,7 +184,6 @@
   <ItemGroup>
     <ClCompile Include="Source\Methods\BuildProjectMethod.cpp" />
     <ClCompile Include="Source\Core\Log.cpp" />
-    <ClCompile Include="Source\Methods\BaseBuildMethod.cpp" />
     <ClCompile Include="Source\Core\BuildSystem.cpp" />
     <ClCompile Include="Source\Core\Application.cpp" />
     <ClCompile Include="Source\Module\Launcher.cpp" />
@@ -194,6 +193,7 @@
     <ClCompile Include="Source\Module\Parser.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Core\Helper.h" />
     <ClInclude Include="Source\Methods\BuildProjectMethod.h" />
     <ClInclude Include="Source\Core\Log.h" />
     <ClInclude Include="Source\Methods\BaseBuildMethod.h" />

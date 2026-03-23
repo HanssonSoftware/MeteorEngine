@@ -6,13 +6,13 @@
 
 class Project;
 
-class Module
+class ScriptModule
 {
 	friend class BuildProjectMethod;
 public:
-	Module() = default;
+	ScriptModule() = default;
 
-	virtual	~Module() noexcept = default;
+	virtual	~ScriptModule() noexcept = default;
 
 protected:
 	String moduleName; // "Core"

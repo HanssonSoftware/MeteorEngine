@@ -22,7 +22,7 @@ enum class ELoadState
 	UNLOADED
 };
 
-class CORE_API Module
+class CORE_API ScriptModule
 {
 	friend class ModuleManager;
 public:
@@ -45,8 +45,8 @@ protected:
 };
 
 #define IMPLEMENT_MODULE(ModuleClass)																		 \
-	static_assert(std::is_base_of<Module, ModuleClass>::value, "ModuleClass does not inherit from Module!"); \
-	extern "C" __declspec(dllimport) Module* InitialiseModule()												 \
+	static_assert(std::is_base_of<ScriptModule, ModuleClass>::value, "ModuleClass does not inherit from Module!"); \
+	extern "C" __declspec(dllimport) ScriptModule* InitialiseModule()												 \
 	{																										 \
 		return new ModuleClass();																			 \
 	}

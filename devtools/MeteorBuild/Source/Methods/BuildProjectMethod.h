@@ -8,7 +8,7 @@
 #include <Memory/MemoryBlockArena.h>
 
 class Project;
-class Module;
+class ScriptModule;
 
 class BuildProjectMethod : public BaseBuildMethod
 {
@@ -24,7 +24,7 @@ public:
 protected:
 	virtual ~BuildProjectMethod() noexcept = default;
 
-	virtual Module* ParseModule(char* buffer);
+	virtual ScriptModule* ParseModule(char* buffer);
 
 	virtual inline void GenerateGUID(char* output);
 
@@ -39,9 +39,11 @@ protected:
 
 	inline BuildProjectMethod::ScriptType DetectScriptType(const char* buffer, u32 length) const noexcept;
 
-	inline void SetSpecifierForModule(::Module* module, const char* verb, const char* verbEntry, u32 length) noexcept;
+	inline void SetSpecifierForModule(::ScriptModule* module, const char* verb, const char* verbEntry, u32 length) noexcept;
 
 	inline void SetSpecifierForProject(::Project* project, const char* verb, const char* verbEntry, u32 length) noexcept;
+
+	bool CreateIntermediateDirectories(const String* directory, Array<ScriptModule*> modules);
 
 	String sourceDirectory;
 
@@ -49,9 +51,7 @@ protected:
 
 	String alternativeSolutionDir;
 
-	Array<wchar_t*> foundScripts;
-
-	Array<::Module*> modules;
+	Array<ScriptModule*> modules;
 
 	//MemoryBlockArena methodArena;
 };

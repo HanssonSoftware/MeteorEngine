@@ -3,7 +3,7 @@
 #pragma once
 #include <Types/String.h>
 
-class Module;
+class ScriptModule;
 class Project;
 
 namespace Parsing

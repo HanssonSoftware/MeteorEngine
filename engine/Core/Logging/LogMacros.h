@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <Platform/DataTypes.h>
+#include <cstdlib>
 
 #define MERGE(x, y) x##y
 #define MERGE2(x) #x
@@ -129,8 +130,11 @@ LOG_ADDCATEGORY(Temp);
                 Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Category, &descriptor));\
                 Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Severity, &descriptor));\
                 Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Message, &descriptor));\
-             } \
-             \
+             } else\
+             { \
+                 char buffer[1024] = { '\0' }; \
+                 exit(-1); \
+             }\
         } while (0); \
     }
 

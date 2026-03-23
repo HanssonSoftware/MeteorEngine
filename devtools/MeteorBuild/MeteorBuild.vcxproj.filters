@@ -36,9 +36,6 @@
     <ClCompile Include="Source\Module\Launcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Methods\BaseBuildMethod.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Core\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -78,6 +75,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Methods\BuildProjectMethod.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Core\Helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

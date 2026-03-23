@@ -55,6 +55,8 @@ bool MemoryHandler::Initialize()
         return false;
     }
 
+    memset(startingAddress, 0, fixed512MB + regionHeaderSize);
+
     constexpr u64 engineSize = fixed512MB / 3ull;
     constexpr u64 projectSize = fixed512MB - engineSize;
 

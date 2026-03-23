@@ -3,7 +3,12 @@
 #include "BuildProjectMethod.h"
 #include <Commandlet.h>
 #include <Core/Log.h>
+#include <Core/Utils.h>
+#include <Platform.h>
+#include <Application/Application.h>
+#include <Core/Helper.h>
 #include <Memory/MemoryHandler.h>
+#include <Memory/MemoryBlockArena.h>
 #include <Module/Parser.h>
 #include <Module/Module.h>
 #include <Module/Project.h>
@@ -52,8 +57,8 @@
 #include <Objbase.h>
 #include <strsafe.h>
 #include <PathCch.h>
-#include <Core/Utils.h>
-#include <Platform.h>
+#include <ShlObj.h>
+
 
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "Pathcch.lib")
@@ -96,7 +101,7 @@ void BuildProjectMethod::StartMethod()
     if (!AcquireRequiredParameters())
         return;
 
-    Array<wchar_t*> files;
+    Array<wchar_t*> files, foundScripts;
     
     wchar_t convertedSourceDir[128] = {};
     Platform::ConvertToWide(convertedSourceDir, 128 - 1, sourceDirectory);
@@ -118,7 +123,7 @@ void BuildProjectMethod::StartMethod()
                 char* buffer = (char*)GetMemoryManager()->Allocate(ld.QuadPart + 1);
                 if (ReadFile(script, buffer, (DWORD)ld.QuadPart, &readActually, nullptr))
                 {
-                    ::Module* actualModule = ParseModule(buffer);
+                    ScriptModule* actualModule = ParseModule(buffer);
                     if (actualModule != nullptr)
                     {
                         GenerateGUID(actualModule->identification);
@@ -129,7 +134,7 @@ void BuildProjectMethod::StartMethod()
                 }
                 else
                 {
-                    MR_LOG(LogTemp, Error, "Failed to read minimum amounts of bytes from file! %ls", file);
+                    MR_LOG(LogTemp, Error, "Failed to read %ls script!", file);
                 }
 
                 GetMemoryManager()->Deallocate(buffer, ld.QuadPart);
@@ -142,22 +147,38 @@ void BuildProjectMethod::StartMethod()
         }
     }
 
-    if (BuildSystemLogger* bls = (BuildSystemLogger*)Logger::Get())
+    if (foundScripts.GetSize() > 0)
     {
-        LARGE_INTEGER lgEnd;
-        QueryPerformanceCounter(&lgEnd);
+        CreateIntermediateDirectories(&intermediateDirectory, modules);
 
-        LARGE_INTEGER frq;
-        QueryPerformanceFrequency(&frq);
 
-        wchar_t result[256] = {};
-        if (SUCCEEDED(swprintf(result, 256, L"%hs method is ran successfully in %.2f seconds!", *name, (lgEnd.QuadPart - lg.QuadPart) / (double)frq.QuadPart)))
+        if (BuildSystemLogger* bls = (BuildSystemLogger*)Logger::Get())
         {
-            DWORD actual = 0;
-            if (!WriteConsoleW(bls->GetOutputHandle(), result, 256, &actual, nullptr))
-            {
+            LARGE_INTEGER lgEnd;
+            QueryPerformanceCounter(&lgEnd);
 
+            LARGE_INTEGER frq;
+            QueryPerformanceFrequency(&frq);
+
+            wchar_t result[64] = {};
+            if (swprintf(result, 64, L"%hs method is ran successfully in %.2f seconds!", *name, (lgEnd.QuadPart - lg.QuadPart) / (double)frq.QuadPart))
+            {
+                DWORD actual = 0;
+                if (!WriteConsoleW(bls->GetOutputHandle(), result, 64, &actual, nullptr))
+                {
+
+                }
             }
+        }
+    }
+    else
+    {
+        if (BuildSystemLogger* bls = (BuildSystemLogger*)Logger::Get())
+        {
+            constexpr const wchar_t nofilesBuffer[] = L"No files generated! Check scripts location or appended switches!";
+
+            DWORD actual = 0;
+            WriteConsoleW(bls->GetOutputHandle(), nofilesBuffer, (DWORD)wcslen(nofilesBuffer), &actual, nullptr);
         }
     }
 }
@@ -169,7 +190,7 @@ void BuildProjectMethod::CleanUp()
 
 }
 
-Module* BuildProjectMethod::ParseModule(char* buffer)
+ScriptModule* BuildProjectMethod::ParseModule(char* buffer)
 {
     if (buffer != nullptr)
     {
@@ -178,15 +199,15 @@ Module* BuildProjectMethod::ParseModule(char* buffer)
         char* begin = buffer;
         char* end = begin;
 
-        ::Module* newModule = new ::Module;
+        ScriptModule* newModule = (ScriptModule*)GetMemoryManager()->Allocate(sizeof(ScriptModule));
         if (Parsing::SkipWord(end, line, current))
         {
             newModule->moduleName = Parsing::GetQuotedWord(end, true);
             if (!Parsing::SkipType(end, Parsing::Colon))
             {
                 MR_LOG(LogTemp, Fatal, "Module is not associated with any project! %s", *newModule->moduleName);
-                
-                delete newModule;
+
+                GetMemoryManager()->Deallocate(newModule, sizeof(ScriptModule));
                 return nullptr;
             }
 
@@ -195,7 +216,7 @@ Module* BuildProjectMethod::ParseModule(char* buffer)
             {
                 MR_LOG(LogTemp, Fatal, "Missing open statement!", );
 
-                delete newModule;
+                GetMemoryManager()->Deallocate(newModule, sizeof(ScriptModule));
                 return nullptr;
             }
 
@@ -209,7 +230,7 @@ Module* BuildProjectMethod::ParseModule(char* buffer)
                     while (Parsing::GetType(end) != Parsing::ClosedBrace)
                     {
                         const String entry = Parsing::GetQuotedWord(end, true);
-                        //SetSpecifierForModule(newModule, word, entry, entry.Length());
+                        SetSpecifierForModule(newModule, word, entry, entry.Length());
 
                         if (!Parsing::SkipType(end, Parsing::Comma))
                             break;
@@ -235,7 +256,7 @@ Module* BuildProjectMethod::ParseModule(char* buffer)
         {
             MR_LOG(LogTemp, Fatal, "Failed to parse buffer!");
 
-            delete newModule;
+            GetMemoryManager()->Deallocate(newModule, sizeof(ScriptModule));
             return nullptr;
         }
 
@@ -291,7 +312,7 @@ inline BuildProjectMethod::ScriptType BuildProjectMethod::DetectScriptType(const
     return ScriptType::None;
 }
 
-inline void BuildProjectMethod::SetSpecifierForModule(::Module* module, const char* verb, const char* verbEntry, u32 length) noexcept
+inline void BuildProjectMethod::SetSpecifierForModule(ScriptModule* module, const char* verb, const char* verbEntry, u32 length) noexcept
 {
     MR_ASSERT(module != nullptr, "Module is invalid!");
 
@@ -315,4 +336,50 @@ inline void BuildProjectMethod::SetSpecifierForProject(::Project* project, const
     }
 
     //INSERT_SPECIFIER("IncludePath");
+}
+
+bool BuildProjectMethod::CreateIntermediateDirectories(const String* directory, Array<ScriptModule*> modules)
+{
+    if (!directory || intermediateDirectory.IsEmpty())
+        return false;
+
+#ifdef MR_PLATFORM_WINDOWS
+    MemoryBlockArena<wchar_t> intermediateProcess = MemoryBlockArena<wchar_t>(16 * 1024 * sizeof(wchar_t));
+
+    wchar_t exeLocation[512] = {};
+    const DWORD exeCount = GetModuleFileNameW(nullptr, exeLocation, 511); 
+            
+    PathCchRemoveFileSpec(exeLocation, exeCount);
+
+    wchar_t* wideIntermediateString = (wchar_t*)intermediateProcess.Allocate(directory->Length() * sizeof(wchar_t));
+    MultiByteToWideChar(CP_UTF8, 0, directory->Chr(), directory->Length(), wideIntermediateString, directory->Length());
+
+    wchar_t appCodeNameWide[256] = {};
+    const u32 appCodeNameLength = (u32)strlen(GetApplication()->GetApplicationCodeName());
+    MultiByteToWideChar(CP_UTF8, 0, GetApplication()->GetApplicationCodeName(), appCodeNameLength, appCodeNameWide, appCodeNameLength);
+
+    wchar_t* combinedIntermediatePath = (wchar_t*)intermediateProcess.Allocate(exeCount + directory->Length() + 0);
+    const u32 combinedIntermediatePathSize = exeCount + directory->Length();
+    
+    PathCchCombine(combinedIntermediatePath, combinedIntermediatePathSize, exeLocation, wideIntermediateString);
+    PathCchCombine(combinedIntermediatePath, combinedIntermediatePathSize + appCodeNameLength, combinedIntermediatePath, appCodeNameWide);
+
+
+    for (ScriptModule*& module : modules)
+    {
+        wchar_t moduleNameWide[256] = {};
+        const u32 convertedModuleNameSize = MultiByteToWideChar(CP_UTF8, 0, module->moduleName, module->moduleName.Length(), moduleNameWide, module->moduleName.Length());
+
+        static wchar_t* fullyCompletedPath = (wchar_t*)intermediateProcess.Allocate(convertedModuleNameSize * sizeof(wchar_t));
+     
+        HRCHECK(PathCchCombine(fullyCompletedPath, combinedIntermediatePathSize + appCodeNameLength + convertedModuleNameSize, combinedIntermediatePath, moduleNameWide));
+
+        SHCreateDirectoryExW(nullptr, fullyCompletedPath, nullptr);
+
+        PathCchRemoveFileSpec(fullyCompletedPath, combinedIntermediatePathSize + appCodeNameLength + convertedModuleNameSize);
+    }
+
+#endif // MR_PLATFORM_WINDOWS
+
+    return true;
 }

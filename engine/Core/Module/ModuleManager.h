@@ -19,7 +19,7 @@ public:
 protected:
 	virtual ~ModuleManager() noexcept;
 
-	Array<Module*> modules;
+	Array<ScriptModule*> modules;
 
 private:
 	static ModuleManager* object; // This must be an extensible class!

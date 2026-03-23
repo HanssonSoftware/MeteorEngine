@@ -24,7 +24,7 @@ ModuleManager& ModuleManager::Get()
 
 ModuleManager::~ModuleManager() noexcept
 {
-    for (Module*& module : modules)
+    for (ScriptModule*& module : modules)
     {
         module->ShutdownModule(); 
 
@@ -41,7 +41,7 @@ ModuleManager::~ModuleManager() noexcept
 }
 
 static constexpr const char* defaultEngineName = "MeteorEngine";
-typedef Module* (*fv)();
+typedef ScriptModule* (*fv)();
 
 bool ModuleManager::LoadModule(const String& moduleName)
 {
@@ -58,7 +58,7 @@ bool ModuleManager::LoadModule(const String& moduleName)
 
         if (moduleInstantiation)
         {
-            Module* newModule = moduleInstantiation();
+            ScriptModule* newModule = moduleInstantiation();
             newModule->name = moduleName;
             //newModule->library = module;
             newModule->StartupModule();
@@ -79,7 +79,7 @@ bool ModuleManager::LoadModule(const String& moduleName)
 
             if (moduleInstantiation)
             {
-                Module* newModule = moduleInstantiation();
+                ScriptModule* newModule = moduleInstantiation();
                 newModule->name = moduleName;
                 //newModule->library = module;
                 newModule->StartupModule();
@@ -102,7 +102,7 @@ bool ModuleManager::UnloadModule(const String& moduleName)
     const uint32_t moduleSize = modules.GetSize();
     for (uint32_t i = 0; i < moduleSize; i++)
     {
-        Module*& module = modules[i];
+        ScriptModule*& module = modules[i];
         
         if (module)
         {
@@ -132,7 +132,7 @@ bool ModuleManager::UnloadModule(const String& moduleName)
 
 bool ModuleManager::IsModuleLoaded(const String& moduleName)
 {
-    for (Module*& mdl : modules)
+    for (ScriptModule*& mdl : modules)
     {
         if (!mdl) continue;
 

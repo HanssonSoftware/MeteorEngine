@@ -4,7 +4,7 @@
 #include <Types/String.h>
 #include <Types/Array.h>
 
-class Module;
+class ScriptModule;
 
 class Project
 {
@@ -12,7 +12,7 @@ class Project
 public:
 	String projectName;
 
-	Array<Module*> modulesReference;
+	Array<ScriptModule*> modulesReference;
 
 	Array<String> globalDefines;
 

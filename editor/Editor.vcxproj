@@ -43,14 +43,14 @@
     <OutDir>$(SolutionDir)Product\</OutDir>
     <TargetName>Meteor$(ProjectName)</TargetName>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);%(AdditionalLibraryDirectories);$(SolutionDir)product</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);%(AdditionalLibraryDirectories);$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
     <OutDir>$(SolutionDir)Product\</OutDir>
     <IntDir>$(SolutionDir)Intermediate\$(ProjectName)\</IntDir>
     <TargetName>Meteor$(ProjectName)</TargetName>
-    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);%(AdditionalLibraryDirectories);$(SolutionDir)product</LibraryPath>
+    <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);%(AdditionalLibraryDirectories);$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -67,6 +67,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>MeteorEngine-Core.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)product;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
       <ShaderType>
@@ -88,6 +89,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <ProgramDatabaseFile />
+      <AdditionalLibraryDirectories>$(SolutionDir)product;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
       <ShaderType>

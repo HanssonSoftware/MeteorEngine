@@ -21,28 +21,16 @@ LOG_ADDCATEGORY(BuildSystemUtils);
 
 String Utils::GetError()
 { 
-	//const DWORD error = ;
-	LPWSTR buffer = nullptr;
+	wchar_t fixed[512] = {};
 
-	const uint32_t returned = (uint32_t)FormatMessageW(
-	/* DWORD dwFlags */			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-								FORMAT_MESSAGE_FROM_SYSTEM |
-								FORMAT_MESSAGE_IGNORE_INSERTS |
-								FORMAT_MESSAGE_MAX_WIDTH_MASK,
-	/* LPCVOID lpSource */		nullptr,
-	/* DWORD   dwMessageId */	::GetLastError(),
-	/* DWORD   dwLanguageId */	LANG_USER_DEFAULT,
-	/* LPWSTR  lpBuffer */		(LPWSTR)&buffer,
-	/* DWORD   nSize */			0,
-	/* va_list *Arguments */	nullptr
-	);
+	const u32 returned = (u32)FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, ::GetLastError(), LANG_USER_DEFAULT, fixed, 511, nullptr);
+	fixed[returned - 1] = L'\0';
+	fixed[returned - 2] = L'\0';
+	
+	char fixedTwo[512] = {};
+	WideCharToMultiByte(CP_UTF8, 0, fixed, returned, fixedTwo, returned, nullptr, nullptr);
 
-	if (buffer)
-	{
-
-	}
-
-	return "";
+	return fixedTwo;
 }
 
 void Utils::ListDirectory(char* name, Array<char*>& container)
