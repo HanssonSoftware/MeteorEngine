@@ -121,7 +121,7 @@ LOG_ADDCATEGORY(Temp);
     {\
         do \
         { \
-             LogDescriptor descriptor = { #CategoryName, #severity, severity, __FUNCTION__, __FILE__, __LINE__ };\
+             LogDescriptor descriptor = { CategoryName::GetName(), #severity, severity, __FUNCTION__, __FILE__, __LINE__ };\
              descriptor.SetMessage(message, __VA_ARGS__);\
              if constexpr (severity != Fatal) \
              { \
@@ -133,6 +133,10 @@ LOG_ADDCATEGORY(Temp);
              } else\
              { \
                  char buffer[1024] = { '\0' }; \
+                 Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Time, &descriptor));\
+                 Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Category, &descriptor));\
+                 Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Severity, &descriptor));\
+                 Logger::Get()->SendToOutputBuffer(buffer, Logger::Get()->FormatLogMessage(buffer, LogFormatting::Message, &descriptor));\
                  exit(-1); \
              }\
         } while (0); \

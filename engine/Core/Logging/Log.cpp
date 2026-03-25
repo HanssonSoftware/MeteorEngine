@@ -24,7 +24,7 @@ static bool bIsDebuggerAttached = false;
 #pragma warning(disable : 6386)
 #endif // MR_PLATFORM_WINDOWS
 
-LOG_ADDCATEGORY(ging); // Log(ging)
+LOG_ADDCATEGORY(Logging);
 
 static Logger* instance = nullptr;
 
@@ -73,7 +73,7 @@ void Logger::Initialize()
             wchar_t path[512 + 1] = { L'\0' };
             wcscpy(path, foundPath);
 
-            static constexpr const wchar_t pathToCat[] = L"\\" WIDE_COMPANY_NAME L"\\";
+            constexpr const wchar_t pathToCat[] = L"\\" WIDE_COMPANY_NAME L"\\";
             wcscat(path, pathToCat);
 
             const u32 appNameLength = (u32)strlen(GetApplication()->GetApplicationNameNoSpaces());
@@ -95,7 +95,7 @@ void Logger::Initialize()
 
             SHCreateDirectoryExW(nullptr, path, nullptr);
 
-            static constexpr const wchar_t pathToCat2[] = L"\\" L"Logs" L"\\";
+            constexpr const wchar_t pathToCat2[] = L"\\" L"Logs" L"\\";
             wcsncat(path, pathToCat2, sizeof(pathToCat2) / sizeof(pathToCat2[0]));
             SHCreateDirectoryExW(nullptr, path, nullptr);
 
@@ -179,7 +179,7 @@ void Logger::Initialize()
     }
 
     QueryPerformanceCounter(&end);
-    MR_LOG(Logging, Info, "Logger system is instantiated in %.2f seconds!", (end.QuadPart - begin.QuadPart) / (freq.QuadPart / 100.0));
+    MR_LOG(LogLogging, Info, "Logger system is instantiated in %.2f seconds!", (end.QuadPart - begin.QuadPart) / (freq.QuadPart / 100.0));
 #endif // MR_PLATFORM_WINDOWS
 
 }
@@ -274,18 +274,13 @@ void Logger::SendToOutputBuffer(char* buffer, const u32 count)
     }
 
     if (bIsDebuggerAttached)
-    {
         OutputDebugStringW(fixBuffer);
-    }
-    else if (consoleHandle)
+
+    if (consoleHandle)
     {
         DWORD written = 0;
         WriteConsoleW(consoleHandle, (wchar_t*)fixBuffer, (DWORD)count, &written, nullptr);
-    }
-    else
-    {
-        // ...
-    }     
+    }   
 
     if (fileHandle)
     {

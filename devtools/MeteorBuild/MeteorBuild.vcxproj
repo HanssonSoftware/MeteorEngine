@@ -182,6 +182,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Generators\BaseGenerator.cpp" />
     <ClCompile Include="Source\Methods\BuildProjectMethod.cpp" />
     <ClCompile Include="Source\Core\Log.cpp" />
     <ClCompile Include="Source\Core\BuildSystem.cpp" />
@@ -191,9 +192,12 @@
     <ClCompile Include="Source\Core\Utils_Win32.cpp" />
     <ClCompile Include="Source\Module\Project.cpp" />
     <ClCompile Include="Source\Module\Parser.cpp" />
+    <ClCompile Include="Source\Generators\VisualStudio\VcxprojGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Generators\BaseGenerator.h" />
     <ClInclude Include="Source\Core\Helper.h" />
+    <ClInclude Include="Source\Generators\GeneratorUtils.h" />
     <ClInclude Include="Source\Methods\BuildProjectMethod.h" />
     <ClInclude Include="Source\Core\Log.h" />
     <ClInclude Include="Source\Methods\BaseBuildMethod.h" />
@@ -205,6 +209,7 @@
     <ClInclude Include="Source\Module\Parser.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Source\Core\Utils.h" />
+    <ClInclude Include="Source\Generators\VisualStudio\VcxprojGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MeteorBuild.aps" />
