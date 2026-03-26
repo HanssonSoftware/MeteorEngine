@@ -210,6 +210,8 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Source\Core\Utils.h" />
     <ClInclude Include="Source\Generators\VisualStudio\VcxprojGenerator.h" />
+    <ClInclude Include="Source\Project\ConfigurationToolkit.h" />
+    <ClInclude Include="Source\Project\IDEConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MeteorBuild.aps" />
