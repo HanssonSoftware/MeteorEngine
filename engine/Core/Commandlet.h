@@ -24,7 +24,7 @@ struct CORE_API Commandlet
 
 	void Shutdown();
 
-	String Parse(const String& inParam);
+	String Parse(const char* inParam);
 
 	bool Check(const String& inParam);
 

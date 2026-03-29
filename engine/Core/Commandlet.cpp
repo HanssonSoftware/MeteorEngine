@@ -24,7 +24,7 @@ void Commandlet::Shutdown()
 	bIsInited = false;
 }
 
-String Commandlet::Parse(const String& inParam)
+String Commandlet::Parse(const char* inParam)
 {
 #ifdef MR_PLATFORM_WINDOWS
 	wchar_t* wideCommandLine = GetCommandLineW();

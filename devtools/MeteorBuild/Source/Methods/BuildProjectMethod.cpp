@@ -5,6 +5,7 @@
 #include <Core/Log.h>
 #include <Core/Utils.h>
 #include <Platform.h>
+#include <VisualStudio/VisualStudioProject.h>
 #include <Application/Application.h>
 #include <Core/Helper.h>
 #include <Memory/MemoryHandler.h>
@@ -78,8 +79,8 @@ BuildProjectMethod::BuildProjectMethod() : BaseBuildMethod()
 bool BuildProjectMethod::AcquireRequiredParameters()
 {
     sourceDirectory = 
-        Commandlet::Get().Check("-source") ? Commandlet::Get().Parse("-source") : 
-        Commandlet::Get().Check("-src") ? Commandlet::Get().Parse("-src") : 
+        Commandlet::Get().Check("-source") ? Commandlet::Get().Parse("-source") :
+        Commandlet::Get().Check("-src") ? Commandlet::Get().Parse("-src") :
         Commandlet::Get().Parse("-s") ? Commandlet::Get().Parse("-s") : String("");
 
     intermediateDirectory = 
@@ -151,7 +152,68 @@ void BuildProjectMethod::StartMethod()
 
     if (foundScripts.GetSize() > 0)
     {
-        CreateIntermediateFiles(&intermediateDirectory, modules);
+        if (Commandlet::Get().Check("-vs2026"))
+        {
+#ifdef MR_PLATFORM_WINDOWS
+            MemoryBlockArena<wchar_t> intermediateProcess = MemoryBlockArena<wchar_t>(16 * 1024 * sizeof(wchar_t));
+
+            wchar_t exeLocation[512] = {};
+            const DWORD exeCount = GetModuleFileNameW(nullptr, exeLocation, 511);
+
+            HRCHECK(PathCchRemoveFileSpec(exeLocation, exeCount));
+
+            wchar_t* wideIntermediateString = (wchar_t*)intermediateProcess.Allocate(intermediateDirectory.Length() * sizeof(wchar_t));
+            MultiByteToWideChar(CP_UTF8, 0, intermediateDirectory.Chr(), intermediateDirectory.Length(), wideIntermediateString, intermediateDirectory.Length());
+
+            wchar_t appCodeNameWide[256] = {};
+            const u32 appCodeNameLength = (u32)strlen(GetApplication()->GetApplicationCodeName());
+            MultiByteToWideChar(CP_UTF8, 0, GetApplication()->GetApplicationCodeName(), appCodeNameLength, appCodeNameWide, appCodeNameLength);
+
+            wchar_t* combinedIntermediatePath = (wchar_t*)intermediateProcess.Allocate(exeCount + intermediateDirectory.Length() + 0);
+            const u32 combinedIntermediatePathSize = exeCount + intermediateDirectory.Length();
+
+            HRCHECK(PathCchCombine(combinedIntermediatePath, combinedIntermediatePathSize, exeLocation, wideIntermediateString));
+            HRCHECK(PathCchCombine(combinedIntermediatePath, combinedIntermediatePathSize + appCodeNameLength, combinedIntermediatePath, appCodeNameWide));
+
+            for (ScriptModule*& module : modules)
+            {
+                wchar_t moduleNameWide[256] = {};
+                const u32 convertedModuleNameSize = MultiByteToWideChar(CP_UTF8, 0, module->moduleName, module->moduleName.Length(), moduleNameWide, module->moduleName.Length());
+
+                wchar_t* fullyCompletedPath = (wchar_t*)intermediateProcess.Allocate((combinedIntermediatePathSize + appCodeNameLength + convertedModuleNameSize) * sizeof(wchar_t));
+
+                HRCHECK(PathCchCombine(fullyCompletedPath, combinedIntermediatePathSize + appCodeNameLength + convertedModuleNameSize, combinedIntermediatePath, moduleNameWide));
+
+                SHCreateDirectoryExW(nullptr, fullyCompletedPath, nullptr);
+
+                wchar_t* fullyQualifiedPathToVcxproj = (wchar_t*)intermediateProcess.Allocate((combinedIntermediatePathSize + appCodeNameLength + (convertedModuleNameSize * 2)));
+                swprintf(fullyQualifiedPathToVcxproj, (combinedIntermediatePathSize + appCodeNameLength + (convertedModuleNameSize * 2)), L"%ls\\%ls.vcxproj", fullyCompletedPath, moduleNameWide);
+
+                HANDLE vcxprojFile = CreateFileW(fullyQualifiedPathToVcxproj, GENERIC_WRITE,
+#ifdef MR_DEBUG
+                    FILE_SHARE_READ | FILE_SHARE_WRITE
+#else
+                    0
+#endif // MR_DEBUG 
+                    ,nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+
+                if (vcxprojFile != INVALID_HANDLE_VALUE)
+                {
+                    VisualStudioStaticClass::GenerateFirstLinesOfBoilerplateCode(vcxprojFile);
+                    VisualStudioStaticClass::GenerateClosingBoilerplateCode(vcxprojFile);
+
+                    CloseHandle(vcxprojFile);
+                }
+                else
+                {
+                    MR_LOG(LogProjectGeneratorVS, Error, "Failed to create project file for: %ls", moduleNameWide);
+                }
+
+                HRCHECK(PathCchRemoveFileSpec(fullyCompletedPath, combinedIntermediatePathSize + appCodeNameLength + convertedModuleNameSize));
+            }
+
+#endif // MR_PLATFORM_WINDOWS
+        }
 
 
         if (BuildSystemLogger* bls = (BuildSystemLogger*)Logger::Get())
@@ -338,75 +400,6 @@ inline void BuildProjectMethod::SetSpecifierForProject(::Project* project, const
     }
 
     //INSERT_SPECIFIER("IncludePath");
-}
-
-bool BuildProjectMethod::CreateIntermediateFiles(const String* directory, Array<ScriptModule*> modules)
-{
-    if (!directory || intermediateDirectory.IsEmpty())
-        return false;
-
-#ifdef MR_PLATFORM_WINDOWS
-    MemoryBlockArena<wchar_t> intermediateProcess = MemoryBlockArena<wchar_t>(16 * 1024 * sizeof(wchar_t));
-
-    wchar_t exeLocation[512] = {};
-    const DWORD exeCount = GetModuleFileNameW(nullptr, exeLocation, 511); 
-            
-    HRCHECK(PathCchRemoveFileSpec(exeLocation, exeCount));
-
-    wchar_t* wideIntermediateString = (wchar_t*)intermediateProcess.Allocate(directory->Length() * sizeof(wchar_t));
-    MultiByteToWideChar(CP_UTF8, 0, directory->Chr(), directory->Length(), wideIntermediateString, directory->Length());
-
-    wchar_t appCodeNameWide[256] = {};
-    const u32 appCodeNameLength = (u32)strlen(GetApplication()->GetApplicationCodeName());
-    MultiByteToWideChar(CP_UTF8, 0, GetApplication()->GetApplicationCodeName(), appCodeNameLength, appCodeNameWide, appCodeNameLength);
-
-    wchar_t* combinedIntermediatePath = (wchar_t*)intermediateProcess.Allocate(exeCount + directory->Length() + 0);
-    const u32 combinedIntermediatePathSize = exeCount + directory->Length();
-    
-    HRCHECK(PathCchCombine(combinedIntermediatePath, combinedIntermediatePathSize, exeLocation, wideIntermediateString));
-    HRCHECK(PathCchCombine(combinedIntermediatePath, combinedIntermediatePathSize + appCodeNameLength, combinedIntermediatePath, appCodeNameWide));
-
-
-    for (ScriptModule*& module : modules)
-    {
-        wchar_t moduleNameWide[256] = {};
-        const u32 convertedModuleNameSize = MultiByteToWideChar(CP_UTF8, 0, module->moduleName, module->moduleName.Length(), moduleNameWide, module->moduleName.Length());
-
-        wchar_t* fullyCompletedPath = (wchar_t*)intermediateProcess.Allocate((combinedIntermediatePathSize + appCodeNameLength + convertedModuleNameSize) * sizeof(wchar_t));
-     
-        HRCHECK(PathCchCombine(fullyCompletedPath, combinedIntermediatePathSize + appCodeNameLength + convertedModuleNameSize, combinedIntermediatePath, moduleNameWide));
-
-        SHCreateDirectoryExW(nullptr, fullyCompletedPath, nullptr);
-        
-        wchar_t* fullyQualifiedPathToVcxproj = (wchar_t*)intermediateProcess.Allocate((combinedIntermediatePathSize + appCodeNameLength + (convertedModuleNameSize *2)));
-        swprintf(fullyQualifiedPathToVcxproj, (combinedIntermediatePathSize + appCodeNameLength + (convertedModuleNameSize * 2)), L"%ls\\%ls.vcxproj", fullyCompletedPath, moduleNameWide);
-
-        HANDLE vcxprojFile = CreateFileW(fullyQualifiedPathToVcxproj, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-        if (vcxprojFile != INVALID_HANDLE_VALUE)
-        {
-            constexpr const char autogeneratedTextAndFirstProjectLine[] = "<!-- This file is generated with MeteorBuild(R) -->\n\n<?xml version=\"1.0\" encoding=\"utf - 8\"?>\n"
-                "<Project DefaultTargets = \"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">\n";
-            constexpr const u32 autogeneratedTextAndFirstProjectLineSize = sizeof(autogeneratedTextAndFirstProjectLine) / sizeof(autogeneratedTextAndFirstProjectLine[0]);
-
-            DWORD written = 0;
-            WriteFile(vcxprojFile, autogeneratedTextAndFirstProjectLine, autogeneratedTextAndFirstProjectLineSize, &written, nullptr);
-
-            FillVcxprojFile(vcxprojFile, module);
-
-
-            CloseHandle(vcxprojFile);
-        }
-        else
-        {
-            MR_LOG(LogProjectGeneratorVS, Error, "Failed to create project file for: %ls", moduleNameWide);
-        }
-
-        HRCHECK(PathCchRemoveFileSpec(fullyCompletedPath, combinedIntermediatePathSize + appCodeNameLength + convertedModuleNameSize));
-    }
-
-#endif // MR_PLATFORM_WINDOWS
-
-    return true;
 }
 
 void BuildProjectMethod::FillVcxprojFile(void* fileHandle, ScriptModule* module)

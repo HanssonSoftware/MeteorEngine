@@ -43,8 +43,6 @@ protected:
 
 	inline void SetSpecifierForProject(::Project* project, const char* verb, const char* verbEntry, u32 length) noexcept;
 
-	bool CreateIntermediateFiles(const String* directory, Array<ScriptModule*> modules);
-
 	void FillVcxprojFile(void* fileHandle, ScriptModule* module);
 
 	String sourceDirectory;
