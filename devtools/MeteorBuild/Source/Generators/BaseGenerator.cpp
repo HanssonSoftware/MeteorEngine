@@ -1,8 +1,8 @@
 /* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
-#include "BaseProject.h"
+#include "BaseGenerator.h"
 
-void BaseProject::AddEntry(ProjectFileEntries* entry)
+void BaseGenerator::AddEntry(ProjectFileEntries* entry)
 {
 	includedEntries.Add(*entry);
 }

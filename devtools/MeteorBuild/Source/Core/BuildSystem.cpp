@@ -51,7 +51,7 @@ bool BuildSystem::UseBuildSystem()
 
 void BuildSystem::Shutdown()
 {
-	if (currentMethod) delete currentMethod;
+	if (currentMethod) delete[] currentMethod;
 }
 
 bool BuildSystem::ReadArguments()

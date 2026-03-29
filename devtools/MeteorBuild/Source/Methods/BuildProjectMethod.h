@@ -7,8 +7,8 @@
 
 #include <Memory/MemoryBlockArena.h>
 
+class Project;
 class ScriptModule;
-class BaseProject;
 
 class BuildProjectMethod : public BaseBuildMethod
 {
@@ -21,7 +21,6 @@ public:
 
 	virtual void CleanUp() override;
 
-	BaseProject* CreateProjectModule(const char* pathToScript);
 protected:
 	virtual ~BuildProjectMethod() noexcept = default;
 

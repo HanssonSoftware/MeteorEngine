@@ -2,20 +2,15 @@
 
 #pragma once
 #include <Types/Array.h>
-#include <Types/String.h>
 #include "GeneratorUtils.h"
 
-class BaseProject
+class BaseGenerator
 {
 public:
 
 	virtual bool Compile() = 0;
 
 	void AddEntry(ProjectFileEntries* entry);
-
-	String projectName;
-
-	String projectParent;
 protected:
 	Array<ProjectFileEntries> includedEntries;
 };

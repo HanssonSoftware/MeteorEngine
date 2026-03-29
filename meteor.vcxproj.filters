@@ -137,10 +137,10 @@
     <ClInclude Include="engine\Core\Memory\MemoryBlockArena.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Types\String.h">
+    <ClInclude Include="engine\Core\Platform\Windows.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Platform\Winapi.h">
+    <ClInclude Include="engine\Core\Types\String.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
