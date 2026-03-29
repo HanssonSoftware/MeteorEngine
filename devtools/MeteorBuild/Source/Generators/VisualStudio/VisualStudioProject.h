@@ -1,12 +1,11 @@
 /* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Generators/BaseGenerator.h>
+#include <Generators/BaseProject.h>
 #include <Platform/Winapi.h>
 
-#include <Project/IDEConfig.h>
 
-class VcxprojGenerator : public BaseGenerator
+class VisualStudioProject : public BaseProject
 {
 public:
 	virtual bool Compile() override;
@@ -15,6 +14,8 @@ public:
 
 	void WriteConfigurations() {};
 
-	void WriteBoilerplate(HANDLE file, const Array<IDEConfiguration>* configs);
+	void WriteProjectConfigurationsBoilerplate(HANDLE file);
+
+	void WritePropertyPropsBoilerplate(HANDLE file);
 };
 

@@ -42,10 +42,10 @@
     <ClCompile Include="Source\Methods\BuildProjectMethod.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Generators\VisualStudio\VcxprojGenerator.cpp">
+    <ClCompile Include="Source\Generators\VisualStudio\VisualStudioProject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Generators\BaseGenerator.cpp">
+    <ClCompile Include="Source\Generators\BaseProject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -86,19 +86,13 @@
     <ClInclude Include="Source\Core\Helper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Generators\VisualStudio\VcxprojGenerator.h">
+    <ClInclude Include="Source\Generators\VisualStudio\VisualStudioProject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Source\Generators\GeneratorUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Generators\BaseGenerator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Project\IDEConfig.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Project\ConfigurationToolkit.h">
+    <ClInclude Include="Source\Generators\BaseProject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
