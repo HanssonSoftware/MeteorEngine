@@ -6,3 +6,6 @@
 *.user
 *.userosscache
 *.sln.docstates
+/meteor.sln
+/devtools/MeteorBuild/MeteorBuild.vcxproj
+/devtools/MeteorBuild/MeteorBuild.vcxproj.filters
