@@ -200,6 +200,8 @@ void BuildProjectMethod::StartMethod()
                 if (vcxprojFile != INVALID_HANDLE_VALUE)
                 {
                     VisualStudioStaticClass::GenerateFirstLinesOfBoilerplateCode(vcxprojFile);
+                    VisualStudioStaticClass::GenerateDynamicDetailsForIdentification(vcxprojFile, &module->moduleName, module->identification);
+                    VisualStudioStaticClass::GenerateConfigurationDetails(vcxprojFile);
                     VisualStudioStaticClass::GenerateClosingBoilerplateCode(vcxprojFile);
 
                     CloseHandle(vcxprojFile);

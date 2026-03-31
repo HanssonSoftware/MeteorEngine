@@ -3,6 +3,7 @@
 #pragma once
 
 typedef void* HANDLE;
+class String;
 
 struct VisualStudioStaticClass
 {
@@ -11,4 +12,8 @@ struct VisualStudioStaticClass
 	static void GenerateFirstLinesOfBoilerplateCode(HANDLE fileHandle);
 
 	static void GenerateClosingBoilerplateCode(HANDLE fileHandle);
+
+	static void GenerateDynamicDetailsForIdentification(HANDLE fileHandle, const String* moduleName, const char* guid);
+	
+	static void GenerateConfigurationDetails(HANDLE fileHandle);
 };
