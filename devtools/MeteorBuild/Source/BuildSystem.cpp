@@ -2,7 +2,6 @@
 
 #include "BuildSystem.h"
 #include <Types/String.h>
-#include <Core/Log.h>
 
 #include <Commandlet.h>
 
@@ -19,21 +18,17 @@
 #pragma comment(lib, "Shell32.lib")
 #pragma comment(lib, "Pathcch.lib")
 
-#include <Methods/BuildProjectMethod.h>
+#include <BuildProjectMethod.h>
 
 LOG_ADDCATEGORY(BuildSystemFramework);
 LOG_ADDCATEGORY(Assembler);
 
 bool BuildSystem::UseBuildSystem()
 {
-	BuildSystemLogger* bl = new BuildSystemLogger;
-	*Logger::Get() = Logger(bl);
+	hConsoleRef = GetStdHandle(STD_OUTPUT_HANDLE);
 
-	bl->Initialize();
-	hConsoleRef = bl->GetOutputHandle();
-
-	static constexpr wchar_t header[] = L"========================== MeteorBuild (R) ==========================\n"
-										L"=== Copyright 2020 - 2026, Hansson Software. All rights reserved. ===\n\0";
+	constexpr wchar_t header[] = L"========================== MeteorBuild (R) ==========================\n"
+								 L"=== Copyright 2020 - 2026, Hansson Software. All rights reserved. ===\n";
 
 	DWORD written = 0;
 	if (!WriteConsoleW(hConsoleRef, header, sizeof(header) / sizeof(header[0]), &written, nullptr))

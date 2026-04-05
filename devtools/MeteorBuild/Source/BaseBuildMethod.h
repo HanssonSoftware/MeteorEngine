@@ -14,10 +14,8 @@ public:
 	virtual void StartMethod() = 0;
 
 	virtual void CleanUp() = 0;
-
+	
 protected:
-	String name;
-
 	u64 start = 0;
 	u64 end = 0;
 };

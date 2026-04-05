@@ -5,7 +5,7 @@
 typedef void* HANDLE;
 class String;
 
-struct VisualStudioStaticClass
+struct VisualStudioProject
 {
 	static void GeneratePropertySheetsBoilerplateCode(HANDLE fileHandle);
 

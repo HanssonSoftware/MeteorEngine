@@ -1,8 +1,8 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "Module.h"
-#include <Core/Utils.h>
-#include <Core/Application.h>
+#include <Utils.h>
+#include <Application.h>
 #include "Project.h"
 
 #include <rpc.h>

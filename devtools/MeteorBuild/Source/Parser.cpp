@@ -1,8 +1,8 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "Parser.h"
-#include <Module/Module.h>
-#include <Module/Project.h>
+#include <Module.h>
+#include <Project.h>
 
 #include <Types/Pointers.h>
 

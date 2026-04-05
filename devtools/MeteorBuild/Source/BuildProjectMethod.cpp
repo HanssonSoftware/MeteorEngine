@@ -2,17 +2,17 @@
 
 #include "BuildProjectMethod.h"
 #include <Commandlet.h>
-#include <Core/Log.h>
-#include <Core/Utils.h>
+#include <Log.h>
+#include <Utils.h>
 #include <Platform.h>
-#include <VisualStudio/VisualStudioProject.h>
+#include <VisualStudioProject.h>
 #include <Application/Application.h>
-#include <Core/Helper.h>
+#include <Helper.h>
 #include <Memory/MemoryHandler.h>
 #include <Memory/MemoryBlockArena.h>
-#include <Module/Parser.h>
-#include <Module/Module.h>
-#include <Module/Project.h>
+#include <Parser.h>
+#include <Module.h>
+#include <Project.h>
 
 #define	WIN32_LEAN_AND_MEAN
 #define NOGDICAPMASKS
@@ -72,8 +72,7 @@ LOG_ADDCATEGORY(ProjectGeneratorVS);
 
 BuildProjectMethod::BuildProjectMethod() : BaseBuildMethod()
 {
-    name = "Build Project";
-    //methodArena = MemoryAllocatorArena(UINT64_MAX);
+
 }
 
 bool BuildProjectMethod::AcquireRequiredParameters()
@@ -199,10 +198,10 @@ void BuildProjectMethod::StartMethod()
 
                 if (vcxprojFile != INVALID_HANDLE_VALUE)
                 {
-                    VisualStudioStaticClass::GenerateFirstLinesOfBoilerplateCode(vcxprojFile);
-                    VisualStudioStaticClass::GenerateDynamicDetailsForIdentification(vcxprojFile, &module->moduleName, module->identification);
-                    VisualStudioStaticClass::GenerateConfigurationDetails(vcxprojFile);
-                    VisualStudioStaticClass::GenerateClosingBoilerplateCode(vcxprojFile);
+                    VisualStudioProject::GenerateFirstLinesOfBoilerplateCode(vcxprojFile);
+                    VisualStudioProject::GenerateDynamicDetailsForIdentification(vcxprojFile, &module->moduleName, module->identification);
+                    VisualStudioProject::GeneratePropertySheetsBoilerplateCode(vcxprojFile);
+                    VisualStudioProject::GenerateClosingBoilerplateCode(vcxprojFile);
 
                     CloseHandle(vcxprojFile);
                 }
@@ -227,7 +226,7 @@ void BuildProjectMethod::StartMethod()
             QueryPerformanceFrequency(&frq);
 
             wchar_t result[64] = {};
-            if (swprintf(result, 64, L"%hs method is ran successfully in %.2f seconds!", *name, (lgEnd.QuadPart - lg.QuadPart) / (double)frq.QuadPart))
+            if (swprintf(result, 64, L"Build method is ran successfully in %.2f seconds!", (lgEnd.QuadPart - lg.QuadPart) / (double)frq.QuadPart))
             {
                 DWORD actual = 0;
                 if (!WriteConsoleW(bls->GetOutputHandle(), result, 64, &actual, nullptr))

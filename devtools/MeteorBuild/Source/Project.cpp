@@ -1,9 +1,9 @@
 /* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "Project.h"
-#include <Core/Utils.h>
+#include <Utils.h>
 #include "Module.h"
-#include <Core/Application.h>
+#include <Application.h>
 
 LOG_ADDCATEGORY(ProjectScriptParser);
 
