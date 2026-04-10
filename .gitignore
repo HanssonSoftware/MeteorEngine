@@ -1,6 +1,8 @@
 [Ii]ntermediate/*
 [Pp]roduct/*
 .vs/*
+.vscode/*
+.idea/*
 *.rsuser
 *.suo
 *.user
