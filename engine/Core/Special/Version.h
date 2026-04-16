@@ -1,10 +1,10 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 #pragma once
-#define BUILD_NUMBER 4250 
-#define BUILD_YEAR ~0,4
-#define BUILD_MONTH ~4,2
-//#define BUILD_DATE L"~4,2/~0,4" 
-#define BUILD_DAY ~6,2
+#define BUILD_NUMBER 0 
+#define BUILD_YEAR 2026
+#define BUILD_MONTH 04
+#define BUILD_DAY 12
+#define BUILD_TIME 19873289472
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 1
 #define VERSION_PATCH 0

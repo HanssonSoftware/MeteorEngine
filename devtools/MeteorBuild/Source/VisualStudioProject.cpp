@@ -10,146 +10,161 @@
 
 LOG_ADDCATEGORY(VisualStudioProject);
 
-void VisualStudioProject::GeneratePropertySheetsBoilerplateCode(HANDLE fileHandle)
+namespace VisualStudioTemplate
 {
-	DWORD written = 0;
-
-	constexpr const char boilerplateConfigurationTypes[] =
-		"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.Default.props\" />\n";
-		"\t<PropertyGroup Condition=\"\'$(Configuration)|$(Platform)\'==\'Debug|x64\'\" Label=\"Configuration\">\n"
-		"\t\t<ConfigurationType>Makefile</ConfigurationType>\n"
-		"\t\t<UseDebugLibraries>true</UseDebugLibraries>\n"
-		"\t\t<PlatformToolset>v145</PlatformToolset>\n"
-		"\t</PropertyGroup>\n"
-		"\t<PropertyGroup Condition=\"\'$(Configuration)|$(Platform)\'==\'Test|x64\'\" Label=\"Configuration\">\n"
-		"\t\t<ConfigurationType>Makefile</ConfigurationType>\n"
-		"\t\t<UseDebugLibraries>true</UseDebugLibraries>\n"
-		"\t\t<PlatformToolset>v145</PlatformToolset>\n"
-		"\t</PropertyGroup>\n"
-		"\t<PropertyGroup Condition=\"\'$(Configuration)|$(Platform)\'==\'Shipping|x64\'\" Label=\"Configuration\">\n"
-		"\t\t<ConfigurationType>Makefile</ConfigurationType>\n"
-		"\t\t<UseDebugLibraries>false</UseDebugLibraries>\n"
-		"\t\t<PlatformToolset>v145</PlatformToolset>\n"
-		"\t</PropertyGroup>\n"
-		"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.props\" />\n"
-		"\t\t<ImportGroup Label=\"ExtensionSettings\">"
-		"\t</ImportGroup>\n"
-		"\t<ImportGroup Label=\"Shared\">\n"
-		"\t</ImportGroup>\n"
-		"\t<ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">\n"
-		"\t\t<Import Project=\"$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\" />\n"
-		"\t</ImportGroup>\n"
-		"\t<ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Test|x64'\">\n"
-		"\t\t<Import Project=\"$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\" />\n"
-		"\t</ImportGroup>\n"
-		"\t<ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Shipping|x64'\">\n"
-		"\t\t<Import Project=\"$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\" />\n"
-		"\t</ImportGroup>\n";
-
-	constexpr const u32 boilerplateConfigurationTypesSize = (sizeof(boilerplateConfigurationTypes) / sizeof(boilerplateConfigurationTypes[0])) - 1;
-
-	if (!WriteFile(fileHandle, boilerplateConfigurationTypes, boilerplateConfigurationTypesSize, &written, nullptr))
+	void GeneratePropertySheetsBoilerplateCode(HANDLE fileHandle)
 	{
-		MR_LOG(LogVisualStudioProject, Fatal, "Failed to write boilerplate code! (%d)  %s", ::GetLastError(), *Utils::GetError());
+		DWORD written = 0;
+
+		constexpr const char boilerplateConfigurationTypes[] =
+			"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.Default.props\" />\n"
+			"\t<PropertyGroup Condition=\"\'$(Configuration)|$(Platform)\'==\'Debug|x64\'\" Label=\"Configuration\">\n"
+			"\t\t<ConfigurationType>Makefile</ConfigurationType>\n"
+			"\t\t<UseDebugLibraries>true</UseDebugLibraries>\n"
+			"\t\t<PlatformToolset>v145</PlatformToolset>\n"
+			"\t</PropertyGroup>\n"
+			"\t<PropertyGroup Condition=\"\'$(Configuration)|$(Platform)\'==\'Test|x64\'\" Label=\"Configuration\">\n"
+			"\t\t<ConfigurationType>Makefile</ConfigurationType>\n"
+			"\t\t<UseDebugLibraries>true</UseDebugLibraries>\n"
+			"\t\t<PlatformToolset>v145</PlatformToolset>\n"
+			"\t</PropertyGroup>\n"
+			"\t<PropertyGroup Condition=\"\'$(Configuration)|$(Platform)\'==\'Shipping|x64\'\" Label=\"Configuration\">\n"
+			"\t\t<ConfigurationType>Makefile</ConfigurationType>\n"
+			"\t\t<UseDebugLibraries>false</UseDebugLibraries>\n"
+			"\t\t<PlatformToolset>v145</PlatformToolset>\n"
+			"\t</PropertyGroup>\n"
+			"\t<Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.props\" />\n"
+			"\t\t<ImportGroup Label=\"ExtensionSettings\">"
+			"\t</ImportGroup>\n"
+			"\t<ImportGroup Label=\"Shared\">\n"
+			"\t</ImportGroup>\n"
+			"\t<ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">\n"
+			"\t\t<Import Project=\"$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\" />\n"
+			"\t</ImportGroup>\n"
+			"\t<ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Test|x64'\">\n"
+			"\t\t<Import Project=\"$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\" />\n"
+			"\t</ImportGroup>\n"
+			"\t<ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Shipping|x64'\">\n"
+			"\t\t<Import Project=\"$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\" />\n"
+			"\t</ImportGroup>\n";
+
+		constexpr const u32 boilerplateConfigurationTypesSize = (sizeof(boilerplateConfigurationTypes) / sizeof(boilerplateConfigurationTypes[0])) - 1;
+
+		if (!WriteFile(fileHandle, boilerplateConfigurationTypes, boilerplateConfigurationTypesSize, &written, nullptr))
+		{
+			MR_LOG(LogVisualStudioProject, Fatal, "Failed to write boilerplate code! (%d)  %s", ::GetLastError(), *Utils::GetError());
+		}
+
+		//for (const IDEConfiguration& config : *configs)
+		//{
+		//	if (config.configurationName)
+		//	{
+		//		char bigEnoughBuffer[512] = {};
+
+		//		const u32 configNameSize = (u32)strlen(config.configurationName);
+
+		//		snprintf(bigEnoughBuffer, boilerplatePrintfSize + configNameSize, boilerplatePrintf, config.configurationName);
+
+		//		if (!WriteFile(file, boilerplateConstant, size, &written, nullptr))
+		//		{
+		//			MR_LOG(LogVcxprojGen, Fatal, "Failed to write boilerplate code! (%d)  %s", ::GetLastError(), *Utils::GetError());
+		//			break;
+		//		}
+		//		
+		//		continue;
+		//	}
+		//		
+		//	MR_LOG(LogVcxprojGen, Fatal, "Invalid config name!");
+		//}
 	}
 
-	//for (const IDEConfiguration& config : *configs)
-	//{
-	//	if (config.configurationName)
-	//	{
-	//		char bigEnoughBuffer[512] = {};
-
-	//		const u32 configNameSize = (u32)strlen(config.configurationName);
-
-	//		snprintf(bigEnoughBuffer, boilerplatePrintfSize + configNameSize, boilerplatePrintf, config.configurationName);
-
-	//		if (!WriteFile(file, boilerplateConstant, size, &written, nullptr))
-	//		{
-	//			MR_LOG(LogVcxprojGen, Fatal, "Failed to write boilerplate code! (%d)  %s", ::GetLastError(), *Utils::GetError());
-	//			break;
-	//		}
-	//		
-	//		continue;
-	//	}
-	//		
-	//	MR_LOG(LogVcxprojGen, Fatal, "Invalid config name!");
-	//}
-}
-
-void VisualStudioProject::GenerateFirstLinesOfBoilerplateCode(HANDLE fileHandle)
-{
-	constexpr const char autogeneratedTextAndFirstProjectLine[] =
-		"<!-- This file is generated with MeteorBuild(R) -->\n\n"
-		"<Project DefaultTargets=\"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">\n"
-		"\t<ItemGroup Label=\"ProjectConfigurations\">\n"
-		"\t\t<ProjectConfiguration Include=\"Debug|x64\">\n"
-		"\t\t\t<Configuration>Debug</Configuration>\n"
-		"\t\t\t<Platform>x64</Platform>\n"
-		"\t\t</ProjectConfiguration>\n"
-		"\t\t<ProjectConfiguration Include=\"Test|x64\">\n"
-		"\t\t\t<Configuration>Test</Configuration>\n"
-		"\t\t\t<Platform>x64</Platform>\n"
-		"\t\t</ProjectConfiguration>\n"
-		"\t\t<ProjectConfiguration Include=\"Shipping|x64\">\n"
-		"\t\t\t<Configuration>Shipping</Configuration>\n"
-		"\t\t\t<Platform>x64</Platform>\n"
-		"\t\t</ProjectConfiguration>\n"
-		"\t</ItemGroup>\n";
-
-	constexpr const u32 autogeneratedTextAndFirstProjectLineSize = (sizeof(autogeneratedTextAndFirstProjectLine) / sizeof(autogeneratedTextAndFirstProjectLine[0])) - 1;
-
-	DWORD written = 0;
-	if (!WriteFile(fileHandle, autogeneratedTextAndFirstProjectLine, autogeneratedTextAndFirstProjectLineSize, &written, nullptr))
+	void GenerateHeaderAndConfigurations(HANDLE fileHandle)
 	{
-		MR_LOG(LogVisualStudioProject, Fatal, "Failed to write boilerplate code! (%d)  %s", ::GetLastError(), *Utils::GetError());
+		constexpr const char autogeneratedTextAndFirstProjectLine[] =
+			"<!-- This file is generated with MeteorBuild(R) -->\n\n"
+			"<Project DefaultTargets=\"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">\n"
+			"\t<ItemGroup Label=\"ProjectConfigurations\">\n"
+			"\t\t<ProjectConfiguration Include=\"Debug|x64\">\n"
+			"\t\t\t<Configuration>Debug</Configuration>\n"
+			"\t\t\t<Platform>x64</Platform>\n"
+			"\t\t</ProjectConfiguration>\n"
+			"\t\t<ProjectConfiguration Include=\"Test|x64\">\n"
+			"\t\t\t<Configuration>Test</Configuration>\n"
+			"\t\t\t<Platform>x64</Platform>\n"
+			"\t\t</ProjectConfiguration>\n"
+			"\t\t<ProjectConfiguration Include=\"Shipping|x64\">\n"
+			"\t\t\t<Configuration>Shipping</Configuration>\n"
+			"\t\t\t<Platform>x64</Platform>\n"
+			"\t\t</ProjectConfiguration>\n"
+			"\t</ItemGroup>\n";
+
+		constexpr const u32 autogeneratedTextAndFirstProjectLineSize = (sizeof(autogeneratedTextAndFirstProjectLine) / sizeof(autogeneratedTextAndFirstProjectLine[0])) - 1;
+
+		DWORD written = 0;
+		if (!WriteFile(fileHandle, autogeneratedTextAndFirstProjectLine, autogeneratedTextAndFirstProjectLineSize, &written, nullptr))
+		{
+			MR_LOG(LogVisualStudioProject, Fatal, "Failed to write boilerplate code! (%d)  %s", ::GetLastError(), *Utils::GetError());
+		}
 	}
-}
 
-void VisualStudioProject::GenerateClosingBoilerplateCode(HANDLE fileHandle)
-{
-	constexpr const char autogeneratedTextAndFirstProjectLine[] =
-		"</Project>";
-	constexpr const u32 autogeneratedTextAndFirstProjectLineSize = sizeof(autogeneratedTextAndFirstProjectLine) / sizeof(autogeneratedTextAndFirstProjectLine[0]);
-
-	DWORD written = 0;
-	if (!WriteFile(fileHandle, autogeneratedTextAndFirstProjectLine, autogeneratedTextAndFirstProjectLineSize, &written, nullptr))
+	void GenerateClosingBoilerplateCode(HANDLE fileHandle)
 	{
-		MR_LOG(LogVisualStudioProject, Fatal, "Failed to write boilerplate code! (%d)  %s", ::GetLastError(), *Utils::GetError());
-	}
-}
+		constexpr const char autogeneratedTextAndFirstProjectLine[] =
+			"</Project>";
+		constexpr const u32 autogeneratedTextAndFirstProjectLineSize = sizeof(autogeneratedTextAndFirstProjectLine) / sizeof(autogeneratedTextAndFirstProjectLine[0]);
 
-void VisualStudioProject::GenerateDynamicDetailsForIdentification(HANDLE fileHandle, const String* moduleName, const char* guid)
-{
-	constexpr const char dynamicGroup[] =
-		"\t<PropertyGroup Label=\"Globals\">\n"
-		"\t\t<VCProjectVersion>18.0</VCProjectVersion>\n"
-		"\t\t<Keyword>Win32Proj</Keyword>\n"
-		"\t\t<ProjectGuid>%s</ProjectGuid>\n"
+		DWORD written = 0;
+		if (!WriteFile(fileHandle, autogeneratedTextAndFirstProjectLine, autogeneratedTextAndFirstProjectLineSize, &written, nullptr))
+		{
+			MR_LOG(LogVisualStudioProject, Fatal, "Failed to write boilerplate code! (%d)  %s", ::GetLastError(), *Utils::GetError());
+		}
+	}
+
+	void GenerateDynamicDetailsForIdentification(HANDLE fileHandle, const String* moduleName, const char* guid)
+	{
+		constexpr const char dynamicGroup[] =
+			"\t<PropertyGroup Label=\"Globals\">\n"
+			"\t\t<VCProjectVersion>18.0</VCProjectVersion>\n"
+			"\t\t<Keyword>Win32Proj</Keyword>\n"
+			"\t\t<ProjectGuid>%s</ProjectGuid>\n"
+			"\t</PropertyGroup>\n";
+
+		char buffer[(sizeof(dynamicGroup) / sizeof(dynamicGroup[0])) - 1 + 128] = {};
+
+		const u32 actualSize = snprintf(nullptr, 0, dynamicGroup, guid) +1;
+		snprintf(buffer, actualSize, dynamicGroup, guid);
+
+		DWORD written = 0;
+		if (!WriteFile(fileHandle, buffer, actualSize, &written, nullptr))
+		{
+			MR_LOG(LogVisualStudioProject, Fatal, "Failed to write dynamic code! (%d)  %s", ::GetLastError(), *Utils::GetError());
+		}
+	}
+
+	void GenerateConfigurationRelatedCallsToCompiler(HANDLE fileHandle)
+	{
+		constexpr const char configurationBuffer[] = 
+		"\t<PropertyGroup Label=\"UserMacros\" />\n"
+		"\t<PropertyGroup Condition=\"\'$(Configuration)|$(Platform)\'==\'Debug|x64\'\">\n"
+		"\t\t<NMakeOutput>%s</NMakeOutput>\n"
+		"\t\t<NMakePreprocessorDefinitions>MR_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>\n"
+		"\t</PropertyGroup>\n"
+		"\t<PropertyGroup Condition=\"\'$(Configuration)|$(Platform)\'==\'Test|x64\'\">\n"
+		"\t\t<NMakeOutput>%s</NMakeOutput>\n"
+		"\t\t<NMakePreprocessorDefinitions>MR_DEBUG$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>\n"
+		"\t</PropertyGroup>\n"
+		"\t<PropertyGroup Condition=\"\'$(Configuration)|$(Platform)\'==\'Shipping|x64\'\">\n"
+		"\t\t<NMakeOutput>%s</NMakeOutput>\n"
+		"\t\t<NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>\n"
 		"\t</PropertyGroup>\n";
 
-	char buffer[(sizeof(dynamicGroup) / sizeof(dynamicGroup[0])) - 1 + 256] = {};
+		char fixed[1024] = {};
+		const u32 write = snprintf(fixed, 1023, configurationBuffer, "wd", "Wd", "cr");
 
-	const u32 actualSize = snprintf(nullptr, 0, dynamicGroup, guid);
-	snprintf(buffer, actualSize, dynamicGroup, guid/*, moduleName->Chr(), moduleName->Chr()*/);
-
-	DWORD written = 0;
-	if (!WriteFile(fileHandle, buffer, actualSize, &written, nullptr))
-	{
-		MR_LOG(LogVisualStudioProject, Fatal, "Failed to write dynamic code! (%d)  %s", ::GetLastError(), *Utils::GetError());
+		DWORD written = 0;
+		if (!WriteFile(fileHandle, configurationBuffer, write, &written, nullptr))
+		{
+			MR_LOG(LogVisualStudioProject, Fatal, "Failed to write dynamic code! (%d)  %s", ::GetLastError(), *Utils::GetError());
+		}
 	}
-}
-
-void VisualStudioProject::GenerateConfigurationDetails(HANDLE fileHandle)
-{
-//	constexpr const char configurationParts[] =
-//;
-//
-//	constexpr const u32 configurationPartsSize = (sizeof(configurationParts) / sizeof(configurationParts[0])) - 1;
-
-
-	//DWORD written = 0;
-	//if (!WriteFile(fileHandle, configurationParts, configurationPartsSize, &written, nullptr))
-	//{
-	//	MR_LOG(LogVisualStudioProject, Fatal, "Failed to write dynamic code! (%d)  %s", ::GetLastError(), *Utils::GetError());
-	//}
 }

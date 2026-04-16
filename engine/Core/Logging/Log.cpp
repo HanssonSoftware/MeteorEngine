@@ -170,9 +170,10 @@ void Logger::Initialize()
                 if (!SetStdHandle(STD_OUTPUT_HANDLE, consoleHandle))
                     Application::RequestExit(-1);
 
-                wchar_t title[256] = { L'\0' };
+                wchar_t title[128] = { L'\0' };
 
-                swprintf(title, 256, L"%ls developer console", L"FILL THIS SWPRINTF PARAMETER!!!");
+
+                swprintf(title, 127, L"%hs developer console (output only!)", GetApplication()->GetApplicationName());
                 SetConsoleTitleW(title);
             }
         }
@@ -223,14 +224,13 @@ u32 Logger::FormatLogMessage(char* buffer, LogFormatting format, LogDescriptor* 
         case LogFormatting::Severity:
         {
 #ifdef MR_PLATFORM_WINDOWS
-            return (u32)snprintf(buffer, 8, "%s: \0", descriptor->severity);
+            return (u32)snprintf(buffer, 8, "%s: ", descriptor->severity);
 #endif // MR_PLATFORM_WINDOWS
         }
         case LogFormatting::Message:
         {
 #ifdef MR_PLATFORM_WINDOWS
-            static constexpr const char val[] = "\n\0";
-            return (u32)snprintf(buffer, (bIsRunningDebugMode ? 512 : 128) + 3, "%s\n\0", descriptor->message);
+            return (u32)snprintf(buffer, (bIsRunningDebugMode ? 512 : 128) + 3, "%s\n", descriptor->message);
 #endif // MR_PLATFORM_WINDOWS
         }
     }

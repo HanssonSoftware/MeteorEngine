@@ -8,7 +8,7 @@
 #include <Memory/MemoryBlockArena.h>
 
 class Project;
-class ScriptModule;
+struct EngineModule;
 
 class BuildProjectMethod : public BaseBuildMethod
 {
@@ -24,7 +24,7 @@ public:
 protected:
 	virtual ~BuildProjectMethod() noexcept = default;
 
-	virtual ScriptModule* ParseModule(char* buffer);
+	virtual EngineModule* ParseModule(char* buffer);
 
 	virtual inline void GenerateGUID(char* output);
 
@@ -39,11 +39,11 @@ protected:
 
 	inline BuildProjectMethod::ScriptType DetectScriptType(const char* buffer, u32 length) const noexcept;
 
-	inline void SetSpecifierForModule(::ScriptModule* module, const char* verb, const char* verbEntry, u32 length) noexcept;
+	inline void SetSpecifierForModule(::EngineModule* module, const char* verb, const char* verbEntry, u32 length) noexcept;
 
 	inline void SetSpecifierForProject(::Project* project, const char* verb, const char* verbEntry, u32 length) noexcept;
 
-	void FillVcxprojFile(void* fileHandle, ScriptModule* module);
+	void FillVcxprojFile(void* fileHandle, EngineModule* module);
 
 	String sourceDirectory;
 
@@ -51,7 +51,7 @@ protected:
 
 	String alternativeSolutionDir;
 
-	Array<ScriptModule*> modules;
+	Array<EngineModule*> modules;
 
 	//MemoryBlockArena methodArena;
 };

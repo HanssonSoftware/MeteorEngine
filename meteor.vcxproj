@@ -133,7 +133,6 @@
     <ClCompile Include="engine\Core\Module\ModuleManager.cpp" />
     <ClCompile Include="engine\Core\Module\Module.cpp" />
     <ClCompile Include="engine\Core\Special\LaunchMeteorSuite.h" />
-    <ClCompile Include="engine\Core\Types\Map.cpp" />
     <ClCompile Include="engine\Core\Types\NameCollection.cpp" />
     <ClCompile Include="engine\Core\Memory\MemoryHandler.cpp" />
     <ClCompile Include="engine\Core\Memory\MemoryRegion.cpp" />
@@ -167,6 +166,7 @@
     <ClInclude Include="engine\Core\Memory\MemoryHandler.h" />
     <ClInclude Include="engine\Core\Memory\MemoryRegion.h" />
     <ClInclude Include="engine\Core\Memory\MemoryBlockArena.h" />
+    <ClInclude Include="Resource\EngineResource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="engine\Engine.mrbuild" />
@@ -174,6 +174,12 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="engine\Core\Core.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource\EngineResource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resource\DefaultEngineIcon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

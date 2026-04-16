@@ -178,10 +178,10 @@ String& String::operator+=(const char* other)
 	return (*this += tmp);
 }
 
-String String::Format(const String& format, ...)
+String String::Format(const char* format, ...)
 {
 	va_list a;
-	va_start(a, format.Chr());
+	va_start(a, format);
 
 	const int sizeForVA = vsnprintf(nullptr, 0, format, a);
 

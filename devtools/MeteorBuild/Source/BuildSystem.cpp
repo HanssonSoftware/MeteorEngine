@@ -40,23 +40,21 @@ bool BuildSystem::UseBuildSystem()
 	if (!ReadArguments())
 		SendHelpInfo();
 
-	currentMethod->StartMethod();
 	return true;
 }
 
 void BuildSystem::Shutdown()
 {
-	if (currentMethod) delete[] currentMethod;
 }
 
 bool BuildSystem::ReadArguments()
 {
-	currentMethod = Commandlet::Get().Check("-build") ? new BuildProjectMethod() :
-		Commandlet::Get().Check("-rebuild") ? new BuildProjectMethod() :
-		Commandlet::Get().Check("-compile") ? new BuildProjectMethod() :
-		Commandlet::Get().Check("-clean") ? new BuildProjectMethod() : nullptr;
+	//currentMethod = Commandlet::Get().Check("-build") ? new BuildProjectMethod() :
+	//	Commandlet::Get().Check("-rebuild") ? new BuildProjectMethod() :
+	//	Commandlet::Get().Check("-compile") ? new BuildProjectMethod() :
+	//	Commandlet::Get().Check("-clean") ? new BuildProjectMethod() : nullptr;
 
-	return currentMethod ? true : false;
+	return 1/*currentMethod */? true : false;
 }
 
 void BuildSystem::SendHelpInfo() const
@@ -69,6 +67,9 @@ void BuildSystem::SendHelpInfo() const
 		"Instruction parameters:\n"
 		"  -build\t\t-  Performs a build project method, requires a source, intermediate parameter.\n"
 		"  -rebuild\t\t-  Performs a full rebuild method, requires the same parameters as the -build, but it deletes everything.\n"
+		"  -clean\t\t-  Clears the entire intermediate (if exists) directory otherwise no changes would be made.\n"
+		"  -compile\t\t-  Compiles the full suite (game, editor, engine, etc.).\n"
+		"  -spirv\t\t-  Compiles GLSL code to SPIR-V bytecode.\n"
 		"\nOrdionary parameters:\n"
 		"  -help // -h // ?\t\t-  Brings up help (this pane).\n"
 		"  -intermediate // -int\t\t-  Sets the intermediate directory, for your generated project files.\n"

@@ -1,5 +1,7 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
+#ifdef MR_PLATFORM_WINDOWS
+
 #include "Platform.h"
 #include <Logging/Log.h>
 #include <Platform/Winapi.h>
@@ -28,3 +30,5 @@ void Platform::ConvertToNarrow(char* targetBuffer, const u32 size, const wchar_t
 
 	MR_LOG(LogPlatform, Error, "Unable to convert wide buffer to narrow!");
 }
+
+#endif // MR_PLATFORM_WINDOWS

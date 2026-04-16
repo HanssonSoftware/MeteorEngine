@@ -4,6 +4,7 @@
 #include <Commandlet.h>
 #include <Log.h>
 #include <Utils.h>
+#include <CommandsRegistry.h>
 #include <Platform.h>
 #include <VisualStudioProject.h>
 #include <Application/Application.h>
@@ -70,6 +71,13 @@ LOG_ADDCATEGORY(ProjectGeneratorVS);
 
 #define INSERT_SPECIFIER(x, statement) if (!strcmp(verb, x)) { statement return; }
 
+ADD_NEW_BUILD_COMMAND(1, build, "builds", CommandBuild);
+
+static void CommandBuild()
+{
+
+}
+
 BuildProjectMethod::BuildProjectMethod() : BaseBuildMethod()
 {
 
@@ -125,7 +133,7 @@ void BuildProjectMethod::StartMethod()
                 char* buffer = (char*)GetMemoryManager()->Allocate(ld.QuadPart + 1);
                 if (ReadFile(script, buffer, (DWORD)ld.QuadPart, &readActually, nullptr))
                 {
-                    ScriptModule* actualModule = ParseModule(buffer);
+                    EngineModule* actualModule = ParseModule(buffer);
                     if (actualModule != nullptr)
                     {
                         GenerateGUID(actualModule->identification);
@@ -174,7 +182,7 @@ void BuildProjectMethod::StartMethod()
             HRCHECK(PathCchCombine(combinedIntermediatePath, combinedIntermediatePathSize, exeLocation, wideIntermediateString));
             HRCHECK(PathCchCombine(combinedIntermediatePath, combinedIntermediatePathSize + appCodeNameLength, combinedIntermediatePath, appCodeNameWide));
 
-            for (ScriptModule*& module : modules)
+            for (EngineModule*& module : modules)
             {
                 wchar_t moduleNameWide[256] = {};
                 const u32 convertedModuleNameSize = MultiByteToWideChar(CP_UTF8, 0, module->moduleName, module->moduleName.Length(), moduleNameWide, module->moduleName.Length());
@@ -198,10 +206,11 @@ void BuildProjectMethod::StartMethod()
 
                 if (vcxprojFile != INVALID_HANDLE_VALUE)
                 {
-                    VisualStudioProject::GenerateFirstLinesOfBoilerplateCode(vcxprojFile);
-                    VisualStudioProject::GenerateDynamicDetailsForIdentification(vcxprojFile, &module->moduleName, module->identification);
-                    VisualStudioProject::GeneratePropertySheetsBoilerplateCode(vcxprojFile);
-                    VisualStudioProject::GenerateClosingBoilerplateCode(vcxprojFile);
+                    VisualStudioTemplate::GenerateHeaderAndConfigurations(vcxprojFile);
+                    VisualStudioTemplate::GenerateDynamicDetailsForIdentification(vcxprojFile, &module->moduleName, module->identification);
+                    VisualStudioTemplate::GeneratePropertySheetsBoilerplateCode(vcxprojFile);
+                    VisualStudioTemplate::GenerateConfigurationRelatedCallsToCompiler(vcxprojFile);
+                    VisualStudioTemplate::GenerateClosingBoilerplateCode(vcxprojFile);
 
                     CloseHandle(vcxprojFile);
                 }
@@ -255,7 +264,7 @@ void BuildProjectMethod::CleanUp()
 
 }
 
-ScriptModule* BuildProjectMethod::ParseModule(char* buffer)
+EngineModule* BuildProjectMethod::ParseModule(char* buffer)
 {
     if (buffer != nullptr)
     {
@@ -264,7 +273,7 @@ ScriptModule* BuildProjectMethod::ParseModule(char* buffer)
         char* begin = buffer;
         char* end = begin;
 
-        ScriptModule* newModule = (ScriptModule*)GetMemoryManager()->Allocate(sizeof(ScriptModule));
+        EngineModule* newModule = (EngineModule*)GetMemoryManager()->Allocate(sizeof(EngineModule));
         if (Parsing::SkipWord(end, line, current))
         {
             newModule->moduleName = Parsing::GetQuotedWord(end, true);
@@ -272,7 +281,7 @@ ScriptModule* BuildProjectMethod::ParseModule(char* buffer)
             {
                 MR_LOG(LogTemp, Fatal, "Module is not associated with any project! %s", *newModule->moduleName);
 
-                GetMemoryManager()->Deallocate(newModule, sizeof(ScriptModule));
+                GetMemoryManager()->Deallocate(newModule, sizeof(EngineModule));
                 return nullptr;
             }
 
@@ -281,7 +290,7 @@ ScriptModule* BuildProjectMethod::ParseModule(char* buffer)
             {
                 MR_LOG(LogTemp, Fatal, "Missing open statement!", );
 
-                GetMemoryManager()->Deallocate(newModule, sizeof(ScriptModule));
+                GetMemoryManager()->Deallocate(newModule, sizeof(EngineModule));
                 return nullptr;
             }
 
@@ -321,7 +330,7 @@ ScriptModule* BuildProjectMethod::ParseModule(char* buffer)
         {
             MR_LOG(LogTemp, Fatal, "Failed to parse buffer!");
 
-            GetMemoryManager()->Deallocate(newModule, sizeof(ScriptModule));
+            GetMemoryManager()->Deallocate(newModule, sizeof(EngineModule));
             return nullptr;
         }
 
@@ -377,7 +386,7 @@ inline BuildProjectMethod::ScriptType BuildProjectMethod::DetectScriptType(const
     return ScriptType::None;
 }
 
-inline void BuildProjectMethod::SetSpecifierForModule(ScriptModule* module, const char* verb, const char* verbEntry, u32 length) noexcept
+inline void BuildProjectMethod::SetSpecifierForModule(EngineModule* module, const char* verb, const char* verbEntry, u32 length) noexcept
 {
     MR_ASSERT(module != nullptr, "Module is invalid!");
 
@@ -403,7 +412,7 @@ inline void BuildProjectMethod::SetSpecifierForProject(::Project* project, const
     //INSERT_SPECIFIER("IncludePath");
 }
 
-void BuildProjectMethod::FillVcxprojFile(void* fileHandle, ScriptModule* module)
+void BuildProjectMethod::FillVcxprojFile(void* fileHandle, EngineModule* module)
 {
 
     char firstPart[] =

@@ -61,7 +61,7 @@ public:
 
 	bool operator!() const
 	{
-		return bIsUsingHeap ? !heapBuffer.ptr : !stackBuffer.ptr;
+		return bIsUsingHeap ? !heapBuffer.ptr : stackBuffer.ptr[0] != '\0';
 	}
 
 	explicit operator bool() const
@@ -111,7 +111,7 @@ public:
 	}
 	
 	/** */
-	static String Format(const String& format, ...);
+	static String Format(const char* format, ...);
 
 	char* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
 

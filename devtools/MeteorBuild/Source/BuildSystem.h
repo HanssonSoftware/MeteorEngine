@@ -5,16 +5,12 @@
 
 class BaseBuildMethod;
 
+
+
 class BuildSystem
 {
 public:
 	bool UseBuildSystem();
-
-	BaseBuildMethod* GetCurrentMethod() const { return currentMethod; }
-
-	//bool GenerateImportExportDefinitions(String* path);
-
-	//Module* FindModule(const String* name);
 
 	void Shutdown();
 protected:
@@ -25,7 +21,5 @@ protected:
 	bool BuildProjectFiles();
 
 	HANDLE hConsoleRef;
-
-	BaseBuildMethod* currentMethod;
 };
 

@@ -5,15 +5,15 @@
 typedef void* HANDLE;
 class String;
 
-struct VisualStudioProject
+namespace VisualStudioTemplate
 {
-	static void GeneratePropertySheetsBoilerplateCode(HANDLE fileHandle);
+	void GeneratePropertySheetsBoilerplateCode(HANDLE fileHandle);
 
-	static void GenerateFirstLinesOfBoilerplateCode(HANDLE fileHandle);
+	void GenerateHeaderAndConfigurations(HANDLE fileHandle);
 
-	static void GenerateClosingBoilerplateCode(HANDLE fileHandle);
+	void GenerateClosingBoilerplateCode(HANDLE fileHandle);
 
-	static void GenerateDynamicDetailsForIdentification(HANDLE fileHandle, const String* moduleName, const char* guid);
-	
-	static void GenerateConfigurationDetails(HANDLE fileHandle);
+	void GenerateDynamicDetailsForIdentification(HANDLE fileHandle, const String* moduleName, const char* guid);
+
+	void GenerateConfigurationRelatedCallsToCompiler(HANDLE fileHandle);
 };

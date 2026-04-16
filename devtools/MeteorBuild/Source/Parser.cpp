@@ -16,7 +16,7 @@ LOG_ADDCATEGORY(Parser);
 namespace Parsing
 {
 
-	static bool AddVerbDetail(ScriptModule* moduleToWrite, const String& verb, const String& value)
+	static bool AddVerbDetail(EngineModule* moduleToWrite, const String& verb, const String& value)
 	{
 		//if (verb == "IncludePath" || verb == "IncludePaths") { moduleToWrite->includePaths.Add(value); return true; }
 		//if (verb == "Dependencies") { moduleToWrite->requires.Add(value); return true; }

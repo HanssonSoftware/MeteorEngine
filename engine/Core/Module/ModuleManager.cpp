@@ -3,9 +3,13 @@
 #include "ModuleManager.h"
 #include <Platform/Platform.h>
 #include <Application/Application.h>
+#include <Special/EngineConstants.h>
 
 #include <Platform/Winapi.h>
+
+#ifdef MR_PLATFORM_WINDOWS
 #include <libloaderapi.h>
+#endif // MR_PLATFORM_WINDOWS
 
 #pragma warning(disable : 6387)
 
@@ -24,7 +28,7 @@ ModuleManager& ModuleManager::Get()
 
 ModuleManager::~ModuleManager() noexcept
 {
-    for (ScriptModule*& module : modules)
+    for (EngineModule*& module : modules)
     {
         module->ShutdownModule(); 
 
@@ -40,8 +44,7 @@ ModuleManager::~ModuleManager() noexcept
     modules.Reset();
 }
 
-static constexpr const char* defaultEngineName = "MeteorEngine";
-typedef ScriptModule* (*fv)();
+typedef EngineModule* (*fv)();
 
 bool ModuleManager::LoadModule(const String& moduleName)
 {
@@ -49,16 +52,19 @@ bool ModuleManager::LoadModule(const String& moduleName)
         return true;
 
 #ifdef MR_PLATFORM_WINDOWS
-    String libraryName = String::Format("%s-%s.dll", GetApplication()->GetApplicationName(), moduleName);
+    wchar_t libraryName[512] = {};
+    const auto resultCount = swprintf(libraryName, 511, L"%s-%hs.dll", WIDE_ENGINE_NAME, *moduleName);
 
-    HMODULE module = LoadLibraryW(L"libraryName");
+    MR_ASSERT(resultCount > 512, "Library formatting buffer is too small! (%d)", resultCount);
+
+    HMODULE module = LoadLibraryW(libraryName);
     if (module != nullptr)
     {
         fv moduleInstantiation = (fv)GetProcAddress(module, "InitialiseModule");
 
         if (moduleInstantiation)
         {
-            ScriptModule* newModule = moduleInstantiation();
+            EngineModule* newModule = moduleInstantiation();
             newModule->name = moduleName;
             //newModule->library = module;
             newModule->StartupModule();
@@ -66,28 +72,6 @@ bool ModuleManager::LoadModule(const String& moduleName)
             modules.Add(newModule);
 
             return true;
-        }
-    }
-    else
-    {
-        libraryName = String::Format("%ls-%s.dll", defaultEngineName, moduleName.Chr());
-
-        module = LoadLibraryW(L"libraryName");
-        if (module != nullptr)
-        {
-            fv moduleInstantiation = (fv)GetProcAddress(module, "InitialiseModule");
-
-            if (moduleInstantiation)
-            {
-                ScriptModule* newModule = moduleInstantiation();
-                newModule->name = moduleName;
-                //newModule->library = module;
-                newModule->StartupModule();
-
-                modules.Add(newModule);
-
-                return true;
-            }
         }
     }
 
@@ -102,7 +86,7 @@ bool ModuleManager::UnloadModule(const String& moduleName)
     const uint32_t moduleSize = modules.GetSize();
     for (uint32_t i = 0; i < moduleSize; i++)
     {
-        ScriptModule*& module = modules[i];
+        EngineModule*& module = modules[i];
         
         if (module)
         {
@@ -132,7 +116,7 @@ bool ModuleManager::UnloadModule(const String& moduleName)
 
 bool ModuleManager::IsModuleLoaded(const String& moduleName)
 {
-    for (ScriptModule*& mdl : modules)
+    for (EngineModule*& mdl : modules)
     {
         if (!mdl) continue;
 

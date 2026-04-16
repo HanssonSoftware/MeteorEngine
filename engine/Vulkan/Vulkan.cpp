@@ -10,7 +10,6 @@
 
 void Vulkan::StartupModule()
 {
-	Renderer::StartupModule();
 #ifdef MR_DEBUG
     enabledLayers.Add("VK_LAYER_KHRONOS_validation");
     enabledExtensions.Add(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
@@ -56,12 +55,11 @@ void Vulkan::StartupModule()
 
 void Vulkan::ShutdownModule()
 {
-	Renderer::ShutdownModule();
 
 	vkDestroyInstance(instance, nullptr);
 }
 
 void Vulkan::Update()
 {
-    Renderer::Update();
+  
 }

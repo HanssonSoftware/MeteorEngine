@@ -3,9 +3,7 @@
 #include "Application.h"
 
 #include <Platform/Winapi.h>
-#include <uxtheme.h>
-#pragma comment(lib, "User32.lib")
-#pragma comment(lib, "UxTheme.lib")
+#include <Types/Map.h>
 
 #include <Types/Array.h>
 #include <Memory/MemoryBlockArena.h>
@@ -22,13 +20,6 @@ void EditorApplication::Init()
 {
 	Application::Init();
 
-	String a = "kurvsyékddfága";
-	
-	MemoryBlockArena<int> ar = {16 * 1024 * 1024 };
-
-	int* j = (int*)ar.Allocate(sizeof(int));
-
-	*j = 16;
 }
 
 void EditorApplication::Run()

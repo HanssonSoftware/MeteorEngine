@@ -92,10 +92,10 @@ struct LogDescriptor
 
     const char* team;
 
-#ifdef MR_DEBUG
+//#ifdef MR_DEBUG
     const char* function;
     const char* file;
-#endif // MR_DEBUG
+//#endif // MR_DEBUG
 
     char message[bIsRunningDebugMode ? 512 : 128] = { '\0' };
 };

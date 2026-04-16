@@ -182,29 +182,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\CommandsRegistry.cpp" />
     <ClCompile Include="Source\Application.cpp" />
     <ClCompile Include="Source\BuildProjectMethod.cpp" />
     <ClCompile Include="Source\BuildSystem.cpp" />
-    <ClCompile Include="Source\Generators\BaseGenerator.cpp" />
     <ClCompile Include="Source\Launcher.cpp" />
     <ClCompile Include="Source\Log.cpp" />
-    <ClCompile Include="Source\Methods\BuildProjectMethod.cpp" />
-    <ClCompile Include="Source\Core\Log.cpp" />
-    <ClCompile Include="Source\Core\BuildSystem.cpp" />
-    <ClCompile Include="Source\Core\Application.cpp" />
     <ClCompile Include="Source\Module.cpp" />
-    <ClCompile Include="Source\Module\Launcher.cpp" />
-    <ClCompile Include="Source\Module\Module.cpp" />
-    <ClCompile Include="Source\Core\Utils_Win32.cpp" />
-    <ClCompile Include="Source\Module\Project.cpp" />
-    <ClCompile Include="Source\Module\Parser.cpp" />
-    <ClCompile Include="Source\Generators\VisualStudio\VcxprojGenerator.cpp" />
     <ClCompile Include="Source\Parser.cpp" />
     <ClCompile Include="Source\Project.cpp" />
     <ClCompile Include="Source\Utils_Win32.cpp" />
     <ClCompile Include="Source\VisualStudioProject.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\CommandsRegistry.h" />
     <ClInclude Include="Source\Application.h" />
     <ClInclude Include="Source\BaseBuildMethod.h" />
     <ClInclude Include="Source\BuildProjectMethod.h" />
@@ -228,9 +219,7 @@
     <ClInclude Include="Source\Module\Module.h" />
     <ClInclude Include="Source\Module\Project.h" />
     <ClInclude Include="Source\Module\Parser.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="Source\Core\Utils.h" />
-    <ClInclude Include="Source\Generators\VisualStudio\VcxprojGenerator.h" />
     <ClInclude Include="Source\Parser.h" />
     <ClInclude Include="Source\Project.h" />
     <ClInclude Include="Source\Project\ConfigurationToolkit.h" />

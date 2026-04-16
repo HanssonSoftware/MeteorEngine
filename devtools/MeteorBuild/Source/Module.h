@@ -6,20 +6,16 @@
 
 class Project;
 
-class ScriptModule
+struct EngineModule
 {
 	friend class BuildProjectMethod;
-public:
-	ScriptModule() = default;
 
-	virtual	~ScriptModule() noexcept = default;
+	EngineModule() = default;
+
+	virtual	~EngineModule() noexcept = default;
 
 protected:
 	String moduleName; // "Core"
-
-	String defineName; // "CORE(_EXPORTS)"
-
-	String generatedProjectFile; // ..\\Core.vcxproj
 
 	String modulePath; // ..\\Core.mrbuild
 

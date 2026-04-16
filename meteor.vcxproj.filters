@@ -36,9 +36,6 @@
     <ClCompile Include="engine\Core\Special\LaunchMeteorSuite.h">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Types\Map.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Types\Name.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -137,10 +134,13 @@
     <ClInclude Include="engine\Core\Memory\MemoryBlockArena.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Platform\Windows.h">
+    <ClInclude Include="engine\Core\Types\String.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Types\String.h">
+    <ClInclude Include="engine\Core\Platform\Winapi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource\EngineResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -152,5 +152,15 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="engine\Core\Core.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource\EngineResource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resource\DefaultEngineIcon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

@@ -6,14 +6,14 @@
 
 #include <vulkan/vulkan.h>
 
-class Vulkan : public Renderer
+class Vulkan
 {
 public:
-	virtual void StartupModule() override;
+	virtual void StartupModule();
 
-	virtual void ShutdownModule() override;
+	virtual void ShutdownModule();
 
-	virtual void Update() override;
+	virtual void Update();
 protected:
 	VkInstance instance;
 
