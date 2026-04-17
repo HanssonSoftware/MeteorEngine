@@ -17,6 +17,8 @@ public:
 
 	CallCommand command = nullptr;
 
+	Command() = default;
+
 	constexpr Command(u8 priority, const char* name, const char* description, CallCommand fn)
 		: priority(priority)
 		, word(name)
@@ -39,7 +41,7 @@ class CommandsRegistry
 
 	static inline Map<const char*, Command*> commands;
 
-	virtual ~CommandsRegistry() noexcept = default;
+	~CommandsRegistry() noexcept = default;
 public:
 	CommandsRegistry() = default;
 
@@ -52,5 +54,5 @@ public:
 
 
 #define ADD_NEW_BUILD_COMMAND(Priority, Name, Desc, Func) \
-	static Command Name##Command = { Priority, #Name, Desc, Func};
+	static Command Func##Command = { Priority, Name, Desc, Func};
 

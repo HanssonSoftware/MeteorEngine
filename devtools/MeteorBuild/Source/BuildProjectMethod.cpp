@@ -71,7 +71,7 @@ LOG_ADDCATEGORY(ProjectGeneratorVS);
 
 #define INSERT_SPECIFIER(x, statement) if (!strcmp(verb, x)) { statement return; }
 
-ADD_NEW_BUILD_COMMAND(1, build, "builds", CommandBuild);
+ADD_NEW_BUILD_COMMAND(1, "-build", "builds", CommandBuild);
 
 static void CommandBuild()
 {
