@@ -29,5 +29,9 @@ struct CORE_API Commandlet
 	bool Check(const String& inParam);
 
 protected:
+	int count = 0;
+
+	char* arglist;
+
 	bool bIsInited = false;
 };

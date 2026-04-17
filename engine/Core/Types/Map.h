@@ -4,11 +4,12 @@
 #include <Types/Array.h>
 #include <Platform/DataTypes.h>
 
-template <typename T>
-static constexpr u64 Hash(const T* str, u64 length)
+static u64 Hash(const char* str)
 {
 	static constexpr const u64 offset = 0xcbf29ce484222325;
 	static constexpr const u64 PRIME = 0x100000001b3;
+
+	const u32 length = (u32)strlen(str);
 
 	u64 value = offset;
 	const u8* bytes = reinterpret_cast<const u8*>(str);
@@ -21,9 +22,9 @@ static constexpr u64 Hash(const T* str, u64 length)
 	return value;
 }
 
-constexpr u64 operator ""_h(const char* str, u64 len)
+u64 operator ""_h(const char* str, u64 len)
 {
-	return Hash<char>(str, len);
+	return Hash(str);
 }
 
 template <typename Key, typename Value>
@@ -41,27 +42,27 @@ public:
 
 	Value& operator[](Key Input)
 	{
-		u64 id = Hash<Key>(&Input);
+		u64 id = Hash(&Input);
 		for (auto& ctr : container)
 		{
 			if (id == ctr.hashKey)
 				return ctr.data;
 		}
 
-		container.Add({ id, 0 });
+		container.Add({ id, Value()});
 		return container[container.GetSize() - 1].data;
 	};
 
 	const Value& operator[](Key Input) const
 	{
-		u64 id = Hash<Key>(&Input);
+		u64 id = Hash(&Input);
 		for (const auto& ctr : container)
 		{
 			if (id == ctr.hashKey)
 				return ctr.data;
 		}
 
-		container.Add({ id, 0 });
+		container.Add({ id, Value()});
 		return container[container.GetSize() - 1].data;
 	};
 

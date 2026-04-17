@@ -52,6 +52,8 @@ extern "C" __declspec(dllimport) int LaunchApplication(Application* instance, in
 #include <Windows.h>
 #include <PathCch.h>
 #include <winuser.h>
+#include <shellapi.h>
+
 #pragma comment (lib, "Pathcch.lib")                                                                     
 #pragma comment (lib, "User32.lib")                                                                          
                                                                                                                             
@@ -81,6 +83,8 @@ extern "C" __declspec(dllimport) int LaunchApplication(Application* instance, in
             if (externalLinkageFunction)                                                                                                 \
             {                                                                                                                            \
                 applicationClass* application = new applicationClass;                                                                    \
+                                                                                                                                         \
+                int countOfArgs = 0;                                                                                                     \
                 int Result = externalLinkageFunction(application, -1, lpCmdLine);                                                        \
                                                                                                                                          \
                 if (!FreeLibrary(entryPoint))                                                                                            \

@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include <Types/String.h>
+#include <shellapi.h>
 #include <Memory/MemoryHandler.h>
 
 #include <Special/LaunchMeteorSuite.h>
@@ -67,6 +68,10 @@ int main(int argc, char argv[])
 		if (externalLinkageFunction)                                                                                                 
 		{                                                                                                                            
 			BuildSystemApplication* application = new BuildSystemApplication;
+
+			int countOfArgs = 0;
+			CommandLineToArgvW(GetCommandLineW(), &countOfArgs);
+
 			int Result = externalLinkageFunction(application, argc, argv);                                                                       
 
 			if (!FreeLibrary(entryPoint))                                                                                            
