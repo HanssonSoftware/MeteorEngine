@@ -2,12 +2,12 @@
 
 #include "Application.h"
 #include <Types/String.h>
-#include <shellapi.h>
 #include <Memory/MemoryHandler.h>
 
 #include <Special/LaunchMeteorSuite.h>
 #include <Platform/Platform.h>
 
+#include <shellapi.h>
 //#pragma comment(lib, "Shell32.lib")
 
 
@@ -22,11 +22,6 @@ BuildSystemApplication::BuildSystemApplication()
 void BuildSystemApplication::Init()
 {
 	Application::Init();
-
-	if (!GetBuildSystem().UseBuildSystem())
-	{
-		//MR_LOG(LogBuildSystemApplication, Fatal, "Build system error!");
-	}
 
 }
 

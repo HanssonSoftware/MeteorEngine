@@ -182,12 +182,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\BuildCommand.cpp" />
+    <ClCompile Include="Source\CommandRegistry.cpp" />
     <ClCompile Include="Source\BuildSystem.cpp" />
     <ClCompile Include="Source\Application.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\CommandRegistry.h" />
     <ClInclude Include="Source\BuildSystem.h" />
     <ClInclude Include="Source\Application.h" />
+    <ClInclude Include="Source\Commands.h" />
     <ClInclude Include="Source\Generators\BaseGenerator.h" />
     <ClInclude Include="Source\Core\Helper.h" />
     <ClInclude Include="Source\Generators\GeneratorUtils.h" />

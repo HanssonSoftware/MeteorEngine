@@ -22,7 +22,7 @@ static u64 Hash(const char* str)
 	return value;
 }
 
-u64 operator ""_h(const char* str, u64 len)
+static u64 operator ""_h(const char* str, u64 len)
 {
 	return Hash(str);
 }
@@ -42,7 +42,7 @@ public:
 
 	Value& operator[](Key Input)
 	{
-		u64 id = Hash(&Input);
+		u64 id = Hash(Input);
 		for (auto& ctr : container)
 		{
 			if (id == ctr.hashKey)
@@ -55,7 +55,7 @@ public:
 
 	const Value& operator[](Key Input) const
 	{
-		u64 id = Hash(&Input);
+		u64 id = Hash(Input);
 		for (const auto& ctr : container)
 		{
 			if (id == ctr.hashKey)
