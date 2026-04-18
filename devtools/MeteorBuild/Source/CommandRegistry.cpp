@@ -4,7 +4,6 @@
 
 void CommandRegistry::RegisterCommand(const char* name, const char* descriptive, CommandInformationFunctionSignature func)
 {
-	/*commands[name] = { name, descriptive, func };*/
-
-
+	commands[count > 0 ? (count - 1) : 0] = { name, descriptive, func };
+	count++;
 } 

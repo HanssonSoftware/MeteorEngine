@@ -24,6 +24,8 @@ public:
 
 	void RegisterCommand(const char* name, const char* descriptive, CommandInformationFunctionSignature func);
 
+	const CommandInformation& GetCommandsList() const { return *commands; };
+	const u32 GetCommandsListCount() const { return count; };
 protected:
 	static constexpr const u32 MAX_COMMANDS = 32;
 	CommandInformation commands[MAX_COMMANDS];

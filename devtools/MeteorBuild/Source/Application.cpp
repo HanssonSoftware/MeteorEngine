@@ -23,6 +23,7 @@ void BuildSystemApplication::Init()
 {
 	Application::Init();
 
+	GetBuildSystem().PrintHelp();
 }
 
 void BuildSystemApplication::Run()
