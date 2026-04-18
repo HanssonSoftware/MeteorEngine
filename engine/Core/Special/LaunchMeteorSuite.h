@@ -64,7 +64,7 @@ extern "C" __declspec(dllimport) int LaunchApplication(Application* instance, in
 #pragma warning(disable : 6387)
 
 #define IMPLEMENT_WINDOWS_STARTUP(libName, applicationClass)                                                                             \
-    int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR lpCmdLine, int nCmdShow)                                       \
+    int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)                                      \
     {                                                                                                                                    \
         wchar_t path[512] = {};                                                                                                          \
         DWORD count = GetModuleFileNameW(hInstance, path, 512);                                                                          \
@@ -78,14 +78,13 @@ extern "C" __declspec(dllimport) int LaunchApplication(Application* instance, in
         HMODULE entryPoint = LoadLibraryExW(L##libName, nullptr, LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_USER_DIRS);   \
         if (entryPoint != nullptr)                                                                                                       \
         {                                                                                                                                \
-            typedef int (*ProxyFunction)(Application*, int, char*);                                                                      \
+            typedef int (*ProxyFunction)(Application*, int, wchar_t*);                                                                   \
             ProxyFunction externalLinkageFunction = (ProxyFunction)GetProcAddress(entryPoint, "LaunchApplication");                      \
             if (externalLinkageFunction)                                                                                                 \
             {                                                                                                                            \
                 applicationClass* application = new applicationClass;                                                                    \
                                                                                                                                          \
-                int countOfArgs = 0;                                                                                                     \
-                int Result = externalLinkageFunction(application, -1, lpCmdLine);                                                        \
+                int Result = externalLinkageFunction(application, -1, pCmdLine);                                                         \
                                                                                                                                          \
                 if (!FreeLibrary(entryPoint))                                                                                            \
                     return -1;                                                                                                           \

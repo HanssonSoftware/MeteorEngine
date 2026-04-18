@@ -59,7 +59,11 @@ void Application::Shutdown()
 #endif // MR_DEBUG 
 }
 
+#ifdef MR_PLATFORM_WINDOWS
+extern "C" __declspec(dllexport) int LaunchApplication(Application* instance, int argc, wchar_t argv[])
+#else
 extern "C" __declspec(dllexport) int LaunchApplication(Application* instance, int argc, char argv[])
+#endif // MR_PLATFORM_WINDOWS
 {	
 #ifdef MR_PLATFORM_WINDOWS
     

@@ -20,7 +20,12 @@ struct CORE_API Commandlet
 		return instance;
 	}
 
+#ifdef MR_PLATFORM_WINDOWS
+	void Initialize(int argumentCount, wchar_t argumentList[]);
+#else
 	void Initialize(int argumentCount, char argumentList[]);
+#endif // MR_PLATFORM_WINDOWS
+
 
 	void Shutdown();
 
@@ -28,10 +33,22 @@ struct CORE_API Commandlet
 
 	bool Check(const String& inParam);
 
-protected:
-	int count = 0;
+	u32 GetCount() const { return count; };
 
-	char* arglist;
+#ifdef MR_PLATFORM_WINDOWS
+	const wchar_t* const* GetArgs() { return (const wchar_t* const*)argumentList; };
+#else
+	const char* const* GetArgs() { return (const char* const*)argumentList; };
+#endif // MR_PLATFORM_WINDOWS
+
+protected:
+#ifdef MR_PLATFORM_WINDOWS
+	wchar_t** argumentList;
+#else
+	char** argumentList;
+#endif // MR_PLATFORM_WINDOWS
+	
+	u32 count = 0;
 
 	bool bIsInited = false;
 };

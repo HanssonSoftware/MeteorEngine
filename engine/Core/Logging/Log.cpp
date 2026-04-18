@@ -19,8 +19,6 @@
 
 static HANDLE consoleHandle;
 static HANDLE fileHandle;
-
-static bool bIsDebuggerAttached = false;
 #pragma warning(disable : 6386)
 #endif // MR_PLATFORM_WINDOWS
 
@@ -106,7 +104,7 @@ void Logger::Initialize()
             swprintf(date, 32, L"%02d%02d%02d-%02d%02d%02d.txt", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
             wcsncat(path, date, 32);
 
-            fileHandle = CreateFileW(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
+            fileHandle = CreateFileW(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING, nullptr);
             if (fileHandle == INVALID_HANDLE_VALUE)
             {
                 wchar_t chars[256] = { L'\0' };
@@ -128,56 +126,56 @@ void Logger::Initialize()
             CoTaskMemFree(foundPath);
         }
     }
-    
-    bIsDebuggerAttached = IsDebuggerPresent() ? true : false;
-    if (!bIsDebuggerAttached)
+#ifdef MR_DEBUG
+    if (!GetConsoleWindow())
     {
-        FreeConsole();
+        //FreeConsole();
 
-        if (!AllocConsole())
-        {
-            if (GetLastError() == ERROR_ACCESS_DENIED)
-            {
-                if (!AttachConsole(ATTACH_PARENT_PROCESS))
-                {
-                    Application::RequestExit(-1);
-                }
-            }
-            else
-            {
-                Application::RequestExit(-1);
-            }
-        }
-        else
-        {
-            if (!SetStdHandle(STD_INPUT_HANDLE, INVALID_HANDLE_VALUE))
-            {
-                Application::RequestExit(-1);
-            }
-
-            consoleHandle = CreateFileW(L"CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
-            if (consoleHandle != INVALID_HANDLE_VALUE)
-            {
-                SetConsoleOutputCP(CP_UTF8);
-
-                CONSOLE_CURSOR_INFO cf;
-                GetConsoleCursorInfo(consoleHandle, &cf);
-                cf.bVisible = false;
-
-                SetConsoleCursorInfo(consoleHandle, &cf);
-
-
-                if (!SetStdHandle(STD_OUTPUT_HANDLE, consoleHandle))
-                    Application::RequestExit(-1);
-
-                wchar_t title[128] = { L'\0' };
-
-
-                swprintf(title, 127, L"%hs developer console (output only!)", GetApplication()->GetApplicationName());
-                SetConsoleTitleW(title);
-            }
-        }
+        //if (!AllocConsole())
+        //{
+        //    if (GetLastError() == ERROR_ACCESS_DENIED)
+        //    {
+        //        if (!AttachConsole(ATTACH_PARENT_PROCESS))
+        //        {
+        //            Application::RequestExit(-1);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Application::RequestExit(-1);
+        //    }
+        //}
+        //else
+        //{
     }
+
+    if (!SetStdHandle(STD_INPUT_HANDLE, INVALID_HANDLE_VALUE))
+    {
+        Application::RequestExit(-1);
+    }
+
+    consoleHandle = CreateFileW(L"CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
+    if (consoleHandle != INVALID_HANDLE_VALUE)
+    {
+        SetConsoleOutputCP(CP_UTF8);
+
+        CONSOLE_CURSOR_INFO cf;
+        GetConsoleCursorInfo(consoleHandle, &cf);
+        cf.bVisible = false;
+
+        SetConsoleCursorInfo(consoleHandle, &cf);
+
+        if (!SetStdHandle(STD_OUTPUT_HANDLE, consoleHandle))
+            Application::RequestExit(-1);
+
+        wchar_t title[128] = {};
+
+        swprintf(title, 127, L"%hs developer console (output only!)", GetApplication()->GetApplicationName());
+        SetConsoleTitleW(title);
+    }
+        //}
+
+#endif // MR_DEBUG
 
     QueryPerformanceCounter(&end);
     MR_LOG(LogLogging, Info, "Logger system is instantiated in %.2f seconds!", (end.QuadPart - begin.QuadPart) / (freq.QuadPart / 100.0));
@@ -273,8 +271,7 @@ void Logger::SendToOutputBuffer(char* buffer, const u32 count)
         MR_ASSERT(false, "fs");
     }
 
-    if (bIsDebuggerAttached)
-        OutputDebugStringW(fixBuffer);
+    OutputDebugStringW(fixBuffer);
 
     if (consoleHandle)
     {

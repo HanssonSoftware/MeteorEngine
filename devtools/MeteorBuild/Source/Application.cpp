@@ -23,18 +23,13 @@ void BuildSystemApplication::Init()
 {
 	Application::Init();
 
-	GetBuildSystem().PrintHelp();
+	GetBuildSystem().CallRequiredMode();
 }
 
 void BuildSystemApplication::Run()
 {
-	//if (BaseBuildMethod* method = GetBuildSystem().GetCurrentMethod())
-	//{
-	//	method->StartMethod();
-	//	method->CleanUp();
-	//}
 
-	//Sleep(60 * 1000); // debug
+
 	Application::RequestExit(0);
 }
 
@@ -44,7 +39,7 @@ void BuildSystemApplication::Shutdown()
 	Application::Shutdown();
 }
 
-int main(int argc, char argv[])
+int wmain(int argc, wchar_t argv[])
 {  
 #ifdef MR_PLATFORM_WINDOWS
 	wchar_t path[512] = {};                                                                                                          
@@ -59,14 +54,11 @@ int main(int argc, char argv[])
 	HMODULE entryPoint = LoadLibraryExW(L"MeteorEngine-Core.dll", nullptr, LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_USER_DIRS);
 	if (entryPoint != INVALID_HANDLE_VALUE)                                                                                          
 	{                                                                                                                                
-		typedef int (*ProxyFunction)(Application*, int, char*);                                                                                  
+		typedef int (*ProxyFunction)(Application*, int, wchar_t*);                                                                                  
 		ProxyFunction externalLinkageFunction = (ProxyFunction)GetProcAddress(entryPoint, "LaunchApplication");                      
 		if (externalLinkageFunction)                                                                                                 
 		{                                                                                                                            
 			BuildSystemApplication* application = new BuildSystemApplication;
-
-			int countOfArgs = 0;
-			CommandLineToArgvW(GetCommandLineW(), &countOfArgs);
 
 			int Result = externalLinkageFunction(application, argc, argv);                                                                       
 

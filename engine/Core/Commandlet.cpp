@@ -8,41 +8,65 @@
 
 #include <Platform/Winapi.h>
 #include <processenv.h>
+#include <shellapi.h>
 
 #include <Memory/MemoryHandler.h>
 
 #pragma warning(disable : 6031)
 
 
+#ifdef MR_PLATFORM_WINDOWS
+void Commandlet::Initialize(int argumentCount, wchar_t argumentList[])
+#else
 void Commandlet::Initialize(int argumentCount, char argumentList[])
+#endif // MR_PLATFORM_WINDOWS
 {
+
+#ifdef MR_PLATFORM_WINDOWS
+	this->argumentList = CommandLineToArgvW(GetCommandLineW(), &argumentCount);
+	count = argumentCount;
+#endif // MR_PLATFORM_WINDOWS
+
+
 	bIsInited = true;
 }
 
 void Commandlet::Shutdown()
 {
+#ifdef MR_PLATFORM_WINDOWS
+
+#endif // MR_PLATFORM_WINDOWS
+
 	bIsInited = false;
 }
 
 String Commandlet::Parse(const char* inParam)
 {
 #ifdef MR_PLATFORM_WINDOWS
-	wchar_t* wideCommandLine = GetCommandLineW();
-
 	wchar_t fixBufferForParameter[128] = { L'\0' };
 	Platform::ConvertToWide(fixBufferForParameter, 128, inParam);
 
-	wchar_t* found = wcsstr(wideCommandLine, fixBufferForParameter);
-	if (found)
+	for (wchar_t** i = argumentList; *i; i++)
 	{
-		wchar_t* end = found;
+		if (wcscmp(fixBufferForParameter, *i) == 0)
+		{
+			char fixBufferForOutputParameter[128] = {};
+			Platform::ConvertToNarrow(fixBufferForOutputParameter, wcslen(*i++), *i++);
+
+			return fixBufferForOutputParameter;
+		}
+	}
+
+	if (0)
+	{
+		wchar_t* end = 0;
 
 		// to first space
 		while (*end && !isspace(*end))
 			end++;
 
 		end++;
-		found = end;
+		//found = end;
 
 		// to second word
 		end++;
@@ -54,9 +78,9 @@ String Commandlet::Parse(const char* inParam)
 				end++;
 
 			char fixBufferForOutputParameter[128] = { '\0' };
-			Platform::ConvertToNarrow(fixBufferForOutputParameter, (u32)(end - found), found);
+			//Platform::ConvertToNarrow(fixBufferForOutputParameter, (u32)(end - found), found);
 
-			return String(fixBufferForOutputParameter, (u32)(end - found));
+			//return String(fixBufferForOutputParameter, (u32)(end - found));
 		}
 
 		return "";
@@ -70,12 +94,10 @@ String Commandlet::Parse(const char* inParam)
 bool Commandlet::Check(const String& inParam)
 {
 #ifdef MR_PLATFORM_WINDOWS
-	wchar_t* wideCommandLine = GetCommandLineW();
-
 	wchar_t fixBufferForParameter[128] = { L'\0' };
 	Platform::ConvertToWide(fixBufferForParameter, 128, inParam);
 
-	wchar_t* found = wcsstr(wideCommandLine, fixBufferForParameter);
+	wchar_t* found = wcsstr(*argumentList, fixBufferForParameter);
 	if (found)
 	{
 		wchar_t* end = found;

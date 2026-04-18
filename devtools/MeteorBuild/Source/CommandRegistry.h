@@ -13,6 +13,7 @@ struct CommandInformation
 	CommandInformationFunctionSignature function = nullptr;
 };
 
+
 class CommandRegistry
 {
 public:
@@ -23,6 +24,7 @@ public:
 	}
 
 	void RegisterCommand(const char* name, const char* descriptive, CommandInformationFunctionSignature func);
+	bool CallFunctionOnCommand(const char* functionName) const;
 
 	const CommandInformation& GetCommandsList() const { return *commands; };
 	const u32 GetCommandsListCount() const { return count; };
@@ -31,8 +33,6 @@ protected:
 	CommandInformation commands[MAX_COMMANDS];
 
 	u32 count = 0;
-
-	//Map<const char*, CommandInformation> commands;
 };
 
 struct CommandMacroAuxiliary
