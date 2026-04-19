@@ -20,14 +20,30 @@ namespace Commands
 		LARGE_INTEGER startTime, endTime, frequency;
 		QueryPerformanceCounter(&startTime);
 
-		const String sourceDirectory = Commandlet::Get().Parse("-source");
-		const String intermediateDirectory = Commandlet::Get().Parse("-intermediate");
+		const String sourceDirectory = Commandlet::Get().Parse("-s");
+		const String intermediateDirectory = Commandlet::Get().Parse("-i");
 
+		// Arena allocates bytes, so equal size will be allocated!
+		// WChar: 32 MB (Char / 2)
+		// Char: 32 MB
+
+#ifdef MR_PLATFORM_WINDOWS
 		static MemoryBlockArena<wchar_t> arena = { 32 * 1024 * 1024 };
+#else
+		static MemoryBlockArena<char> arena = { 32 * 1024 * 1024 };
+#endif // MR_PLATFORM_WINDOWS
 
 		if (sourceDirectory && intermediateDirectory)
 		{
+			wchar_t* sourceDirectoryW = (wchar_t*)arena.Allocate(sourceDirectory.Length() * sizeof(wchar_t));
+			if (!MultiByteToWideChar(CP_UTF8, 0, sourceDirectory, sourceDirectory.Length(), sourceDirectoryW, sourceDirectory.Length()))
+			{
+				MR_LOG(LogCommands, Error, "%s", *GetLastErrorString());
+				return;
+			}
 
+			Array<wchar_t*> files;
+			DirectorySearch(sourceDirectoryW, files);
 		}
 
 		QueryPerformanceCounter(&endTime);

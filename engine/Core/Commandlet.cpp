@@ -34,7 +34,7 @@ void Commandlet::Initialize(int argumentCount, char argumentList[])
 void Commandlet::Shutdown()
 {
 #ifdef MR_PLATFORM_WINDOWS
-
+	LocalFree(argumentList);
 #endif // MR_PLATFORM_WINDOWS
 
 	bIsInited = false;
@@ -44,49 +44,24 @@ String Commandlet::Parse(const char* inParam)
 {
 #ifdef MR_PLATFORM_WINDOWS
 	wchar_t fixBufferForParameter[128] = { L'\0' };
-	Platform::ConvertToWide(fixBufferForParameter, 128, inParam);
+	Platform::ConvertToWide(fixBufferForParameter, strlen(inParam), inParam);
 
+	bool bFound = false;
 	for (wchar_t** i = argumentList; *i; i++)
 	{
-		if (wcscmp(fixBufferForParameter, *i) == 0)
+		if (bFound)
 		{
 			char fixBufferForOutputParameter[128] = {};
-			Platform::ConvertToNarrow(fixBufferForOutputParameter, wcslen(*i++), *i++);
+			Platform::ConvertToNarrow(fixBufferForOutputParameter, wcslen(*i), *i);
 
 			return fixBufferForOutputParameter;
 		}
-	}
-
-	if (0)
-	{
-		wchar_t* end = 0;
-
-		// to first space
-		while (*end && !isspace(*end))
-			end++;
-
-		end++;
-		//found = end;
-
-		// to second word
-		end++;
-		if (*end != L'-')
+		else if (wcscmp(fixBufferForParameter, *i) == 0)
 		{
-			end++;
-
-			while (*end && !isspace(*end))
-				end++;
-
-			char fixBufferForOutputParameter[128] = { '\0' };
-			//Platform::ConvertToNarrow(fixBufferForOutputParameter, (u32)(end - found), found);
-
-			//return String(fixBufferForOutputParameter, (u32)(end - found));
+			bFound = true;
 		}
-
-		return "";
 	}
 #endif // MR_PLATFORM_WINDOWS
-
 
 	return "";
 }

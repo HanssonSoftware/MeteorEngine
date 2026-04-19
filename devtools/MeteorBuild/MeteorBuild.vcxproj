@@ -183,6 +183,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\BuildCommand.cpp" />
+    <ClCompile Include="Source\CentralCommands.cpp" />
     <ClCompile Include="Source\CommandRegistry.cpp" />
     <ClCompile Include="Source\BuildSystem.cpp" />
     <ClCompile Include="Source\Application.cpp" />
