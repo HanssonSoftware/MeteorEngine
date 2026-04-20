@@ -43,7 +43,7 @@ namespace Commands
 			}
 
 			Array<wchar_t*> files;
-			DirectorySearch(sourceDirectoryW, files);
+			DirectorySearch(sourceDirectoryW, files, &arena);
 		}
 
 		QueryPerformanceCounter(&endTime);

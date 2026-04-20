@@ -2,23 +2,26 @@
 
 #pragma once
 #include "Commands.h"
-#include <Memory/MemoryBlockArena.h>
+#include <Commandlet.h>
 
 #include <Platform/Winapi.h>
+#include <shlwapi.h>
 #include <pathcch.h>
 
-#include <shlwapi.h>
 //#include <strsafe.h>
 #include <Platform.h>
+
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "Pathcch.lib")
+
+LOG_ADDCATEGORY(Commands);
 
 namespace Commands
 {
 #ifdef MR_PLATFORM_WINDOWS
-	void DirectorySearch(wchar_t* directory, Array<wchar_t*>& foundFiles)
+	void Commands::DirectorySearch(wchar_t* directory, Array<wchar_t*>& foundFiles, MemoryBlockArena<wchar_t>* arena)
 #else
-	void DirectorySearch(char* directory, Array<char*>& foundFiles)
+	void DirectorySearch(char* directory, Array<char*>& foundFiles, MemoryBlockArena<char>* arena)
 #endif // MR_PLATFORM_WINDOWS
 	{ 
 		if (!directory)
@@ -26,57 +29,75 @@ namespace Commands
 
 		if (PathIsRelativeW(directory))
 		{
-			//GetModuleFileNameW(GetModuleHandleW(nullptr), );
+			wchar_t exeLocation[MAX_PATH] = {};
+
+			wcscpy_s(exeLocation, MAX_PATH, Commandlet::Get().GetArgs()[0]);
+			PathRemoveFileSpecW(exeLocation);
+
+			const u32 combinedDirectorySize = wcslen(exeLocation) + wcslen(directory);
+			wchar_t* newDirectory = (wchar_t*)arena->Allocate((combinedDirectorySize + 10) * sizeof(wchar_t));
+			
+			PathCchCombine(newDirectory, combinedDirectorySize, exeLocation, directory);
+			directory = newDirectory;
 		}
 
+		HRCHECK(PathCchCombine(directory, wcslen(directory) + 5, directory, L"*"));
 
-		WIN32_FIND_DATAW foundFile;
-		HANDLE fileHandle = FindFirstFileExW(/*charBuffer*/nullptr, FindExInfoBasic, &foundFile, FindExSearchNameMatch, nullptr, FIND_FIRST_EX_LARGE_FETCH);
+		WIN32_FIND_DATAW foundFile = {};
+		HANDLE fileHandle = FindFirstFileExW(directory, FindExInfoBasic, &foundFile, FindExSearchNameMatch, nullptr, FIND_FIRST_EX_LARGE_FETCH);
 
-		//PathCchRemoveFileSpec(charBuffer, wcslen(charBuffer));
-		if (fileHandle != INVALID_HANDLE_VALUE)
+		HRCHECK(PathCchRemoveFileSpec(directory, wcslen(directory)));
+
+		MR_ASSERT(fileHandle != INVALID_HANDLE_VALUE, "Unable to list path at %ls", directory);
+
+		do
 		{
-			do
+			if (foundFile.cFileName[0] == L'.')
+				continue;
+
+			if (foundFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				if (foundFile.cFileName[0] == L'.')
-					continue;
+				static MemoryBlockArena<wchar_t> directoryArena = { 16 * 1024 * 1024 };
 
-				if (foundFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+				const u32 nextSearchableDirectorySize = (u32)swprintf(nullptr, 0, L"%ls\\%ls", directory, foundFile.cFileName) + 1;
+				wchar_t* newDirectoryName = (wchar_t*)directoryArena.Allocate(nextSearchableDirectorySize * sizeof(wchar_t));
+
+				if (swprintf(newDirectoryName, nextSearchableDirectorySize, L"%ls\\%ls", directory, foundFile.cFileName))
 				{
-					static MemoryBlockArena<wchar_t> directoryArena = { 16 * 1024 * 1024 };
-
-					const u32 nextSearchableDirectorySize = (u32)swprintf(nullptr, 0, L"%ls\\%ls", directory, foundFile.cFileName) + 1;
-					wchar_t* newDirectoryName = (wchar_t*)directoryArena.Allocate(nextSearchableDirectorySize * sizeof(wchar_t));
-
-					if (swprintf(newDirectoryName, nextSearchableDirectorySize, L"%ls\\%ls", directory, foundFile.cFileName))
-					{
-						DirectorySearch(newDirectoryName, foundFiles);
-					}
+					DirectorySearch(newDirectoryName, foundFiles, arena);
 				}
-				else if (foundFile.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
+			}
+			else if (foundFile.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
+			{
+				static MemoryBlockArena<wchar_t> fileArena = { 16 * 1024 * 1024 };
+
+				const u32 nextSearchableDirectorySize = (u32)swprintf(nullptr, 0, L"%ls\\%ls", directory, foundFile.cFileName) + 1;
+				wchar_t* newDirectoryName = (wchar_t*)fileArena.Allocate(nextSearchableDirectorySize * sizeof(wchar_t));
+
+				if (swprintf(newDirectoryName, nextSearchableDirectorySize, L"%ls\\%ls", directory, foundFile.cFileName))
 				{
-					static MemoryBlockArena<wchar_t> fileArena = { 16 * 1024 * 1024 };
-
-					const u32 nextSearchableDirectorySize = (u32)swprintf(nullptr, 0, L"%ls\\%ls", directory, foundFile.cFileName) + 1;
-					wchar_t* newDirectoryName = (wchar_t*)fileArena.Allocate(nextSearchableDirectorySize * sizeof(wchar_t));
-
-					if (swprintf(newDirectoryName, nextSearchableDirectorySize, L"%ls\\%ls", directory, foundFile.cFileName))
-					{
-						foundFiles.Add(newDirectoryName);
-					}
+					foundFiles.Add(newDirectoryName);
 				}
+			}
 
-			} while (FindNextFileW(fileHandle, &foundFile));
+		} while (FindNextFileW(fileHandle, &foundFile));
 
-			FindClose(fileHandle);
-		}
-
+		FindClose(fileHandle);
 	}
 
 	String GetLastErrorString()
 	{
+		wchar_t fixed[512] = {};
+	
+		const u32 returned = (u32)FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, ::GetLastError(), LANG_USER_DEFAULT, fixed, 511, nullptr);
+		if (returned > 0)
+		{
+			char fixedTwo[512] = {};
+			WideCharToMultiByte(CP_UTF8, 0, fixed, returned - 2, fixedTwo, returned - 2, nullptr, nullptr);
+			return "";
+		}
 
-		return String();
+		return "";
 	}
 }
 

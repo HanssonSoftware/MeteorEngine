@@ -3,9 +3,9 @@
 #pragma once
 #include <Types/Array.h>
 #include <Types/String.h>
+#include <Memory/MemoryBlockArena.h>
 
 #ifdef MR_PLATFORM_WINDOWS
-#include <errhandlingapi.h>
 
 LOG_ADDCATEGORY(HResultChecks);
 
@@ -26,10 +26,10 @@ namespace Commands
 	void Build_Cmd();
 
 #ifdef MR_PLATFORM_WINDOWS
-	void DirectorySearch(wchar_t* directory, Array<wchar_t*>& foundFiles);
+	void DirectorySearch(wchar_t* directory, Array<wchar_t*>& foundFiles, MemoryBlockArena<wchar_t>* arena);
 
 	String GetLastErrorString();
 #else
-	void DirectorySearch(char* directory, Array<char*>& foundFiles);
+	void DirectorySearch(char* directory, Array<char*>& foundFiles, MemoryBlockArena<char>* arena);
 #endif // MR_PLATFORM_WINDOWS
 }
