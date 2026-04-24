@@ -4,22 +4,18 @@
 #include <Types/Array.h>
 #include <Platform/DataTypes.h>
 
-static u64 Hash(const char* str)
+template<typename T>
+static u64 Hash(const T& str)
 {
-	static constexpr const u64 offset = 0xcbf29ce484222325;
-	static constexpr const u64 PRIME = 0x100000001b3;
-
-	const u32 length = (u32)strlen(str);
-
-	u64 value = offset;
-	const u8* bytes = reinterpret_cast<const u8*>(str);
-	for (u64 i = 0; i < length; ++i)
+	u64 final = 0xcbf29ce484222325;
+	
+	for (char val : str)
 	{
-		value ^= static_cast<u64>(bytes[i]);
-		value *= PRIME;
+		final *= 1099511628211;
+		final ^= static_cast<u64>(val);
 	}
 
-	return value;
+	return final;
 }
 
 static u64 operator ""_h(const char* str, u64 len)

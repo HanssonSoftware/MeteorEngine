@@ -24,8 +24,7 @@ namespace Commands
 	void DirectorySearch(char* directory, Array<char*>& foundFiles, MemoryBlockArena<char>* arena)
 #endif // MR_PLATFORM_WINDOWS
 	{ 
-		if (!directory)
-			return;
+		MR_ASSERT(directory != nullptr, "Directory cannot be invalid!");
 
 		if (PathIsRelativeW(directory))
 		{

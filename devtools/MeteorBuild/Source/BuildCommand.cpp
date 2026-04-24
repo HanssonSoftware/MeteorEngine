@@ -8,6 +8,7 @@
 #include "CommandRegistry.h"
 
 #include <Platform/Winapi.h>
+#include <Shlwapi.h>
 
 LOG_ADDCATEGORY(Commands);
 
@@ -44,6 +45,33 @@ namespace Commands
 
 			Array<wchar_t*> files;
 			DirectorySearch(sourceDirectoryW, files, &arena);
+
+			for (auto& file : files)
+			{
+				u64 h = ".cpp"_h;
+				u64 hs = ".h"_h;
+
+				wchar_t* end = PathFindExtensionW(file);
+				switch (Hash(reinterpret_cast<char*>(end)))
+				{
+				case 12638124528392833969: // .cpp
+				{
+
+					int J = 43;
+					break;
+				}
+				case 565857095260348859: // .h
+				{
+
+					int J = 43;
+					break;
+				}
+				default:
+					break;
+				}
+
+				int J = 43;
+			}
 		}
 
 		QueryPerformanceCounter(&endTime);
