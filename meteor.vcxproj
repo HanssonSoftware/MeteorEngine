@@ -151,6 +151,7 @@
     <ClInclude Include="engine\Core\Special\EngineConstants.h" />
     <ClInclude Include="engine\Core\Types\Array.h" />
     <ClInclude Include="engine\Core\Platform\DataTypes.h" />
+    <ClInclude Include="engine\Core\Types\Crypto.h" />
     <ClInclude Include="engine\Core\Types\Delegate.h" />
     <ClInclude Include="engine\Core\Types\Name.h" />
     <ClInclude Include="engine\Core\Types\String.h" />

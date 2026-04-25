@@ -56,10 +56,8 @@ namespace Commands
 
 			if (foundFile.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 			{
-				static MemoryBlockArena<wchar_t> directoryArena = { 16 * 1024 * 1024 };
-
 				const u32 nextSearchableDirectorySize = (u32)swprintf(nullptr, 0, L"%ls\\%ls", directory, foundFile.cFileName) + 1;
-				wchar_t* newDirectoryName = (wchar_t*)directoryArena.Allocate(nextSearchableDirectorySize * sizeof(wchar_t));
+				wchar_t* newDirectoryName = (wchar_t*)arena->Allocate(nextSearchableDirectorySize * sizeof(wchar_t));
 
 				if (swprintf(newDirectoryName, nextSearchableDirectorySize, L"%ls\\%ls", directory, foundFile.cFileName))
 				{
@@ -68,10 +66,8 @@ namespace Commands
 			}
 			else if (foundFile.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
 			{
-				static MemoryBlockArena<wchar_t> fileArena = { 16 * 1024 * 1024 };
-
 				const u32 nextSearchableDirectorySize = (u32)swprintf(nullptr, 0, L"%ls\\%ls", directory, foundFile.cFileName) + 1;
-				wchar_t* newDirectoryName = (wchar_t*)fileArena.Allocate(nextSearchableDirectorySize * sizeof(wchar_t));
+				wchar_t* newDirectoryName = (wchar_t*)arena->Allocate(nextSearchableDirectorySize * sizeof(wchar_t));
 
 				if (swprintf(newDirectoryName, nextSearchableDirectorySize, L"%ls\\%ls", directory, foundFile.cFileName))
 				{

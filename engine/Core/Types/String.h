@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-
+#include "Crypto.h"
 #include <string>
 #include <Platform/DataTypes.h>
 
@@ -115,6 +115,10 @@ public:
 
 	char* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
 
+
+	const char* begin() const { return Chr(); };
+	const char* end() const { return Chr() + Length(); };
+
 private:
 
 	void NullOut();
@@ -170,6 +174,11 @@ struct StringView
 	const char* ptr = nullptr;
 
 	const u32 size = 0;
+
+	const char* begin() const { return ptr; };
+	const char* end() const { return ptr + size; };
 };
 
 //String operator+(const String& OtherA, const String& OtherB);
+
+CREATE_HASH_FOR_TYPE(String, { return 0; });

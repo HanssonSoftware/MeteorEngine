@@ -21,6 +21,39 @@ LOG_ADDCATEGORY(HResultChecks);
 #define HRCHECK() // This macro does nothing, besides decoration.
 #endif // MR_PLATFORM_WINDOWS
 
+struct FoundUnit
+{
+#ifdef MR_PLATFORM_WINDOWS
+	const wchar_t* path;
+#else
+	const char* path;
+#endif // MR_PLATFORM_WINDOWS
+	enum Type
+	{
+		SOURCE,
+		HEADER,
+		NATVIS,
+		BUILD_SCRIPT
+	} type;
+
+#ifdef MR_PLATFORM_WINDOWS
+	FoundUnit(const wchar_t* path, Type type)
+		: path(path)
+		, type(type)
+	{
+
+	}
+#else
+	FoundUnit(const char* path, Type type)
+		: path(path)
+		, type(type)
+	{
+
+	}
+#endif // MR_PLATFORM_WINDOWS
+};
+
+
 namespace Commands
 {
 	void Build_Cmd();

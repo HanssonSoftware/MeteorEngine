@@ -29,9 +29,9 @@ namespace Commands
 		// Char: 32 MB
 
 #ifdef MR_PLATFORM_WINDOWS
-		static MemoryBlockArena<wchar_t> arena = { 32 * 1024 * 1024 };
+		static MemoryBlockArena<wchar_t> arena = { 64 * 1024 * 1024 };
 #else
-		static MemoryBlockArena<char> arena = { 32 * 1024 * 1024 };
+		static MemoryBlockArena<char> arena = { 64 * 1024 * 1024 };
 #endif // MR_PLATFORM_WINDOWS
 
 		if (sourceDirectory && intermediateDirectory)
@@ -44,33 +44,60 @@ namespace Commands
 			}
 
 			Array<wchar_t*> files;
+			Array<FoundUnit> processedFiles;
 			DirectorySearch(sourceDirectoryW, files, &arena);
+
+			if (files.GetSize() < 0)
+				return;
 
 			for (auto& file : files)
 			{
-				u64 h = ".cpp"_h;
-				u64 hs = ".h"_h;
+				wchar_t* extension = PathFindExtensionW(file);
+				if (*extension == L'\0')
+					continue;
 
-				wchar_t* end = PathFindExtensionW(file);
-				switch (Hash(reinterpret_cast<char*>(end)))
+				char extensionForHashing[16] = {};
+				if (WideCharToMultiByte(CP_UTF8, 0, extension, wcslen(extension), extensionForHashing, 15, nullptr, nullptr) > 0)
 				{
-				case 12638124528392833969: // .cpp
+					switch (Hash(extensionForHashing))
+					{
+					case 3091167709698109830: // .cpp
+					{
+						processedFiles.Add({file, FoundUnit::Type::SOURCE});
+						break;
+					}
+					case 9301237637030385942: // .natvis
+					{
+						processedFiles.Add({file, FoundUnit::Type::NATVIS});
+						break;
+					}
+					case 7699041615178930058: // .mrbuild
+					{
+						processedFiles.Add({file, FoundUnit::Type::BUILD_SCRIPT});
+						break;
+					}
+					default:
+						break;
+					}
+				}
+			}
+
+			for (auto& processedFile : processedFiles)
+			{
+				if (processedFile.type != FoundUnit::Type::BUILD_SCRIPT)
+					continue;
+
+				HANDLE script = CreateFileW(processedFile.path, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING, nullptr);
+				if (script != INVALID_HANDLE_VALUE)
 				{
-
-					int J = 43;
-					break;
+					int J = 5;
+					CloseHandle(script);
 				}
-				case 565857095260348859: // .h
+				else
 				{
-
-					int J = 43;
-					break;
+					MR_LOG(LogCommands, Error, "%s", *GetLastErrorString());
+					return;
 				}
-				default:
-					break;
-				}
-
-				int J = 43;
 			}
 		}
 

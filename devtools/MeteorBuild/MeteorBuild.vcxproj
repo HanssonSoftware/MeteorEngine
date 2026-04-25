@@ -182,6 +182,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Processing.cpp" />
     <ClCompile Include="Source\BuildCommand.cpp" />
     <ClCompile Include="Source\CentralCommands.cpp" />
     <ClCompile Include="Source\CommandRegistry.cpp" />
@@ -189,6 +190,7 @@
     <ClCompile Include="Source\Application.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Processing.h" />
     <ClInclude Include="Source\CommandRegistry.h" />
     <ClInclude Include="Source\BuildSystem.h" />
     <ClInclude Include="Source\Application.h" />

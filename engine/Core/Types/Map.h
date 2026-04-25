@@ -4,18 +4,19 @@
 #include <Types/Array.h>
 #include <Platform/DataTypes.h>
 
-template<typename T>
-static u64 Hash(const T& str)
+static constexpr u64 Hash(const char* key)
 {
-	u64 final = 0xcbf29ce484222325;
-	
-	for (char val : str)
+	u64 hash = 0xcbf29ce484222325;
+	constexpr u64 prime = 0x100000001b3;
+
+	while (*key && *key != '\0')
 	{
-		final *= 1099511628211;
-		final ^= static_cast<u64>(val);
+		hash = hash ^ *key;
+		hash *= prime;
+		key++;
 	}
 
-	return final;
+	return hash;
 }
 
 static u64 operator ""_h(const char* str, u64 len)
@@ -38,7 +39,7 @@ public:
 
 	Value& operator[](Key Input)
 	{
-		u64 id = Hash(Input);
+		u64 id = Hash(Input, strlen(Input));
 		for (auto& ctr : container)
 		{
 			if (id == ctr.hashKey)
@@ -51,7 +52,7 @@ public:
 
 	const Value& operator[](Key Input) const
 	{
-		u64 id = Hash(Input);
+		u64 id = Hash(Input, strlen(Input));
 		for (const auto& ctr : container)
 		{
 			if (id == ctr.hashKey)
