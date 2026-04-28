@@ -73,7 +73,9 @@ void* MemoryHandler::Allocate(const u64 byte)
 {
     MR_ASSERT(projectRegion, "Tried accessing to an invalid address, which has not been initialised yet!");
 
-    if (projectRegion->offset + byte > projectRegion->size)
+    const u64 rounded = RoundToMemoryAlignment(byte);
+
+    if (projectRegion->offset + rounded > projectRegion->size)
         return nullptr;
 
     void* allocated = projectRegion->ptr + projectRegion->offset;
@@ -82,7 +84,7 @@ void* MemoryHandler::Allocate(const u64 byte)
         return nullptr;
     }
 
-    projectRegion->offset += byte;
+    projectRegion->offset += rounded;
     return allocated;
 }
 

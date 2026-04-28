@@ -24,6 +24,24 @@ public:
 
 	virtual bool RequestNewRegion(const u64 newRegionSizeInBytes);
 	virtual bool RequestNewEngineRegion(const u64 newRegionSizeInBytes);
+
+	static inline constexpr u64 RoundToMemoryAlignment(u64 byte)
+	{
+		if (byte == 0)
+			return 1;
+
+		byte--;
+		byte |= byte >> 1;
+		byte |= byte >> 2;
+		byte |= byte >> 4;
+		byte |= byte >> 8;
+		byte |= byte >> 16;
+		byte |= byte >> 32;
+		byte++;
+
+		return byte;
+	}
+
 protected:
 	MemoryRegion* engineRegion = nullptr;
 	MemoryRegion* projectRegion = nullptr;

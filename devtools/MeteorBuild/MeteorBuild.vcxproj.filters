@@ -30,7 +30,7 @@
     <ClCompile Include="Source\CentralCommands.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Processing.cpp">
+    <ClCompile Include="Source\Module.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,7 +92,7 @@
     <ClInclude Include="Source\Commands.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Processing.h">
+    <ClInclude Include="Source\Module.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

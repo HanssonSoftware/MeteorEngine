@@ -4,6 +4,6 @@
 
 namespace Processing
 {
-
+	void ProcessEntireBuffer(char*& buffer);
 };
 
