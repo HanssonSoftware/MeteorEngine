@@ -8,6 +8,8 @@ template<typename T>
 class MemoryBlockArena
 {
 public:
+	MemoryBlockArena(const MemoryBlockArena&) = delete;
+
 	constexpr MemoryBlockArena() = default;
 	virtual ~MemoryBlockArena() noexcept
 	{
@@ -25,11 +27,13 @@ public:
 
 	virtual void* Allocate(const u64 bytes)
 	{
-		if (ptr && (u64)(ptr + offset + bytes) <= (u64)(ptr + size))
+		const u64 rounded = MemoryHandler::RoundToMemoryAlignment(bytes);
+
+		if (ptr && (u64)(ptr + offset + rounded) <= (u64)(ptr + size))
 		{
 			void* result = ptr + offset;
 
-			offset += bytes;
+			offset += rounded;
 			return result;
 		}
 

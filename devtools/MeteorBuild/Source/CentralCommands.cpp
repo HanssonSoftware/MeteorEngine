@@ -19,7 +19,7 @@ LOG_ADDCATEGORY(Commands);
 namespace Commands
 {
 #ifdef MR_PLATFORM_WINDOWS
-	void Commands::DirectorySearch(wchar_t* directory, Array<wchar_t*>& foundFiles, MemoryBlockArena<wchar_t>* arena)
+	void DirectorySearch(wchar_t* directory, Array<wchar_t*>& foundFiles, MemoryBlockArena<wchar_t>* arena)
 #else
 	void DirectorySearch(char* directory, Array<char*>& foundFiles, MemoryBlockArena<char>* arena)
 #endif // MR_PLATFORM_WINDOWS
