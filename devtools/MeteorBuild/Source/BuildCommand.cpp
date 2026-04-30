@@ -87,10 +87,24 @@ namespace Commands
 				if (processedFile.type != FoundUnit::Type::BUILD_SCRIPT)
 					continue;
 
-				HANDLE script = CreateFileW(processedFile.path, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING, nullptr);
+				HANDLE script = CreateFileW(processedFile.path, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
 				if (script != INVALID_HANDLE_VALUE)
 				{
-					int J = 5;
+					LARGE_INTEGER size;
+					GetFileSizeEx(script, &size);
+
+					char scriptBufferEach[2048] = {};
+
+					DWORD actualRead = 0;
+					if (ReadFile(script, scriptBufferEach, size.QuadPart, &actualRead, nullptr))
+					{
+
+					}
+					else
+					{
+						MR_LOG(LogCommands, Error, "%s (%d)", *GetLastErrorString(), ::GetLastError());
+					}
+
 					CloseHandle(script);
 				}
 				else

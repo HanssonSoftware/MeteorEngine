@@ -33,7 +33,7 @@ namespace Commands
 			wcscpy_s(exeLocation, MAX_PATH, Commandlet::Get().GetArgs()[0]);
 			PathRemoveFileSpecW(exeLocation);
 
-			const u32 combinedDirectorySize = wcslen(exeLocation) + wcslen(directory);
+			const u32 combinedDirectorySize = (u32)wcslen(exeLocation) + (u32)wcslen(directory);
 			wchar_t* newDirectory = (wchar_t*)arena->Allocate((combinedDirectorySize + 10) * sizeof(wchar_t));
 			
 			PathCchCombine(newDirectory, combinedDirectorySize, exeLocation, directory);
@@ -87,9 +87,16 @@ namespace Commands
 		const u32 returned = (u32)FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, ::GetLastError(), LANG_USER_DEFAULT, fixed, 511, nullptr);
 		if (returned > 0)
 		{
+			fixed[returned - 2] = L'\0';
+
 			char fixedTwo[512] = {};
-			WideCharToMultiByte(CP_UTF8, 0, fixed, returned - 2, fixedTwo, returned - 2, nullptr, nullptr);
-			return "";
+			if (!WideCharToMultiByte(CP_UTF8, 0, fixed, returned, fixedTwo, returned * sizeof(wchar_t), nullptr, nullptr))
+			{
+				MR_LOG(LogTemp, Error, "Conversion error! %d", ::GetLastError());
+				return "";
+			}
+
+			return fixedTwo;
 		}
 
 		return "";
