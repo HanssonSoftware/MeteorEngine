@@ -19,10 +19,6 @@ String::~String() noexcept
 		GetMemoryManager()->Deallocate(heapBuffer.ptr, heapBuffer.capacity);
 
 	NullOut();
-
-#ifdef MR_DEBUG
-	functionWhereWasInited = nullptr;
-#endif // MR_DEBUG
 }
 
 String::String(const char* Input)
@@ -36,41 +32,22 @@ String::String(const char* Input)
 	char* target = DetermineLocation(size);
 
 	strncpy(target, Input, size);
-
-#ifdef MR_DEBUG
-	bIsInited = true;
-	functionWhereWasInited = __FUNCSIG__;
-#endif // MR_DEBUG
 }
 
 String::String(int Input)
 {
 	//swprintf(stackBuffer.ptr, SSO_MAX_CHARS, L"%d", Input);
-
-#ifdef MR_DEBUG
-	bIsInited = true;
-	functionWhereWasInited = __FUNCSIG__;
-#endif // MR_DEBUG
 }
 
 String::String(u32 Input)
 {
 	//sprintf(stackBuffer.ptr, SSO_MAX_CHARS, L"%ud", Input);
 
-#ifdef MR_DEBUG
-	bIsInited = true;
-	functionWhereWasInited = __FUNCSIG__;
-#endif // MR_DEBUG
 }
 
 String::String(float Input)
 {
 	//sprintf(stackBuffer.ptr, SSO_MAX_CHARS, L"%f", Input);
-
-#ifdef MR_DEBUG
-	bIsInited = true;
-	functionWhereWasInited = __FUNCSIG__;
-#endif // MR_DEBUG
 }
 
 String::String(String&& other) noexcept
@@ -92,10 +69,6 @@ String::String(String&& other) noexcept
 	char* determined = DetermineLocation(Length());
 	memmove(determined, other.Data(), Length());
 
-#ifdef MR_DEBUG
-	bIsInited = true;
-	functionWhereWasInited = __FUNCSIG__;
-#endif // MR_DEBUG
 }
 
 String::String(const String& other)
@@ -119,11 +92,6 @@ String::String(const String& other)
 		memset(stackBuffer.ptr, 0, stackBuffer.length);
 		strncpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
 	}
-
-#ifdef MR_DEBUG
-	bIsInited = true;
-	functionWhereWasInited = __FUNCSIG__;
-#endif // MR_DEBUG
 }
 
 String::String(const char* Input, u32 length)
@@ -135,11 +103,6 @@ String::String(const char* Input, u32 length)
 
 	char* direct = DetermineLocation(length);
 	strncpy(direct, Input, length);
-
-#ifdef MR_DEBUG
-	bIsInited = true;
-	functionWhereWasInited = __FUNCSIG__;
-#endif // MR_DEBUG
 }
 
 String String::operator+(const String& Other)
@@ -209,10 +172,6 @@ void String::NullOut()
 
 	memset(stackBuffer.ptr, 0, SSO_MAX_CHARS + 1);
 	stackBuffer.length = 0;
-
-#ifdef MR_DEBUG
-	bIsInited = false;
-#endif // MR_DEBUG
 }
 
 char* String::DetermineLocation(u32 size)
@@ -253,11 +212,6 @@ String& String::operator=(const String& other)
 			memset(stackBuffer.ptr, 0, stackBuffer.length);
 			strncpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
 		}
-
-#ifdef MR_DEBUG
-		bIsInited = true;
-		functionWhereWasInited = __FUNCSIG__;
-#endif // MR_DEBUG
 	}
 
 	return *this;

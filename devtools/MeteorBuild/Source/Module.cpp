@@ -10,5 +10,14 @@ namespace Processing
 	}
 };
 
+Module Module::MakeModuleFromBuffer(const char* buffer)
+{
+	Module instance;
 
+	while (true)
+	{
 
+	}
+
+	return instance;
+}

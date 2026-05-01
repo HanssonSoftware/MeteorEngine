@@ -82,6 +82,7 @@ namespace Commands
 				}
 			}
 
+			MemoryBlockArena<char> currentReadFile = { 8 * 1024 * 1024 };
 			for (auto& processedFile : processedFiles)
 			{
 				if (processedFile.type != FoundUnit::Type::BUILD_SCRIPT)
@@ -93,10 +94,10 @@ namespace Commands
 					LARGE_INTEGER size;
 					GetFileSizeEx(script, &size);
 
-					char scriptBufferEach[2048] = {};
+					char* allocatedBufferForScript = (char*)currentReadFile.Allocate(size.QuadPart + 16);
 
 					DWORD actualRead = 0;
-					if (ReadFile(script, scriptBufferEach, size.QuadPart, &actualRead, nullptr))
+					if (ReadFile(script, allocatedBufferForScript, size.QuadPart, &actualRead, nullptr))
 					{
 
 					}
@@ -106,11 +107,11 @@ namespace Commands
 					}
 
 					CloseHandle(script);
+					currentReadFile.Reset();
 				}
 				else
 				{
 					MR_LOG(LogCommands, Error, "%s", *GetLastErrorString());
-					return;
 				}
 			}
 		}

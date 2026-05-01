@@ -18,10 +18,6 @@ public:
 	String() noexcept
 	{
 		NullOut();
-
-#ifdef MR_DEBUG
-		bIsInited = true;
-#endif // MR_DEBUG
 	}
 
 	~String() noexcept;
@@ -138,22 +134,16 @@ private:
 
 		struct
 		{
-			char ptr[sizeof(heapBuffer) - sizeof(u16)] = {'\0'};
+			char ptr[sizeof(heapBuffer) - sizeof(u8)] = {'\0'};
 
-			u16 length = 0;
+			u8 length = 0;
 
 		} stackBuffer;
 	};
 
-	static constexpr u32 SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(u16) - 1;
+	static constexpr u32 SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(u8) - 1;
 
 	bool bIsUsingHeap = false;
-
-#ifdef MR_DEBUG
-	bool bIsInited = false;
-
-	const char* functionWhereWasInited = nullptr;
-#endif // MR_DEBUG
 };
 
 
@@ -169,7 +159,7 @@ struct StringView
 
 	}
 
-	virtual ~StringView() noexcept = default;
+	~StringView() = default;
 
 	const char* ptr = nullptr;
 
@@ -180,5 +170,3 @@ struct StringView
 };
 
 //String operator+(const String& OtherA, const String& OtherB);
-
-CREATE_HASH_FOR_TYPE(String, { return 0; });
