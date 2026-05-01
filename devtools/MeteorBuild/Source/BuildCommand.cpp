@@ -6,6 +6,7 @@
 #include <Memory/MemoryBlockArena.h>
 
 #include "CommandRegistry.h"
+#include "Module.h"
 
 #include <Platform/Winapi.h>
 #include <Shlwapi.h>
@@ -94,12 +95,12 @@ namespace Commands
 					LARGE_INTEGER size;
 					GetFileSizeEx(script, &size);
 
-					char* allocatedBufferForScript = (char*)currentReadFile.Allocate(size.QuadPart + 16);
+					char* allocatedBufferForScript = (char*)currentReadFile.Allocate(size.QuadPart);
 
 					DWORD actualRead = 0;
 					if (ReadFile(script, allocatedBufferForScript, size.QuadPart, &actualRead, nullptr))
 					{
-
+						Module newModule = Module::MakeModuleFromBuffer(allocatedBufferForScript);
 					}
 					else
 					{

@@ -105,6 +105,17 @@ String::String(const char* Input, u32 length)
 	strncpy(direct, Input, length);
 }
 
+String::String(const StringView& str)
+{
+	NullOut();
+
+	if (!str.ptr || *str.ptr == '\0' || str.size <= 0)
+		return;
+
+	char* direct = DetermineLocation(str.size);
+	strncpy(direct, str.ptr, str.size);
+}
+
 String String::operator+(const String& Other)
 {
 	//const char* thisData = Data();

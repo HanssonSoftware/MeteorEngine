@@ -19,7 +19,7 @@ static constexpr u64 Hash(const char* key)
 	return hash;
 }
 
-static u64 operator ""_h(const char* str, u64 len)
+static constexpr u64 operator ""_h(const char* str, u64 len)
 {
 	return Hash(str);
 }

@@ -11,6 +11,27 @@
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
 
+struct CORE_API StringView
+{
+	StringView() = delete;
+
+	StringView(const char* data, u32 length)
+		: ptr(data)
+		, size(length)
+	{
+
+	}
+
+	~StringView() = default;
+
+	const char* ptr = nullptr;
+
+	const u32 size = 0;
+
+	const char* begin() const { return ptr; };
+	const char* end() const { return ptr + size; };
+};
+
 /** Human readable piece of text. */
 class CORE_API String
 {
@@ -33,6 +54,8 @@ public:
 	String(const String& other);
 
 	String(const char* string, u32 length);
+
+	String(const StringView& str);
 
 	String(String&& other) noexcept;
 
@@ -144,29 +167,6 @@ private:
 	static constexpr u32 SSO_MAX_CHARS = sizeof(heapBuffer) - sizeof(u8) - 1;
 
 	bool bIsUsingHeap = false;
-};
-
-
-
-struct StringView
-{
-	StringView() = delete;
-
-	StringView(const char* data, u32 length)
-		: ptr(data)
-		, size(length)
-	{
-
-	}
-
-	~StringView() = default;
-
-	const char* ptr = nullptr;
-
-	const u32 size = 0;
-
-	const char* begin() const { return ptr; };
-	const char* end() const { return ptr + size; };
 };
 
 //String operator+(const String& OtherA, const String& OtherB);

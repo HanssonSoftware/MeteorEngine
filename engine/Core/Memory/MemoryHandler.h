@@ -47,4 +47,19 @@ protected:
 	MemoryRegion* projectRegion = nullptr;
 };
 
+constexpr u64 operator""_kB(u64 val)
+{
+	return val * 1024;
+}
+
+constexpr u64 operator""_mB(u64 val)
+{
+	return val * 1024 * 1024;
+}
+
+constexpr u64 operator""_gB(u64 val)
+{
+	return val * 1024 * 1024 * 1024;
+}
+
 extern CORE_API MemoryHandler* GetMemoryManager();

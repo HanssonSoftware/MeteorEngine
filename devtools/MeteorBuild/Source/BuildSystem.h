@@ -8,5 +8,7 @@ public:
 	void CallRequiredMode();
 
 	void PrintHelp();
+
+	void InitKnownWords();
 };
 
