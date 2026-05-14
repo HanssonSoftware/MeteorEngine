@@ -228,6 +228,18 @@ String& String::operator=(const String& other)
 	return *this;
 }
 
+String& String::operator=(const StringView& other)
+{
+	if (strcmp(Chr(), other.ptr) == 0)
+		return *this;
+
+
+	char* target = DetermineLocation(other.size);
+	strncpy(target, other.ptr, other.size);
+
+	return *this;
+}
+
 String& String::operator+=(const String& other)
 {
 	if (other.IsEmpty())

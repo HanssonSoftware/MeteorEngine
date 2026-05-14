@@ -57,6 +57,9 @@
     <ClCompile Include="engine\Core\Logging\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\Core\Memory\MemoryPackage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Application\Application.h">
@@ -144,6 +147,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Types\Crypto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Memory\MemoryPackage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

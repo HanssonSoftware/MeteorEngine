@@ -55,13 +55,15 @@ public:
 
 	String(const char* string, u32 length);
 
-	String(const StringView& str);
+	explicit String(const StringView& str);
 
 	String(String&& other) noexcept;
 
 	String& operator=(const String& other);
 
 	String operator+(const String& Other);
+
+	String& operator=(const StringView& other);
 
 	bool operator==(const String& Other) const
 	{

@@ -2,8 +2,7 @@ Module "Vulkan" : "Meteor"
 {
 	Dependencies:
 	{
-		"Core",
-		"Renderer"
+		"Core"
 	}
 
 	IncludePaths:

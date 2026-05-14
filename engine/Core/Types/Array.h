@@ -25,14 +25,14 @@ public:
 	Array(u32 count)
 	{
 		Reserve(count);
-		for (uint32_t i = 0; i < count; ++i) container[i] = T{};
+		for (u32 i = 0; i < count; ++i) container[i] = T{};
 		size = count;
 	}
 
 	Array(const Array& other)
 	{
 		Reserve(other.size);
-		for (uint32_t i = 0; i < other.size; ++i) container[i] = other.container[i];
+		for (u32 i = 0; i < other.size; ++i) container[i] = other.container[i];
 		size = other.size;
 	}
 
@@ -70,11 +70,11 @@ public:
 	{
 		MR_ASSERT(at <= size, "Your index value is pointing out of the array!");
 		if (size >= capacity) Reserve(RecalculateCapacity(capacity));
-		for (uint32_t i = size; i > at; --i) container[i] = std::move(container[i - 1]);
+		for (u32 i = size; i > at; --i) container[i] = std::move(container[i - 1]);
 		container[at] = elem;
 	}
 
-	void Swap(uint32_t from, uint32_t to)
+	void Swap(u32 from, u32 to)
 	{
 		if (from < capacity || to < capacity)
 		{

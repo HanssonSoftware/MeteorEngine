@@ -12,7 +12,13 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned long long u64;
 
-static constexpr const bool bIsUsingWide = true;
+inline constexpr const u64 U64_MAX = (u64)-1;
+inline constexpr const u32 U32_MAX = (u32)-1;
+inline constexpr const u16 U16_MAX = (u16)-1;
+inline constexpr const u8 U8_MAX = (u8)-1;
+
+
+inline constexpr const bool bIsUsingWide = true;
 
 
 #elif MR_PLATFORM_LINUX
@@ -25,7 +31,7 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned long long u64;
 
-static constexpr const bool bIsUsingWide = false;
+inline constexpr const bool bIsUsingWide = false;
 
 #else
 #error No platform found! (DataTypes.h)

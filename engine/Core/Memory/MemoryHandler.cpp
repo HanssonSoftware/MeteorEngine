@@ -11,11 +11,11 @@
 
 LOG_ADDCATEGORY(Memory);
 
-static MemoryHandler* instance = new MemoryHandler();
+static MemoryHandler instance;
 
 MemoryHandler* GetMemoryManager()
 {
-    return instance;
+    return &instance;
 }
 
 MemoryHandler::~MemoryHandler() noexcept
@@ -38,14 +38,12 @@ MemoryHandler::~MemoryHandler() noexcept
         }
 #endif // MR_PLATFORM_WINDOWS
     }
-
-    delete instance;
 }
 
 bool MemoryHandler::Initialize()
 {
 #ifdef MR_PLATFORM_WINDOWS
-    constexpr const u64 fixed512MB = 512 * 1024 * 1024;
+    constexpr const u64 fixed512MB = 512_mB;
     constexpr const u64 regionHeaderSize = (2 * sizeof(MemoryRegion));
 
     void* startingAddress = VirtualAlloc(nullptr, fixed512MB + regionHeaderSize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
@@ -127,4 +125,22 @@ bool MemoryHandler::RequestNewEngineRegion(const u64 newRegionSizeInBytes)
     }
 
     return newRegion;
+}
+
+MemoryPackage MemoryHandler::AllocateTracked(u64 bytes)
+{
+    u32 lastIndex = 0xFFFFFFF;
+    for (u32 i = 0; i < MAX_HANDLES; i++)
+    {
+        MemoryTable& index = list[i];
+        if (!index.bUsed)
+        {
+            lastIndex = i;
+            break;
+        }
+    }
+
+
+
+    return;
 }

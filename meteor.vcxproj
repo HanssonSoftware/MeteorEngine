@@ -137,6 +137,7 @@
     <ClCompile Include="engine\Core\Memory\MemoryHandler.cpp" />
     <ClCompile Include="engine\Core\Memory\MemoryRegion.cpp" />
     <ClCompile Include="engine\Core\Memory\MemoryBlockArena.cpp" />
+    <ClCompile Include="engine\Core\Memory\MemoryPackage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Common\Configuration.h" />
@@ -167,6 +168,7 @@
     <ClInclude Include="engine\Core\Memory\MemoryHandler.h" />
     <ClInclude Include="engine\Core\Memory\MemoryRegion.h" />
     <ClInclude Include="engine\Core\Memory\MemoryBlockArena.h" />
+    <ClInclude Include="engine\Core\Memory\MemoryPackage.h" />
     <ClInclude Include="Resource\EngineResource.h" />
   </ItemGroup>
   <ItemGroup>

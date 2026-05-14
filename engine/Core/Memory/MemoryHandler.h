@@ -2,6 +2,7 @@
 
 #pragma once
 #include <Platform/DataTypes.h>
+#include "MemoryPackage.h"
 
 class MemoryRegion;
 
@@ -42,9 +43,35 @@ public:
 		return byte;
 	}
 
+	virtual MemoryPackage AllocateTracked(u64 bytes);
+
 protected:
 	MemoryRegion* engineRegion = nullptr;
 	MemoryRegion* projectRegion = nullptr;
+
+#ifdef MR_WITH_EDITOR
+	static constexpr const u32 MAX_HANDLES = 8192;
+#else
+	static constexpr const u32 MAX_HANDLES = 4096;
+#endif // MR_WITH_EDITOR
+
+	struct MemoryTable
+	{
+		void* address = nullptr;
+		u64 size = 0;
+		u16 version = 0;
+		i16 referenceCount = 0;
+		bool bUsed = false;
+
+		static constexpr MemoryTable Invalid() 
+		{
+			return { nullptr, U64_MAX, U16_MAX, -1, false };
+		}
+	};
+
+	MemoryTable list[MAX_HANDLES];
+
+	u32 availableIndex = 0;
 };
 
 constexpr u64 operator""_kB(u64 val)

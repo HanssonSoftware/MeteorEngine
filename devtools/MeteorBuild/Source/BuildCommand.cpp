@@ -84,6 +84,8 @@ namespace Commands
 			}
 
 			MemoryBlockArena<char> currentReadFile = { 8 * 1024 * 1024 };
+
+			Array<Module> modules;
 			for (auto& processedFile : processedFiles)
 			{
 				if (processedFile.type != FoundUnit::Type::BUILD_SCRIPT)
@@ -100,7 +102,7 @@ namespace Commands
 					DWORD actualRead = 0;
 					if (ReadFile(script, allocatedBufferForScript, size.QuadPart, &actualRead, nullptr))
 					{
-						Module newModule = Module::MakeModuleFromBuffer(allocatedBufferForScript);
+						modules.Add(Module::MakeModuleFromBuffer(allocatedBufferForScript));
 					}
 					else
 					{
@@ -114,6 +116,14 @@ namespace Commands
 				{
 					MR_LOG(LogCommands, Error, "%s", *GetLastErrorString());
 				}
+			}
+
+			u32 highestModule = 0;
+			for (Module& module : modules)
+			{
+				const u32 tempCount = module.commands["Dependencies"].GetSize();
+
+				highestModule = highestModule < tempCount ? tempCount : highestModule;
 			}
 		}
 

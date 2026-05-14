@@ -5,6 +5,8 @@
 #include <Types/Map.h>
 #include <Types/Array.h>
 
+struct Module;
+
 namespace Processing
 {
 	inline void SkipSpaces(const char*& buffer)
@@ -60,7 +62,26 @@ namespace Processing
 
 		return strncmp(in, &what, 1) == 0;
 	}
+
+	inline void SkipBlock(const char*& toSkip)
+	{
+		SkipSpaces(toSkip);
+
+		if (Processing::ExpectedCharacter(toSkip, ':'))
+			toSkip++;
+
+		if (Processing::ExpectedCharacter(toSkip, '{'))
+		{
+			toSkip++;
+
+			while (Processing::ExpectedCharacter(toSkip, '}'))
+				toSkip++;
+		}
+	}
+
+	void EnterBlock(const char*& input, const char* inCommandName, Module* inModule);
 };
+
 
 
 struct Module

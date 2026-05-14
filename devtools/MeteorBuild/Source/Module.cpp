@@ -6,6 +6,35 @@
 
 LOG_ADDCATEGORY(Processing);
 
+namespace Processing
+{
+	void EnterBlock(const char*& input, const char* inCommandName, Module* inModule)
+	{
+		if (Processing::ExpectedCharacter(input, ':'))
+			input++;
+
+		if (Processing::ExpectedCharacter(input, '{'))
+		{
+			input++; // {
+
+			while (!Processing::ExpectedCharacter(input, '}'))
+			{
+				const String value = String(Processing::GetQuotedWord(input));
+
+				inModule->commands[inCommandName].Add(value);
+
+				if (!Processing::ExpectedCharacter(input, ','))
+					break;
+
+				input++; // ,
+			}
+
+			input++; // }
+		}
+	}
+}
+
+
 Module Module::MakeModuleFromBuffer(const char* buffer)
 {
 	Module instance;
@@ -26,24 +55,26 @@ Module Module::MakeModuleFromBuffer(const char* buffer)
 			{
 				buffer++;
 
-				MemoryBlockArena<char> arrayOfParsedCommands = { 4_mB };
-
 				const char* last = buffer;
 				while (*buffer)
 				{
-					const String command = Processing::GetWord(buffer);
+					const String command = String(Processing::GetWord(buffer));
 					
-					constexpr u64 b = "IncludePath"_h;
+					//constexpr u64 b = "Dependencies"_h;
 
 					switch (Hash(command))
 					{
 					case 5786862590791793456:  // IncludePath
 					case 11138787046201537241: // IncludePaths
-						instance.commands[command] = 
-						
+						Processing::EnterBlock(buffer, command, &instance);
+						break;
+
+					case 14686587794296974560: // Dependencies
+						Processing::EnterBlock(buffer, command, &instance);
 						break;
 
 					default:
+						Processing::SkipBlock(buffer);
 						break;
 					}
 
@@ -61,7 +92,7 @@ Module Module::MakeModuleFromBuffer(const char* buffer)
 		}
 		else
 		{
-			MR_LOG(LogProcessing, Error, "Module has no parent! (%s)", *instance.moduleName);
+			MR_LOG(LogProcessing, Error, "Module has no parent! %s", *instance.moduleName);
 		}
 	}
 	else
@@ -71,3 +102,5 @@ Module Module::MakeModuleFromBuffer(const char* buffer)
 
 	return instance;
 }
+
+	
