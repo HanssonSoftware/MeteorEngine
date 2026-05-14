@@ -41,7 +41,7 @@ ModuleManager::~ModuleManager() noexcept
 #endif // MR_PLATFORM_WINDOWS
     }
 
-    modules.Reset();
+    //modules.Reset();
 }
 
 typedef EngineModule* (*fv)();
@@ -105,7 +105,7 @@ bool ModuleManager::UnloadModule(const String& moduleName)
             // FIXME: No non-windows implementation for module load!
 #endif // MR_PLATFORM_WINDOWS
 
-            modules.Pop(i);
+            //modules.Pop(i);
         }
 
         return true;

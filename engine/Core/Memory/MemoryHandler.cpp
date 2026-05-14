@@ -82,7 +82,9 @@ void* MemoryHandler::Allocate(const u64 byte)
         return nullptr;
     }
 
+    memset(allocated, 0, rounded);
     projectRegion->offset += rounded;
+
     return allocated;
 }
 
@@ -142,5 +144,5 @@ MemoryPackage MemoryHandler::AllocateTracked(u64 bytes)
 
 
 
-    return;
+    return MemoryPackage();
 }

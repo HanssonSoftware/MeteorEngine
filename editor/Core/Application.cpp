@@ -20,6 +20,15 @@ void EditorApplication::Init()
 {
 	Application::Init();
 
+	Array<String> val;
+	val.Add("gecifasz");
+	val.Add("lurko");
+	val.Add("furko");
+	val.Add("dakó");
+
+	Array<String> va = val;
+
+	int J = 3;
 }
 
 void EditorApplication::Run()
