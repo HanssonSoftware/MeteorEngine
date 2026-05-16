@@ -8,7 +8,6 @@
 #include <cstring>
 #include <Logging/Log.h>
 
-#include <vector>
 
 template <typename T>
 class Array final
@@ -34,14 +33,22 @@ public:
 	{
 		const u32 newPos = size + 1;
 
-		new (container[newPos]) T(elementToAdd);
+		container[size] = std::move(elementToAdd);
+		size++;
 	}
 
 	void Add(const T& elementToAdd)
 	{
 		const u32 newPos = size + 1;
 
-		new (container[newPos]) T(elementToAdd);
+		new (&container[newPos]) T(std::forward<T>(elementToAdd));
+	}
+
+	template<typename...Args>
+	T& Add(Args&&... args)
+	{
+		container[size++] = T(std::forward<T>(args...));
+		return container[size];
 	}
 
 	T* Data() noexcept { return container; }
@@ -81,5 +88,5 @@ private:
 
 	u32 size = 0;
 
-	u32 capacity = 2; // capacity = capacity + (capacity / 0.3)
+	u32 capacity = 2;
 }; 
