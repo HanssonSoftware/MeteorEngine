@@ -102,7 +102,9 @@ namespace Commands
 					DWORD actualRead = 0;
 					if (ReadFile(script, allocatedBufferForScript, size.QuadPart, &actualRead, nullptr))
 					{
-						modules.Add(Module::MakeModuleFromBuffer(allocatedBufferForScript));
+						Module module = Module::MakeModuleFromBuffer(allocatedBufferForScript);
+
+						modules.Add(module);
 					}
 					else
 					{

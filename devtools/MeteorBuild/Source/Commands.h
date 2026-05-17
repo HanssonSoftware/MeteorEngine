@@ -23,6 +23,9 @@ LOG_ADDCATEGORY(HResultChecks);
 
 struct FoundUnit
 {
+	FoundUnit() = default;
+	~FoundUnit() noexcept = default;
+
 #ifdef MR_PLATFORM_WINDOWS
 	const wchar_t* path;
 #else

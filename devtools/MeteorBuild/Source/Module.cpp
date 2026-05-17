@@ -19,9 +19,7 @@ namespace Processing
 
 			while (!Processing::ExpectedCharacter(input, '}'))
 			{
-				const String value = String(Processing::GetQuotedWord(input));
-
-				inModule->commands[inCommandName].Add(value);
+				inModule->commands[inCommandName].Add(String(Processing::GetQuotedWord(input)));
 
 				if (!Processing::ExpectedCharacter(input, ','))
 					break;
@@ -69,7 +67,7 @@ Module Module::MakeModuleFromBuffer(const char* buffer)
 						Processing::EnterBlock(buffer, command, &instance);
 						break;
 
-					case 14686587794296974560: // Dependencies
+					case 14686587794296974560: // Dependencies 
 						Processing::EnterBlock(buffer, command, &instance);
 						break;
 

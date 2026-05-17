@@ -4,20 +4,19 @@
 
 #include "Iterator.h"
 #include <Memory/MemoryHandler.h>
-
-#include <cstring>
 #include <Logging/Log.h>
 
-
 template <typename T>
-class Array final
+class Array
 {
 public:
 	Array()
 	{
+		Resize(2);
+
 		for (u32 i = 0; i < size; i++)
 		{
-			new(container[i]) T();
+			new(&container[i]) T();
 		}
 	};
 
@@ -27,28 +26,135 @@ public:
 		{
 			container[i].~T();
 		}
+
+		GetMemoryManager()->Deallocate(container, capacity * sizeof(T));
+
+		container = nullptr;
+		capacity = 0;
+		size = 0;
 	};
+
+	Array(const Array<T>& copy)
+	{		
+		capacity = copy.capacity;
+		size = copy.size;
+		if (capacity > 0) 
+		{
+			container = (T*)GetMemoryManager()->Allocate(capacity * sizeof(T));
+
+			for (u32 i = 0; i < size; i++) 
+			{
+				new (&container[i]) T(copy.container[i]);
+			}
+		}
+	}
+
+	Array(Array&& move) noexcept
+		: container(move.container)
+		, capacity(move.capacity)
+		, size(move.size)
+	{		
+		move.container = nullptr;
+		move.capacity = 0;
+		move.size = 0;
+	}
+
+	Array& operator=(const Array<T>& old)
+	{
+		if (*this != old)
+		{
+			Clear();
+
+			capacity = old.capacity;
+			size = old.size;
+			if (capacity > 0)
+			{
+				container = (T*)GetMemoryManager()->Allocate(capacity * sizeof(T));
+
+				for (u32 i = 0; i < size; i++)
+				{
+					new (&container[i]) T(old.container[i]);
+				}
+			}
+		}
+
+		return *this;
+	}
+
+	Array& operator=(Array<T>&& old)
+	{
+		if (*this != old)
+		{
+			Clear();
+
+			container = old.container;
+			capacity = old.capacity;
+			size = old.size;
+
+			old.container = nullptr;
+			old.capacity = 0;
+			old.size = 0;
+		}
+
+		return *this;
+	}
 
 	void Add(T&& elementToAdd)
 	{
-		const u32 newPos = size + 1;
+		if (size + 1 > capacity)
+			Resize(capacity + (size / 2));
 
-		container[size] = std::move(elementToAdd);
-		size++;
+		container[size++] = std::move(elementToAdd);
 	}
 
 	void Add(const T& elementToAdd)
 	{
-		const u32 newPos = size + 1;
+		if (size + 1 > capacity)
+			Resize(capacity + (size / 2));
 
-		new (&container[newPos]) T(std::forward<T>(elementToAdd));
+		new (&container[size++]) T(std::forward<T>(elementToAdd));
 	}
 
 	template<typename...Args>
 	T& Add(Args&&... args)
 	{
+		if (size + 1 > capacity)
+			Resize(capacity + (size / 2));
+
 		container[size++] = T(std::forward<T>(args...));
-		return container[size];
+		return container[size - 1];
+	}
+
+	void Resize(u32 newCount)
+	{
+		MR_ASSERT(capacity < newCount, "Old array cap is higher than new!");
+
+		T* newBlock = (T*)GetMemoryManager()->Allocate(newCount * sizeof(T));
+		for (u32 i = 0; i < size; i++)
+			newBlock[i] = container[i];
+
+		GetMemoryManager()->Deallocate(container, capacity * sizeof(T));
+
+		container = newBlock;
+		capacity = newCount;
+	}
+
+	/** Empties your array, after this you should not use it anymore. */
+	void Clear()
+	{
+		if (container)
+		{
+			for (u32 i = 0; i < size; i++)
+			{
+				container[i].~T();
+			}
+
+			GetMemoryManager()->Deallocate(container, capacity * sizeof(T));
+			container = nullptr;
+		}
+
+		size = 0;
+		capacity = 0;
 	}
 
 	T* Data() noexcept { return container; }
@@ -59,21 +165,26 @@ public:
 
 	explicit operator bool() const { return size > 0; }
 
+	bool operator!=(const Array<T>& other)
+	{
+		return container != other.container ? true : false;
+	}
+
 	T& operator[](u32 index)
 	{
-		MR_ASSERT(index < capacity, "Index out of range! Your pointed: %u  Border: %u", index, capacity);
+		MR_ASSERT(index < size, "Index out of range! Your pointed: %u  Border: %u", index, capacity);
 		return container[index];
 	}
 
 	const T& operator[](u32 index) const
 	{
-		MR_ASSERT(index < capacity, "Index out of range! Your pointed: %u  Border: %u", index, capacity);
+		MR_ASSERT(index < size, "Index out of range! Your pointed: %u  Border: %u", index, capacity);
 		return container[index];
 	}
 
 	T* operator&(u32 index)
 	{
-		MR_ASSERT(index < capacity, "");
+		MR_ASSERT(index < size, "");
 		return &container[index];
 	}
 
@@ -88,5 +199,5 @@ private:
 
 	u32 size = 0;
 
-	u32 capacity = 2;
+	u32 capacity = 0;
 }; 

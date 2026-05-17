@@ -86,6 +86,41 @@ namespace Processing
 
 struct Module
 {
+	Module() = default;
+	~Module() noexcept = default;
+	Module(const Module& old)
+		: moduleName(old.moduleName)
+		, parent(old.parent)
+		, commands(old.commands)
+	{
+
+	}
+	Module(Module&& old) noexcept
+	{
+		moduleName = std::move(old.moduleName);
+		parent = std::move(old.parent);
+		commands = std::move(old.commands);
+	}
+
+	Module& operator=(const Module& old) noexcept
+	{
+		moduleName = old.moduleName;
+		parent = old.parent;
+		commands = old.commands;
+		return *this;
+	};
+
+	Module& operator=(Module&& old) noexcept
+	{
+		moduleName = old.moduleName;
+		parent = old.parent;
+		commands = old.commands;
+
+		old.moduleName = "";
+		old.parent = "";
+		return *this;
+	}
+
 	String moduleName;
 
 	String parent;

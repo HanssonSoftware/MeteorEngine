@@ -1,6 +1,7 @@
 /* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "CommandRegistry.h"
+#include <cstring>
 
 LOG_ADDCATEGORY(CommandRegistry);
 

@@ -25,7 +25,7 @@ static constexpr u64 operator ""_h(const char* str, u64 len)
 }
 
 template <typename Key, typename Value>
-class Map final
+class Map
 {
 	struct InternalContainerForMap
 	{
@@ -35,7 +35,11 @@ class Map final
 
 public:
 	Map() = default;
-	~Map() noexcept = default;
+	~Map() = default;
+	Map(const Map&) = default;
+	Map(Map&&) = default;
+	Map& operator=(const Map&) = default;
+	Map& operator=(Map&&) = default;
 
 	Value& operator[](Key Input)
 	{
