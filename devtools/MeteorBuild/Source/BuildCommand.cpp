@@ -20,6 +20,27 @@ namespace Commands
 {
 	ADD_NEW_BUILD_COMMAND("-build", "Builds your project", Build_Cmd);
 	
+	inline constexpr const u32 GetDebugLevel(const char* configuration)
+	{
+		switch (Hash(configuration))
+		{
+		case 3837802033854913258: // Development
+			return 1;
+		case 2626979548338364165: // Test
+			return 2;
+		case 16287715700692604995: // Shipping
+			return 3;
+
+		default:
+			return 0;
+		};
+	};
+
+	void MakeModuleToForwardableCommand(Module* module, Array<wchar_t*>& commands)
+	{
+
+	}
+
 	void Build_Cmd()
 	{
 #ifdef MR_PLATFORM_WINDOWS
@@ -42,6 +63,8 @@ namespace Commands
 
 		const String sourceDirectory = Commandlet::Get().Parse("-s");
 		const String intermediateDirectory = Commandlet::Get().Parse("-i");
+		const String configuration = Commandlet::Get().Parse("-c");
+		const String productDirectory = Commandlet::Get().Parse("-p");
 
 		// Arena allocates bytes, so equal size will be allocated!
 		// WChar: 32 MB (Char / 2)
@@ -126,34 +149,48 @@ namespace Commands
 					ranking[a] += 1;
 			}
 
-			// Get cpp files to compile for module
-
-
-
 			// Get thread count and start compiling
+
+			bool bIsMultiThreadEnabled = Commandlet::Get().Check("-mt");
 
 #ifdef MR_PLATFORM_WINDOWS
 			SYSTEM_INFO syi = {};
 			GetSystemInfo(&syi);
 
-			PROCESS_INFORMATION pi2 = {};
-			STARTUPINFOW si2 = { sizeof(STARTUPINFOW) };
+			Array<wchar_t*> forwardingCommandsToCompiler;
 
-			wchar_t clangCall[4096] = L"clang++";
-			if (!CreateProcessW(nullptr, clangCall, nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT, nullptr, nullptr, &si2, &pi2))
+			if (bIsMultiThreadEnabled)
 			{
-				MR_LOG(LogValidator, Fatal, "Error occoured while compiling source: %s", "VARIABLE NAME");
-				return;
+
+			}
+			else
+			{
+				PROCESS_INFORMATION pi2 = {};
+				STARTUPINFOW si2 = { sizeof(STARTUPINFOW) };
+				
+
+
+				swprintf(clangCall, L"clang++ -O%d -o %s -D%s -shared", GetDebugLevel(configuration), L"d.obj", L"exports");
+
+				wchar_t clangCall[4096] = {};
+				if (!CreateProcessW(nullptr, clangCall, nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT, nullptr, nullptr, &si2, &pi2))
+				{
+					MR_LOG(LogValidator, Fatal, "Error occoured while compiling source: %s", "VARIABLE NAME");
+					return;
+				}
+
+				WaitForSingleObject(pi2.hProcess, INFINITE);
+
+				CloseHandle(pi2.hProcess);
+				CloseHandle(pi2.hThread);
 			}
 
-			CloseHandle(pi2.hProcess);
-			CloseHandle(pi2.hThread);
 #endif // MR_PLATFORM_WINDOWS
 		}
 
 		QueryPerformanceCounter(&endTime);
 		QueryPerformanceFrequency(&frequency);
 
-		MR_LOG(LogCommands, Log, "Build command ran in %.2f seconds!", (endTime.QuadPart - startTime.QuadPart) / (frequency.QuadPart / 100.0));
+		MR_LOG(LogCommands, Log, "Build command ran in %.4f seconds!", (endTime.QuadPart - startTime.QuadPart) / frequency.QuadPart);
 	}
 }

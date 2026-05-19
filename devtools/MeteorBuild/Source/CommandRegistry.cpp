@@ -10,7 +10,7 @@ void CommandRegistry::RegisterCommand(const char* name, const char* descriptive,
 	if (count > MAX_COMMANDS)
 		return;
 
-	commands[count > 0 ? (count - 1) : 0] = { name, descriptive, func };
+	commands[count > 0 ? count : 0] = { name, descriptive, func };
 	count++;
 }
 

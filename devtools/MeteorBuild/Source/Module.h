@@ -92,6 +92,7 @@ struct Module
 		: moduleName(old.moduleName)
 		, parent(old.parent)
 		, commands(old.commands)
+		, files(old.files)
 	{
 
 	}
@@ -100,6 +101,7 @@ struct Module
 		moduleName = std::move(old.moduleName);
 		parent = std::move(old.parent);
 		commands = std::move(old.commands);
+		files = std::move(old.files);
 	}
 
 	Module& operator=(const Module& old) noexcept
@@ -107,6 +109,7 @@ struct Module
 		moduleName = old.moduleName;
 		parent = old.parent;
 		commands = old.commands;
+		files = old.files;
 		return *this;
 	};
 
@@ -115,6 +118,7 @@ struct Module
 		moduleName = old.moduleName;
 		parent = old.parent;
 		commands = old.commands;
+		files = old.files;
 
 		old.moduleName = "";
 		old.parent = "";
@@ -126,6 +130,8 @@ struct Module
 	String parent;
 
 	String path;
+
+	String guid;
 #ifdef MR_PLATFORM_WINDOWS
 	Array<wchar_t*> files;
 #else

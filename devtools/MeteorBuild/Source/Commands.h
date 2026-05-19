@@ -54,14 +54,14 @@ struct FoundUnit
 
 	}
 #endif // MR_PLATFORM_WINDOWS
-
-	u64 hashGroup = 0;
 };
 
 
 namespace Commands
 {
 	void Build_Cmd();
+
+	void Generate_Cmd();
 
 #ifdef MR_PLATFORM_WINDOWS
 	void DirectorySearch(wchar_t* directory, Array<wchar_t*>& foundFiles, MemoryBlockArena<wchar_t>* arena);
