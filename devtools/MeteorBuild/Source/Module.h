@@ -131,7 +131,7 @@ struct Module
 
 	String path;
 
-	String guid;
+	char guid[48];
 #ifdef MR_PLATFORM_WINDOWS
 	Array<wchar_t*> files;
 #else
