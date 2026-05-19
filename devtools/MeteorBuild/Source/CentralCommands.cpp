@@ -40,6 +40,9 @@ namespace Commands
 			directory = newDirectory;
 		}
 
+		if (*PathFindExtensionW(directory))
+			PathCchRemoveFileSpec(directory, wcslen(directory));
+
 		HRCHECK(PathCchCombine(directory, wcslen(directory) + 5, directory, L"*"));
 
 		WIN32_FIND_DATAW foundFile = {};

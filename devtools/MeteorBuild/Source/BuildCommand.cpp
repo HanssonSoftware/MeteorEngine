@@ -10,8 +10,11 @@
 
 #include <Platform/Winapi.h>
 #include <Shlwapi.h>
+#include <PathCch.h>
 
 LOG_ADDCATEGORY(Commands);
+LOG_ADDCATEGORY(Build);
+LOG_ADDCATEGORY(Validator);
 
 namespace Commands
 {
@@ -19,6 +22,21 @@ namespace Commands
 	
 	void Build_Cmd()
 	{
+#ifdef MR_PLATFORM_WINDOWS
+		PROCESS_INFORMATION pi = {};
+		STARTUPINFOW si = { sizeof(STARTUPINFOW) };
+
+		wchar_t clangCall[] = L"clang++";
+		if (!CreateProcessW(nullptr, clangCall, nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT, nullptr, nullptr, &si, &pi))
+		{
+			MR_LOG(LogValidator, Fatal, "Check clang++ is installed, or added as environment variable!");
+			return;
+		}
+
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+#endif // MR_PLATFORM_WINDOWS
+
 		LARGE_INTEGER startTime, endTime, frequency;
 		QueryPerformanceCounter(&startTime);
 
@@ -44,54 +62,25 @@ namespace Commands
 				return;
 			}
 
+			// Collect files in folder
+
 			Array<wchar_t*> files;
-			Array<FoundUnit> processedFiles;
 			DirectorySearch(sourceDirectoryW, files, &arena);
 
 			if (files.GetSize() < 0)
 				return;
 
-			for (auto& file : files)
-			{
-				wchar_t* extension = PathFindExtensionW(file);
-				if (*extension == L'\0')
-					continue;
-
-				char extensionForHashing[16] = {};
-				if (WideCharToMultiByte(CP_UTF8, 0, extension, wcslen(extension), extensionForHashing, 15, nullptr, nullptr) > 0)
-				{
-					switch (Hash(extensionForHashing))
-					{
-					case 3091167709698109830: // .cpp
-					{
-						processedFiles.Add({file, FoundUnit::Type::SOURCE});
-						break;
-					}
-					case 9301237637030385942: // .natvis
-					{
-						processedFiles.Add({file, FoundUnit::Type::NATVIS});
-						break;
-					}
-					case 7699041615178930058: // .mrbuild
-					{
-						processedFiles.Add({file, FoundUnit::Type::BUILD_SCRIPT});
-						break;
-					}
-					default:
-						break;
-					}
-				}
-			}
-
+			// Read scripts
 			MemoryBlockArena<char> currentReadFile = { 8 * 1024 * 1024 };
 
 			Array<Module> modules;
-			for (auto& processedFile : processedFiles)
+			for (auto& file : files)
 			{
-				if (processedFile.type != FoundUnit::Type::BUILD_SCRIPT)
+				wchar_t* extension = PathFindExtensionW(file);
+				if (*extension && wcscmp(extension, L".mrbuild") != 0)
 					continue;
 
-				HANDLE script = CreateFileW(processedFile.path, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
+				HANDLE script = CreateFileW(file, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
 				if (script != INVALID_HANDLE_VALUE)
 				{
 					LARGE_INTEGER size;
@@ -103,6 +92,14 @@ namespace Commands
 					if (ReadFile(script, allocatedBufferForScript, size.QuadPart, &actualRead, nullptr))
 					{
 						Module module = Module::MakeModuleFromBuffer(allocatedBufferForScript);
+
+						u32 wideNameSize = wcslen(file);
+						char* narrowName = (char*)arena.Allocate(wideNameSize + 1);
+
+						WideCharToMultiByte(CP_UTF8, 0, file, wideNameSize, narrowName, wideNameSize, nullptr, 0);
+						module.path = narrowName;
+						
+						DirectorySearch(file, module.files, &arena);	
 
 						modules.Add(module);
 					}
@@ -120,13 +117,38 @@ namespace Commands
 				}
 			}
 
-			u32 highestModule = 0;
+			// Rank each module by significance
+
+			Map<const char*, u32> ranking;
 			for (Module& module : modules)
 			{
-				const u32 tempCount = module.commands["Dependencies"].GetSize();
-
-				highestModule = highestModule < tempCount ? tempCount : highestModule;
+				for (auto& a : module.commands["Dependencies"])
+					ranking[a] += 1;
 			}
+
+			// Get cpp files to compile for module
+
+
+
+			// Get thread count and start compiling
+
+#ifdef MR_PLATFORM_WINDOWS
+			SYSTEM_INFO syi = {};
+			GetSystemInfo(&syi);
+
+			PROCESS_INFORMATION pi2 = {};
+			STARTUPINFOW si2 = { sizeof(STARTUPINFOW) };
+
+			wchar_t clangCall[4096] = L"clang++";
+			if (!CreateProcessW(nullptr, clangCall, nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT, nullptr, nullptr, &si2, &pi2))
+			{
+				MR_LOG(LogValidator, Fatal, "Error occoured while compiling source: %s", "VARIABLE NAME");
+				return;
+			}
+
+			CloseHandle(pi2.hProcess);
+			CloseHandle(pi2.hThread);
+#endif // MR_PLATFORM_WINDOWS
 		}
 
 		QueryPerformanceCounter(&endTime);

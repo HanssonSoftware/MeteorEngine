@@ -54,6 +54,8 @@ struct FoundUnit
 
 	}
 #endif // MR_PLATFORM_WINDOWS
+
+	u64 hashGroup = 0;
 };
 
 

@@ -125,6 +125,12 @@ struct Module
 
 	String parent;
 
+	String path;
+#ifdef MR_PLATFORM_WINDOWS
+	Array<wchar_t*> files;
+#else
+	Array<char*> fileHashes;
+#endif // MR_PLATFORM_WINDOWS
 	Map<const char*, Array<String>> commands;
 
 	static Module MakeModuleFromBuffer(const char* buffer);
