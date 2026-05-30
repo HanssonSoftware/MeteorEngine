@@ -51,7 +51,7 @@ int wmain(int argc, wchar_t argv[])
 	}
 
 	AddDllDirectory(path);                                                                                                           
-	HMODULE entryPoint = LoadLibraryExW(L"MeteorEngine-Core.dll", nullptr, LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_USER_DIRS);
+	HMODULE entryPoint = LoadLibraryExW(L"core.dll", nullptr, LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_USER_DIRS);
 	if (entryPoint != INVALID_HANDLE_VALUE)                                                                                          
 	{                                                                                                                                
 		typedef int (*ProxyFunction)(Application*, int, wchar_t*);                                                                                  

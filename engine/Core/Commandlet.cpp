@@ -72,7 +72,10 @@ bool Commandlet::Check(const String& inParam)
 	wchar_t fixBufferForParameter[128] = { L'\0' };
 	Platform::ConvertToWide(fixBufferForParameter, 128, inParam);
 
-	wchar_t* found = wcsstr(*argumentList, fixBufferForParameter);
+	if (!argumentList) 
+		return false;
+
+	wchar_t* found = wcsstr(*this->argumentList, fixBufferForParameter);
 	if (found)
 	{
 		wchar_t* end = found;

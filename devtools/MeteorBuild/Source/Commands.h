@@ -3,6 +3,7 @@
 #pragma once
 #include <Types/Array.h>
 #include <Types/String.h>
+#include "Module.h"
 #include <Memory/MemoryBlockArena.h>
 
 #ifdef MR_PLATFORM_WINDOWS
@@ -62,6 +63,8 @@ namespace Commands
 	void Build_Cmd();
 
 	void Generate_Cmd();
+
+	void AddSolution(const Array<Module>* modules);
 
 #ifdef MR_PLATFORM_WINDOWS
 	void DirectorySearch(wchar_t* directory, Array<wchar_t*>& foundFiles, MemoryBlockArena<wchar_t>* arena);

@@ -18,7 +18,7 @@ FOR /R %~dp0..\engine\Core %%G IN (*.cpp) DO (
 
 SET includes=-I%~dp0..\engine\Core
 SET compiler=-g -Wvarargs
-SET linker=-L%~dp0..\%packagingDirectory% -lMeteorEngine-Core.lib
+SET linker=-L%~dp0..\%packagingDirectory% -lcore.lib
 SET defines=-DMR_DEBUG -DMR_PLATFORM_WINDOWS -D_CRT_SECURE_NO_WARNINGS 
 
 REM echo %sources%
@@ -29,7 +29,7 @@ FOR /R %~dp0..\devtools\MeteorBuild %%G IN (*.cpp) DO (
 )
 
 echo Building Core...
-clang++ %sourcesFromCore% -std=c++17 -o %~dp0..\%packagingDirectory%\MeteorEngine-Core.dll %defines% -DMR_CORE_EXPORTS %includes% %compiler% -shared
+clang++ %sourcesFromCore% -std=c++17 -o %~dp0..\%packagingDirectory%\core.dll %defines% -DMR_CORE_EXPORTS %includes% %compiler% -shared
 IF %errorlevel% == 0 (
     echo 
 	echo Compiling done!

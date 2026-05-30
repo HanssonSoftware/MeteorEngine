@@ -165,15 +165,19 @@ namespace Commands
 			}
 			else
 			{
-				PROCESS_INFORMATION pi2 = {};
-				STARTUPINFOW si2 = { sizeof(STARTUPINFOW) };
 				
 
 
-				swprintf(clangCall, L"clang++ -O%d -o %s -D%s -shared", GetDebugLevel(configuration), L"d.obj", L"exports");
+				PROCESS_INFORMATION pi2 = {};
+				STARTUPINFOW si2 = { sizeof(STARTUPINFOW) };
+				si2.wShowWindow = SW_HIDE;
+
+				wchar_t* sources;
 
 				wchar_t clangCall[4096] = {};
-				if (!CreateProcessW(nullptr, clangCall, nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT, nullptr, nullptr, &si2, &pi2))
+				//swprintf(clangCall, L"clang++ %s -O%d -o %s -D%s -shared", ,GetDebugLevel(configuration), L"d.obj", L"exports");
+
+				if (!CreateProcessW(nullptr, clangCall, nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS, nullptr, nullptr, &si2, &pi2))
 				{
 					MR_LOG(LogValidator, Fatal, "Error occoured while compiling source: %s", "VARIABLE NAME");
 					return;

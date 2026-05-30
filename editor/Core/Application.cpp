@@ -44,4 +44,4 @@ void EditorApplication::Shutdown()
 
 #include <Special/LaunchMeteorSuite.h>
 
-IMPLEMENT_WINDOWS_STARTUP("MeteorEngine-Core", EditorApplication);
+IMPLEMENT_WINDOWS_STARTUP("core", EditorApplication);
