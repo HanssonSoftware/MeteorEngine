@@ -88,42 +88,11 @@ struct Module
 {
 	Module() = default;
 	~Module() noexcept = default;
-	Module(const Module& old)
-		: moduleName(old.moduleName)
-		, parent(old.parent)
-		, commands(old.commands)
-		, files(old.files)
-	{
+	Module(const Module& old);
+	Module(Module&& old) noexcept;
 
-	}
-	Module(Module&& old) noexcept
-	{
-		moduleName = std::move(old.moduleName);
-		parent = std::move(old.parent);
-		commands = std::move(old.commands);
-		files = std::move(old.files);
-	}
-
-	Module& operator=(const Module& old) noexcept
-	{
-		moduleName = old.moduleName;
-		parent = old.parent;
-		commands = old.commands;
-		files = old.files;
-		return *this;
-	};
-
-	Module& operator=(Module&& old) noexcept
-	{
-		moduleName = old.moduleName;
-		parent = old.parent;
-		commands = old.commands;
-		files = old.files;
-
-		old.moduleName = "";
-		old.parent = "";
-		return *this;
-	}
+	Module& operator=(const Module& old) noexcept;
+	Module& operator=(Module&& old) noexcept;
 
 	String moduleName;
 
@@ -131,13 +100,16 @@ struct Module
 
 	String path;
 
-	char guid[48];
+	char guid[48] = {};
 #ifdef MR_PLATFORM_WINDOWS
 	Array<wchar_t*> files;
 #else
-	Array<char*> fileHashes;
+	Array<char*> files;
 #endif // MR_PLATFORM_WINDOWS
 	Map<const char*, Array<String>> commands;
 
 	static Module MakeModuleFromBuffer(const char* buffer);
+
+protected:
+	MemoryBlockArena<u8> underlyingData = { 1_kB };
 };

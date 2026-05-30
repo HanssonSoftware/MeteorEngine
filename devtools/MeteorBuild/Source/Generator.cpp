@@ -133,13 +133,6 @@ namespace Commands
 		return slnxTemplate;
 	}
 
-	inline constexpr const char* InsertSlnxFooterSpecifier()
-	{
-		constexpr const char* slnxTemplate =
-			"\n</Solution>";
-		return slnxTemplate;
-	}
-
 	void Generate_Cmd()
 	{
 		LARGE_INTEGER startTime, endTime, frequency;
@@ -153,9 +146,9 @@ namespace Commands
 		// Char: 32 MB
 
 #ifdef MR_PLATFORM_WINDOWS
-		static MemoryBlockArena<wchar_t> arena = { 16 * 1024 * 1024 };
+		static MemoryBlockArena<wchar_t> arena = { 32_mB };
 #else
-		static MemoryBlockArena<char> arena = { 16 * 1024 * 1024 };
+		static MemoryBlockArena<char> arena = { 16_mB };
 #endif // MR_PLATFORM_WINDOWS
 
 		if (sourceDirectory && intermediateDirectory)
@@ -176,7 +169,7 @@ namespace Commands
 				return;
 
 			// Read scripts
-			MemoryBlockArena<char> currentReadFile = { 8 * 1024 * 1024 };
+			MemoryBlockArena<char> currentReadFile = { 4_mB };
 
 			Array<Module> modules;
 			for (auto& file : files)

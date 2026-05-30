@@ -33,6 +33,44 @@ namespace Processing
 }
 
 
+Module::Module(const Module& old)
+	: moduleName(old.moduleName)
+	, parent(old.parent)
+	, commands(old.commands)
+	, files(old.files)
+{
+
+}
+
+Module::Module(Module&& old) noexcept
+{
+	moduleName = std::move(old.moduleName);
+	parent = std::move(old.parent);
+	commands = std::move(old.commands);
+	files = std::move(old.files);
+}
+
+Module& Module::operator=(const Module& old) noexcept
+{
+	moduleName = old.moduleName;
+	parent = old.parent;
+	commands = old.commands;
+	files = old.files;
+	return *this;
+}
+
+Module& Module::operator=(Module&& old) noexcept
+{
+	moduleName = old.moduleName;
+	parent = old.parent;
+	commands = old.commands;
+	files = old.files;
+
+	old.moduleName = "";
+	old.parent = "";
+	return *this;
+}
+
 Module Module::MakeModuleFromBuffer(const char* buffer)
 {
 	Module instance;

@@ -8,7 +8,12 @@ template<typename T>
 class MemoryBlockArena
 {
 public:
+	MemoryBlockArena() = delete;
 	MemoryBlockArena(const MemoryBlockArena&) = delete;
+	MemoryBlockArena(MemoryBlockArena&&) = delete;
+
+	MemoryBlockArena& operator=(const MemoryBlockArena&) = delete;
+	MemoryBlockArena& operator=(MemoryBlockArena&&) = delete;
 
 	constexpr MemoryBlockArena() = default;
 	virtual ~MemoryBlockArena() noexcept
