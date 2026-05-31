@@ -185,6 +185,11 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resource\DefaultEngineIcon.ico" />
+  </ItemGroup>  
+  <ItemGroup>
+    <BuildMacro Include="ProductDir">
+      <Value>$(ProductDir)</Value>
+    </BuildMacro>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

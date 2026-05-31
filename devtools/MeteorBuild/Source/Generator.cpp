@@ -85,7 +85,10 @@ namespace Commands
 			"  <Import Project=\"$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\" />\n"
 			" </ImportGroup>\n"
 
-			" <PropertyGroup Label=\"UserMacros\" />\n"
+			" <PropertyGroup Label=\"UserMacros\">\n"
+			"  <ProductDir>$(SolutionDir)product\\</ProductDir>\n"
+			"  <ModuleDir>$(SolutionDir)engine\\%s\\</ModuleDir>\n"
+			" </PropertyGroup>\n"
 			" <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">\n"
 			"  <NMakeBuildCommandLine>$(ProductDir)MeteorBuild.exe -build -c $(Configuration)</NMakeBuildCommandLine>\n"
 			"  <NMakeReBuildCommandLine>$(ProductDir)MeteorBuild.exe -rebuild -c $(Configuration)</NMakeReBuildCommandLine>\n"
@@ -114,9 +117,16 @@ namespace Commands
 			"  <ExecutablePath>$(ProductDir)$(ExecutablePath)</ExecutablePath>\n"
 			" </PropertyGroup>\n"
 
-			" <ItemGroup>\n"
-			" </ItemGroup>\n"
+			"%s"
 
+			" <ItemGroup>\n"
+			"  <BuildMacro Include=\"ProductDir\">\n"
+			"   <Value>$(ProductDir)</Value>\n"
+			"  </BuildMacro>\n"
+			"  <BuildMacro Include=\"ModuleDir\">\n"
+			"   <Value>$(ModuleDir)</Value>\n"
+			"  </BuildMacro>\n"
+			" </ItemGroup>\n"
 			" <Import Project=\"$(VCTargetsPath)\\Microsoft.Cpp.targets\" />\n"
 			" <ImportGroup Label=\"ExtensionTargets\">\n"
 			" </ImportGroup>\n"
@@ -274,10 +284,22 @@ namespace Commands
 				HANDLE proj = CreateFileW(fullPathToIntermediate, GENERIC_READ | GENERIC_WRITE, bIsRunningDebugMode ? FILE_SHARE_READ : 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 				if (proj != INVALID_HANDLE_VALUE)
 				{
-					const u32 required = (u32)snprintf(nullptr, 0, InsertVcxprojFormatSpecifier(), mdl.guid, mdl.moduleName.Chr(), mdl.moduleName.Chr(), mdl.moduleName.Chr());
+					Map<const char*, const wchar_t*> extensionTypes;
+
+					for (const wchar_t* file : mdl.files)
+					{
+						if (!*PathFindExtensionW(file))
+							continue;
+
+						extensionTypes[file] = file;
+					}
+
+					FlushFileBuffers(proj);
+
+					const u32 required = (u32)snprintf(nullptr, 0, InsertVcxprojFormatSpecifier(), mdl.guid, mdl.moduleName.Chr(), mdl.moduleName.Chr(), mdl.moduleName.Chr(), mdl.moduleName.Chr(), mdl.moduleName.Chr());
 					char* writeOut = (char*)moduleBuffer.Allocate(required + 1);
 
-					snprintf(writeOut, required + 1, InsertVcxprojFormatSpecifier(), mdl.guid, mdl.moduleName.Chr(), mdl.moduleName.Chr(), mdl.moduleName.Chr());
+					snprintf(writeOut, required + 1, InsertVcxprojFormatSpecifier(), mdl.guid, mdl.moduleName.Chr(), mdl.moduleName.Chr(), mdl.moduleName.Chr(), mdl.moduleName.Chr(), mdl.moduleName.Chr());
 					
 					DWORD written = 0;
 					WriteFile(proj, writeOut, required, &written, nullptr);
@@ -389,10 +411,10 @@ namespace Commands
 				"	EndGlobalSection\n";
 
 
-			WriteFile(slnx, preSolutions, sizeof(preSolutions) / sizeof(preSolutions[0]), &written, nullptr);
+			WriteFile(slnx, preSolutions, (sizeof(preSolutions) / sizeof(preSolutions[0])) - 1, &written, nullptr);
 
 			constexpr const char openProjectConfigurationPlatforms[] = "	GlobalSection(ProjectConfigurationPlatforms) = postSolution";
-			WriteFile(slnx, openProjectConfigurationPlatforms, sizeof(openProjectConfigurationPlatforms) / sizeof(openProjectConfigurationPlatforms[0]), &written, nullptr);
+			WriteFile(slnx, openProjectConfigurationPlatforms, (sizeof(openProjectConfigurationPlatforms) / sizeof(openProjectConfigurationPlatforms[0])) - 1, &written, nullptr);
 
 			for (auto& mdl : *modules)
 			{
@@ -409,7 +431,7 @@ namespace Commands
 
 				snprintf(lineBuffer, requiredAmountToFormat, activeCfgTemplate, mdl.guid, mdl.guid, mdl.guid, mdl.guid, mdl.guid, mdl.guid);
 
-				WriteFile(slnx, lineBuffer, requiredAmountToFormat, &written, nullptr);
+				WriteFile(slnx, lineBuffer, requiredAmountToFormat - 1, &written, nullptr);
 
 #ifdef MR_DEBUG
 				FlushFileBuffers(slnx);
@@ -417,7 +439,7 @@ namespace Commands
 			}
 
 			constexpr const char closeProjectConfigurationPlatforms[] = "\n\tEndGlobalSection\n";
-			WriteFile(slnx, closeProjectConfigurationPlatforms, sizeof(closeProjectConfigurationPlatforms) / sizeof(closeProjectConfigurationPlatforms[0]), &written, nullptr);
+			WriteFile(slnx, closeProjectConfigurationPlatforms, (sizeof(closeProjectConfigurationPlatforms) / sizeof(closeProjectConfigurationPlatforms[0])) - 1, &written, nullptr);
 
 			GUID id = {};
 			CoCreateGuid(&id);

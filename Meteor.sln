@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.6.11822.322 stable
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "intermediate\Apollo\Core\Core.vcxproj", "{68C75081-86A7-4C7D-BC68-DAECE4249C24}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "intermediate\Apollo\Core\Core.vcxproj", "{EF25D6E4-EC43-480F-8E70-EE8B86364CE1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Vulkan", "intermediate\Apollo\Vulkan\Vulkan.vcxproj", "{781FA63D-AFD0-420E-A9D6-1D1C7D4BD545}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Vulkan", "intermediate\Apollo\Vulkan\Vulkan.vcxproj", "{E27744D6-54ED-4853-AE67-00F1322AA7FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,23 +14,23 @@ Global
 		Shipping|x64 = Shipping|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{68C75081-86A7-4C7D-BC68-DAECE4249C24}.Debug|x64.ActiveCfg = Debug|x64
-		{68C75081-86A7-4C7D-BC68-DAECE4249C24}.Debug|x64.Build.0 = Debug|x64
-		{68C75081-86A7-4C7D-BC68-DAECE4249C24}.Development|x64.ActiveCfg = Development|x64
-		{68C75081-86A7-4C7D-BC68-DAECE4249C24}.Development|x64.Build.0 = Development|x64
-		{68C75081-86A7-4C7D-BC68-DAECE4249C24}.Shipping|x64.ActiveCfg = Shipping|x64
-		{68C75081-86A7-4C7D-BC68-DAECE4249C24}.Shipping|x64.Build.0 = Shipping|x64
-		{781FA63D-AFD0-420E-A9D6-1D1C7D4BD545}.Debug|x64.ActiveCfg = Debug|x64
-		{781FA63D-AFD0-420E-A9D6-1D1C7D4BD545}.Debug|x64.Build.0 = Debug|x64
-		{781FA63D-AFD0-420E-A9D6-1D1C7D4BD545}.Development|x64.ActiveCfg = Development|x64
-		{781FA63D-AFD0-420E-A9D6-1D1C7D4BD545}.Development|x64.Build.0 = Development|x64
-		{781FA63D-AFD0-420E-A9D6-1D1C7D4BD545}.Shipping|x64.ActiveCfg = Shipping|x64
-		{781FA63D-AFD0-420E-A9D6-1D1C7D4BD545}.Shipping|x64.Build.0 = Shipping|x64
+		{EF25D6E4-EC43-480F-8E70-EE8B86364CE1}.Debug|x64.ActiveCfg = Debug|x64
+		{EF25D6E4-EC43-480F-8E70-EE8B86364CE1}.Debug|x64.Build.0 = Debug|x64
+		{EF25D6E4-EC43-480F-8E70-EE8B86364CE1}.Development|x64.ActiveCfg = Development|x64
+		{EF25D6E4-EC43-480F-8E70-EE8B86364CE1}.Development|x64.Build.0 = Development|x64
+		{EF25D6E4-EC43-480F-8E70-EE8B86364CE1}.Shipping|x64.ActiveCfg = Shipping|x64
+		{EF25D6E4-EC43-480F-8E70-EE8B86364CE1}.Shipping|x64.Build.0 = Shipping|x64
+		{E27744D6-54ED-4853-AE67-00F1322AA7FF}.Debug|x64.ActiveCfg = Debug|x64
+		{E27744D6-54ED-4853-AE67-00F1322AA7FF}.Debug|x64.Build.0 = Debug|x64
+		{E27744D6-54ED-4853-AE67-00F1322AA7FF}.Development|x64.ActiveCfg = Development|x64
+		{E27744D6-54ED-4853-AE67-00F1322AA7FF}.Development|x64.Build.0 = Development|x64
+		{E27744D6-54ED-4853-AE67-00F1322AA7FF}.Shipping|x64.ActiveCfg = Shipping|x64
+		{E27744D6-54ED-4853-AE67-00F1322AA7FF}.Shipping|x64.Build.0 = Shipping|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {49592E8D-DBBA-41F3-A840-20FEFB5464BF}
+		SolutionGuid = {CC86E03D-D992-4A2E-99C0-BFFCDB7F06C3}
 	EndGlobalSection
 EndProject
