@@ -15,7 +15,6 @@ public:
 	MemoryBlockArena& operator=(const MemoryBlockArena&) = delete;
 	MemoryBlockArena& operator=(MemoryBlockArena&&) = delete;
 
-	constexpr MemoryBlockArena() = default;
 	virtual ~MemoryBlockArena() noexcept
 	{
 		if (ptr)

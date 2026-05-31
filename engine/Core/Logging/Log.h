@@ -42,6 +42,7 @@ public:
 	virtual void SendToOutputBuffer(char* buffer, const u32 count);
 	virtual void HandleFatal(LogDescriptor* Descriptor);
 
+
 protected:
 	bool bIsInitialized = false;
 

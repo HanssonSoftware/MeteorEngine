@@ -8,6 +8,7 @@
 
 #include <Platform/Winapi.h>
 #include <Shlwapi.h>
+#include <Shlobj.h>
 #include <PathCch.h>
 #include <Application/Application.h>
 
@@ -17,6 +18,7 @@
 LOG_ADDCATEGORY(Commands);
 LOG_ADDCATEGORY(Build);
 LOG_ADDCATEGORY(Validator);
+LOG_ADDCATEGORY(Persistent);
 
 namespace Commands
 {
@@ -236,6 +238,8 @@ namespace Commands
 				intermediateDirectoryW = newDirectory;
 			}
 			
+			SHCreateDirectory(nullptr, intermediateDirectoryW);
+
 			static MemoryBlockArena<char> moduleBuffer = { 1_mB };
 			for (Module& mdl : modules)
 			{
@@ -260,6 +264,10 @@ namespace Commands
 					DWORD written = 0;
 					WriteFile(proj, writeOut, required, &written, nullptr);
 					CloseHandle(proj);
+				}
+				else
+				{
+					MR_LOG(LogPersistent, Error, "CreateFileW failed with: %s", GetLastErrorString().Chr());
 				}
 
 				moduleBuffer.Reset();
@@ -340,7 +348,6 @@ namespace Commands
 			DWORD written = 0;
 			WriteFile(slnx, InsertSlnxHeaderFormatSpecifier(), strlen(InsertSlnxHeaderFormatSpecifier()), &written, nullptr);
 
- 			char* appendedProjects = nullptr;
 			for (auto& mdl : *modules)
 			{
 				const u32 requiredAmountToFormat = snprintf(nullptr, 0, "\nProject(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"%s\", \"%ls\\%s\\%s.vcxproj\", \"%s\"\nEndProject", mdl.moduleName.Chr(), pathToProductName, mdl.moduleName.Chr(), mdl.moduleName.Chr(), mdl.guid) + 1;
@@ -348,10 +355,10 @@ namespace Commands
 
 				snprintf(lineBuffer, requiredAmountToFormat, "\nProject(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"%s\", \"%ls\\%s\\%s.vcxproj\", \"%s\"\nEndProject", mdl.moduleName.Chr(), pathToProductName, mdl.moduleName.Chr(), mdl.moduleName.Chr(), mdl.guid);
 
-				WriteFile(slnx, lineBuffer, requiredAmountToFormat, &written, nullptr);
+				WriteFile(slnx, lineBuffer, requiredAmountToFormat - 1, &written, nullptr);
 
 #ifdef MR_DEBUG
-				FlushFileBuffers(slnx);
+				if (written > 256) FlushFileBuffers(slnx);
 #endif // MR_DEBUG
 			}
 

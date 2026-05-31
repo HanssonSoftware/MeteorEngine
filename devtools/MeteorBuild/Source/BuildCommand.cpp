@@ -112,7 +112,7 @@ namespace Commands
 					char* allocatedBufferForScript = (char*)currentReadFile.Allocate(size.QuadPart);
 
 					DWORD actualRead = 0;
-					if (ReadFile(script, allocatedBufferForScript, size.QuadPart, &actualRead, nullptr))
+					if (ReadFile(script, allocatedBufferForScript, (u32)size.QuadPart, &actualRead, nullptr))
 					{
 						Module module = Module::MakeModuleFromBuffer(allocatedBufferForScript);
 

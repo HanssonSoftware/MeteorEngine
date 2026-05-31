@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.6.11819.183 stable
+VisualStudioVersion = 18.6.11819.183
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Meteor", "meteor.vcxproj", "{709B7964-F338-40B8-B8E2-A2898B438A1C}"
 EndProject
@@ -13,8 +13,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeteorBuild", "devtools\MeteorBuild\MeteorBuild.vcxproj", "{E75C5354-0747-4518-9E9B-B4FDFF214314}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "renderer", "intermediate\Apollo\Vulkan\renderer.vcxproj", "{95D8E080-D55E-40C7-B72C-8EE7BBF949D2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,16 +32,9 @@ Global
 		{E75C5354-0747-4518-9E9B-B4FDFF214314}.Debug|x64.Build.0 = Debug|x64
 		{E75C5354-0747-4518-9E9B-B4FDFF214314}.Shipping|x64.ActiveCfg = Debug|x64
 		{E75C5354-0747-4518-9E9B-B4FDFF214314}.Shipping|x64.Build.0 = Debug|x64
-		{95D8E080-D55E-40C7-B72C-8EE7BBF949D2}.Debug|x64.ActiveCfg = Debug|x64
-		{95D8E080-D55E-40C7-B72C-8EE7BBF949D2}.Debug|x64.Build.0 = Debug|x64
-		{95D8E080-D55E-40C7-B72C-8EE7BBF949D2}.Shipping|x64.ActiveCfg = Release|x64
-		{95D8E080-D55E-40C7-B72C-8EE7BBF949D2}.Shipping|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{95D8E080-D55E-40C7-B72C-8EE7BBF949D2} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7442A397-EEB5-400C-B726-B1A2CAA77F66}

@@ -5,6 +5,8 @@
 #include <Types/Map.h>
 #include <Types/Array.h>
 
+#include <Memory/MemoryBlockArena.h>
+
 struct Module;
 
 namespace Processing
