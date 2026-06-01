@@ -284,14 +284,59 @@ namespace Commands
 				HANDLE proj = CreateFileW(fullPathToIntermediate, GENERIC_READ | GENERIC_WRITE, bIsRunningDebugMode ? FILE_SHARE_READ : 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 				if (proj != INVALID_HANDLE_VALUE)
 				{
-					Map<const char*, const wchar_t*> extensionTypes;
-
+					MemoryBlockArena<char> xmlIncludeEntryassembly = { 8_kB };
 					for (const wchar_t* file : mdl.files)
 					{
-						if (!*PathFindExtensionW(file))
-							continue;
+						char extension[16] = {};
+						wchar_t* extensionType = PathFindExtensionW(file);
 
-						extensionTypes[file] = file;
+						if (!WideCharToMultiByte(CP_UTF8, 0, extensionType, wcslen(extensionType), extension, 16, nullptr, nullptr))
+						{
+							MR_LOG(LogBuild, Error, "WideCharToMultiByte returned: %s", GetLastErrorString().Chr());
+							
+							xmlIncludeEntryassembly.Reset();
+							continue;
+						}
+
+						//constexpr auto a = Hash(".natvis");
+
+						const char* selectedFormat = nullptr;
+						switch (Hash(extension))
+						{
+							case 3091167709698109830: // .cpp
+							{
+								constexpr const char* cppFormat = "<ClCompile Include=\"%ls\" />\n";
+								selectedFormat = cppFormat;
+								break;
+							}
+							case 565857095260348859: // .h
+							{
+								constexpr const char* hFormat = "<ClInclude Include=\"%ls\" />\n";
+								selectedFormat = hFormat;
+								break;
+							}
+							case 9301237637030385942: // .natvis
+							{
+								constexpr const char* natvisFormat = "<Natvis Include=\"%ls\" />\n";
+								selectedFormat = natvisFormat;
+								break;
+							}
+
+							default:
+							{
+								constexpr const char* noneFormat = "<None Include=\"%ls\" />\n";
+								selectedFormat = noneFormat;
+								break;
+							}
+						}
+
+						MR_ASSERT(selectedFormat, "Check formatting selection at xml generator!");
+
+						char* xmlEntry = (char*)xmlIncludeEntryassembly.Allocate(strlen(selectedFormat) + wcslen(file) + 1);
+						snprintf(xmlEntry, strlen(selectedFormat) + wcslen(file), selectedFormat, file);
+
+						DWORD written = 0;
+						WriteFile(proj, xmlEntry, strlen(selectedFormat) + wcslen(file), &written, nullptr);
 					}
 
 					FlushFileBuffers(proj);
