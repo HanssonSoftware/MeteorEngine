@@ -44,6 +44,11 @@ public:
 		return nullptr;
 	}
 	
+	virtual void* Exhaust()
+	{
+		return Allocate(size - offset);
+	}
+
 	void Reset()
 	{
 		offset = 0;

@@ -66,7 +66,7 @@ String Commandlet::Parse(const char* inParam)
 	return "";
 }
 
-bool Commandlet::Check(const String& inParam)
+bool Commandlet::Check(const char* inParam)
 {
 #ifdef MR_PLATFORM_WINDOWS
 	wchar_t fixBufferForParameter[128] = { L'\0' };
@@ -75,16 +75,15 @@ bool Commandlet::Check(const String& inParam)
 	if (!argumentList) 
 		return false;
 
-	wchar_t* found = wcsstr(*this->argumentList, fixBufferForParameter);
-	if (found)
+	for (wchar_t** i = argumentList; *i; i++)
 	{
-		wchar_t* end = found;
+		char fixBufferForOutputParameter[128] = {};
+		Platform::ConvertToNarrow(fixBufferForOutputParameter, wcslen(*i), *i);
 
-		// to first space
-		while (*end && !isspace(*end))
-			end++;
-
-		return wcsncmp(found, fixBufferForParameter, end - found) == 0;
+		if (strcmp(fixBufferForOutputParameter, inParam) != 0)
+			continue;
+		
+		return fixBufferForOutputParameter;
 	}
 #endif // MR_PLATFORM_WINDOWS
 

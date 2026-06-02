@@ -31,7 +31,7 @@ struct CORE_API Commandlet
 
 	String Parse(const char* inParam);
 
-	bool Check(const String& inParam);
+	bool Check(const char* inParam);
 
 	u32 GetCount() const { return count; };
 
