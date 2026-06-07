@@ -32,6 +32,10 @@ public:
 
 	Logger() = default;
 	Logger(Logger* newInstance);
+	Logger(Logger&&) = delete;
+	Logger& operator=(const Logger&) = delete;
+	Logger& operator=(Logger&&) = delete;
+
 	virtual ~Logger() noexcept;
 
 	virtual void Initialize();

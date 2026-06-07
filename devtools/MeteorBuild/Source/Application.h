@@ -8,7 +8,9 @@
 
 LOG_ADDCATEGORY(BuildSystemApplication);
 
-struct BuildSystemApplication : public Application 
+#define BUILDSYSTEM_API __declspec(dllexport)
+
+struct BUILDSYSTEM_API BuildSystemApplication : public Application
 {
 public:
 	BuildSystemApplication();

@@ -218,6 +218,7 @@
     <ClInclude Include="Source\Project\ConfigurationToolkit.h" />
     <ClInclude Include="Source\Project\IDEConfig.h" />
     <ClInclude Include="Source\VisualStudioBoilerplates.h" />
+    <ClInclude Include="Source\VisualStudio\Boilerplates.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MeteorBuild.aps" />

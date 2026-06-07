@@ -1,6 +1,8 @@
 /* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
+#include <DataTypes.h>
+#include <Logging/Log.h>
 
 namespace Project
 {
@@ -95,29 +97,29 @@ namespace Project
 
 	inline constexpr const char ConfigurationDependentSettings[] =
 		" <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">\n"
-		"  <NMakeBuildCommandLine>$(ProductDir)MeteorBuild.exe -build -c $(Configuration)</NMakeBuildCommandLine>\n"
-		"  <NMakeReBuildCommandLine>$(ProductDir)MeteorBuild.exe -rebuild -c $(Configuration)</NMakeReBuildCommandLine>\n"
-		"  <NMakeCleanCommandLine>$(ProductDir)MeteorBuild.exe -clean -c $(Configuration)</NMakeCleanCommandLine>\n"
+		"  <NMakeBuildCommandLine>$(ProductDir)MeteorBuild.exe -build -c $(Configuration) -m $(ProjectName)</NMakeBuildCommandLine>\n"
+		"  <NMakeReBuildCommandLine>$(ProductDir)MeteorBuild.exe -rebuild -c $(Configuration) -m $(ProjectName)</NMakeReBuildCommandLine>\n"
+		"  <NMakeCleanCommandLine>$(ProductDir)MeteorBuild.exe -clean -c $(Configuration) -m $(ProjectName)</NMakeCleanCommandLine>\n"
 		"  <NMakeOutput>%s.dll</NMakeOutput>\n"
-		"  <NMakePreprocessorDefinitions>MR_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>\n"
+		"  <NMakePreprocessorDefinitions>MR_DEBUG;MR_%s_EXPORT;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>\n"
 		"  <NMakeIncludeSearchPath>%s</NMakeIncludeSearchPath>\n"
 		"  <ExecutablePath>$(ProductDir);$(ExecutablePath)</ExecutablePath>\n"
 		" </PropertyGroup>\n"
 		" <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Development|x64'\">\n"
-		"  <NMakeBuildCommandLine>$(ProductDir)MeteorBuild.exe -build -c $(Configuration)</NMakeBuildCommandLine>\n"
-		"  <NMakeReBuildCommandLine>$(ProductDir)MeteorBuild.exe -rebuild -c $(Configuration)</NMakeReBuildCommandLine>\n"
-		"  <NMakeCleanCommandLine>$(ProductDir)MeteorBuild.exe -clean -c $(Configuration)</NMakeCleanCommandLine>\n"
+		"  <NMakeBuildCommandLine>$(ProductDir)MeteorBuild.exe -build -c $(Configuration) -m $(ProjectName)</NMakeBuildCommandLine>\n"
+		"  <NMakeReBuildCommandLine>$(ProductDir)MeteorBuild.exe -rebuild -c $(Configuration) -m $(ProjectName)</NMakeReBuildCommandLine>\n"
+		"  <NMakeCleanCommandLine>$(ProductDir)MeteorBuild.exe -clean -c $(Configuration) -m $(ProjectName)</NMakeCleanCommandLine>\n"
 		"  <NMakeOutput>%s.dll</NMakeOutput>\n"
-		"  <NMakePreprocessorDefinitions>MR_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>\n"
+		"  <NMakePreprocessorDefinitions>MR_DEBUG;MR_%s_EXPORT;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>\n"
 		"  <NMakeIncludeSearchPath>%s</NMakeIncludeSearchPath>\n"
 		"  <ExecutablePath>$(ProductDir);$(ExecutablePath)</ExecutablePath>\n"
 		" </PropertyGroup>\n"
 		" <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Shipping|x64'\">\n"
-		"  <NMakeBuildCommandLine>$(ProductDir)MeteorBuild.exe -build -c $(Configuration)</NMakeBuildCommandLine>\n"
-		"  <NMakeReBuildCommandLine>$(ProductDir)MeteorBuild.exe -rebuild -c $(Configuration)</NMakeReBuildCommandLine>\n"
-		"  <NMakeCleanCommandLine>$(ProductDir)MeteorBuild.exe -clean -c $(Configuration)</NMakeCleanCommandLine>\n"
+		"  <NMakeBuildCommandLine>$(ProductDir)MeteorBuild.exe -build -c $(Configuration) -m $(ProjectName)</NMakeBuildCommandLine>\n"
+		"  <NMakeReBuildCommandLine>$(ProductDir)MeteorBuild.exe -rebuild -c $(Configuration) -m $(ProjectName)</NMakeReBuildCommandLine>\n"
+		"  <NMakeCleanCommandLine>$(ProductDir)MeteorBuild.exe -clean -c $(Configuration) -m $(ProjectName)</NMakeCleanCommandLine>\n"
 		"  <NMakeOutput>%s.dll</NMakeOutput>\n"
-		"  <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>\n"
+		"  <NMakePreprocessorDefinitions>MR_%s_EXPORT;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>\n"
 		"  <NMakeIncludeSearchPath>%s</NMakeIncludeSearchPath>\n"
 		"  <ExecutablePath>$(ProductDir);$(ExecutablePath)</ExecutablePath>\n"
 		" </PropertyGroup>\n"

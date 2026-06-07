@@ -7,7 +7,7 @@
 #include <cstdint>
 // #include <CoreProxy.h>
 
-#ifdef MR_CORE_EXPORTS
+#ifdef MR_CORE_EXPORT
 #define CORE_API __declspec(dllexport)
 #else
 #define CORE_API __declspec(dllimport)

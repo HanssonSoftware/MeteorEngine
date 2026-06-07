@@ -23,6 +23,7 @@ static HANDLE fileHandle;
 #endif // MR_PLATFORM_WINDOWS
 
 LOG_ADDCATEGORY(Logging);
+LOG_ADDCATEGORY(LoggingIO);
 
 static Logger* instance = nullptr;
 
@@ -114,7 +115,7 @@ void Logger::Initialize()
                 MR_LOG(LogTemp, Error, "%ls", chars);
             }
 
-            static constexpr const char fileBeginFormatting[] = "Logging started at: %02d/%02d/%02d %02d:%02d:%02d\n";
+            constexpr const char fileBeginFormatting[] = "Logging started at: %02d/%02d/%02d %02d:%02d:%02d\n";
             char fileBeginFormatted[64] = "\0";
 
             const u32 count = snprintf(fileBeginFormatted, 64, fileBeginFormatting, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
@@ -173,12 +174,11 @@ void Logger::Initialize()
         swprintf(title, 127, L"%hs developer console (output only!)", GetApplication()->GetApplicationName());
         SetConsoleTitleW(title);
     }
-        //}
 
 #endif // MR_DEBUG
 
     QueryPerformanceCounter(&end);
-    MR_LOG(LogLogging, Info, "Logger system is instantiated in %.2f seconds!", (end.QuadPart - begin.QuadPart) / (freq.QuadPart / 100.0));
+    MR_LOG(LogLogging, Info, "Logger system is instantiated in %.3f seconds!", ((double)end.QuadPart - (double)begin.QuadPart) / (double)freq.QuadPart);
 #endif // MR_PLATFORM_WINDOWS
 
 }
@@ -279,13 +279,19 @@ void Logger::SendToOutputBuffer(char* buffer, const u32 count)
         WriteConsoleW(consoleHandle, (wchar_t*)fixBuffer, (DWORD)count, &written, nullptr);
     }   
 
-    if (fileHandle)
+    static bool bFileHandlingState = true;
+    if (fileHandle && bFileHandlingState)
     {
         static u32 bytes = 0;
         DWORD written = 0;
 
         if (!WriteFile(fileHandle, buffer, count, &written, nullptr))
+        {
+            bFileHandlingState = false;
+
+            CloseHandle(fileHandle);
             return;
+        }
 
         bytes += (u32)written;
         if (bytes > 512)

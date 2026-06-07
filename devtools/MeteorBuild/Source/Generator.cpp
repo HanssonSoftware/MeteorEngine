@@ -2,7 +2,7 @@
 
 #include "Commands.h"
 #include "CommandRegistry.h"
-#include "VisualStudioBoilerplates.h"
+#include "VisualStudio/Boilerplates.h"
 
 #include <Commandlet.h>
 #include <Application/Application.h>
@@ -26,6 +26,8 @@ LOG_ADDCATEGORY(FileConstruct);
 namespace Commands
 {
 	ADD_NEW_BUILD_COMMAND("-make", "Generates project files", Generate_Cmd);
+
+	void VcxprojGenerate(Module& mdl, const wchar_t* fullPathToIntermediateDir, u32& createdFilesCount);
 
 	void Generate_Cmd()
 	{
@@ -163,94 +165,11 @@ namespace Commands
 
 
 				requiredEachModule = swprintf(nullptr, 0, L"%s\\%hs.vcxproj", fullPathToModuleFolder, mdl.moduleName.Chr()) + 1;
-		 
+
 				wchar_t* fullPathToIntermediate = (wchar_t*)moduleBuffer.Allocate(requiredEachModule * sizeof(wchar_t));
 				swprintf(fullPathToIntermediate, L"%s\\%hs.vcxproj", fullPathToModuleFolder, mdl.moduleName.Chr());
 
-				MR_LOG(LogFileConstruct, Log, "Creating %s project file", mdl.moduleName.Chr());
-
-				HANDLE proj = CreateFileW(fullPathToIntermediate, GENERIC_READ | GENERIC_WRITE, bIsRunningDebugMode ? FILE_SHARE_READ : 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-				if (proj != INVALID_HANDLE_VALUE)
-				{
-					MemoryBlockArena<char> xmlAssembly = { 1_mB };
-					DWORD written = 0;
-					
-					WriteFile(proj, Project::Configurations, (sizeof(Project::Configurations) / sizeof(Project::Configurations[0])) - 1, &written, nullptr);
-
-					u32 requiredBytesForIdentificationPart = (sizeof(Project::ProjectIdentification) / sizeof(Project::ProjectIdentification[0])) + 64;
-					char* identificationPartAllocatedGuid = (char*)xmlAssembly.Allocate(requiredBytesForIdentificationPart);
-
-					requiredBytesForIdentificationPart = snprintf(identificationPartAllocatedGuid, requiredBytesForIdentificationPart, Project::ProjectIdentification, mdl.guid);
-
-					WriteFile(proj, identificationPartAllocatedGuid, requiredBytesForIdentificationPart, &written, nullptr);
-
-#ifdef MR_DEBUG
-					FlushFileBuffers(proj);
-#endif // MR_DEBUG
-
-					WriteFile(proj, Project::PropertyGroups, (sizeof(Project::PropertyGroups) / sizeof(Project::PropertyGroups[0])) - 1, &written, nullptr);
-
-					WriteFile(proj, Project::Macros, (sizeof(Project::Macros) / sizeof(Project::Macros[0])) - 1, &written, nullptr);
-
-
-					u32 requiredBytesForConfigurationSettings = (sizeof(Project::ConfigurationDependentSettings) / sizeof(Project::ConfigurationDependentSettings[0])) + 64;
-					char* allocatedForConfigSettings = (char*)xmlAssembly.Allocate(requiredBytesForConfigurationSettings);
-
-					requiredBytesForConfigurationSettings = snprintf(allocatedForConfigSettings, requiredBytesForConfigurationSettings, Project::ConfigurationDependentSettings, 
-						mdl.moduleName.Chr() /* <NMakeOutput>%s.dll</NMakeOutput> */, 
-						"" /**/, 
-						mdl.moduleName.Chr() /* <NMakeOutput>%s.dll</NMakeOutput> */,
-						"" /**/, 
-						mdl.moduleName.Chr() /* <NMakeOutput>%s.dll</NMakeOutput> */,
-						"" /**/
-					);
-
-					WriteFile(proj, allocatedForConfigSettings, requiredBytesForConfigurationSettings, &written, nullptr);
-#ifdef MR_DEBUG
-					FlushFileBuffers(proj);
-#endif // MR_DEBUG
-
-					MemoryBlockArena<char> projectFilesIncluded = { 256_kB };
-					for (const wchar_t* file : mdl.files)
-					{
-						char extension[16] = {};
-						wchar_t* extensionType = PathFindExtensionW(file);
-
-						if (!WideCharToMultiByte(CP_UTF8, 0, extensionType, wcslen(extensionType), extension, 16, nullptr, nullptr))
-						{
-							MR_LOG(LogBuild, Error, "WideCharToMultiByte returned: %s", GetLastErrorString().Chr());
-							
-							projectFilesIncluded.Reset();
-							continue;
-						}
-
-						wchar_t pathTo[MAX_PATH] = {};
-						PathRelativePathToW(pathTo, fullPathToIntermediate, FILE_ATTRIBUTE_NORMAL, file, FILE_ATTRIBUTE_NORMAL);
-
-						u32 requiredBytesForAnEntry = snprintf(nullptr, 0, Project::EntryFormat(Hash(extension)), pathTo) + 1;
-
-						char* xmlEntry = (char*)projectFilesIncluded.Allocate(requiredBytesForAnEntry);
-						snprintf(xmlEntry, requiredBytesForAnEntry, Project::EntryFormat(Hash(extension)), pathTo);
-
-						WriteFile(proj, xmlEntry, requiredBytesForAnEntry - 1, &written, nullptr);
-
-//#ifdef MR_DEBUG
-//						FlushFileBuffers(proj); // Forget it
-//#endif // MR_DEBUG
-					}
-
-					WriteFile(proj, Project::BottomPart, (sizeof(Project::BottomPart) / sizeof(Project::BottomPart[0])) - 1, &written, nullptr);
-
-					CloseHandle(proj);
-					filesCreated++;
-				}
-				else
-				{
-					MR_LOG(LogFileConstruct, Error, "Failed to create module file asset %s", mdl.moduleName.Chr());
-					MR_LOG(LogFileConstruct, Error, "CreateFileW failed with: %s", GetLastErrorString().Chr());
-				}
-
-				moduleBuffer.Reset();
+				VcxprojGenerate(mdl, fullPathToIntermediate, filesCreated);
 			}
 
 			if (filesCreated == modules.GetSize())
@@ -430,5 +349,86 @@ namespace Commands
 			MR_LOG(LogBuild, Log, "Opening trophy: %ls", fullPathToSln);
 			ShellExecuteW(nullptr, L"open", fullPathToSln, nullptr, nullptr, SW_SHOWNORMAL);
 		}
+	}
+
+	void VcxprojGenerate(Module& mdl, const wchar_t* fullPathToIntermediateDir, u32& createdFilesCount)
+	{
+		MR_LOG(LogFileConstruct, Log, "Creating %s project file", mdl.moduleName.Chr());
+
+		HANDLE proj = CreateFileW(fullPathToIntermediateDir, GENERIC_READ | GENERIC_WRITE, bIsRunningDebugMode ? FILE_SHARE_READ : 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+		if (proj == INVALID_HANDLE_VALUE)
+		{
+			MR_LOG(LogFileConstruct, Error, "Failed to create module file asset %s", mdl.moduleName.Chr());
+			MR_LOG(LogFileConstruct, Error, "CreateFileW failed with: %s", GetLastErrorString().Chr());
+			
+			return;
+		};
+
+		MemoryBlockArena<char> xmlAssembly = { 1_mB };
+		char* xmlBuffer = (char*)xmlAssembly.Exhaust();
+		u32 offset = 0;
+
+
+		auto Append = [&](const char* format, ...) 
+		{
+			va_list args;
+			va_start(args, format);
+
+			u32 written = (u32)vsnprintf(xmlBuffer + offset, 1_mB - offset, format, args);
+
+			if (written > 0) 
+				offset += written;
+
+			va_end(args);
+		};
+
+		Append(Project::Configurations);
+		Append(Project::ProjectIdentification, mdl.guid);
+
+		Append(Project::PropertyGroups);
+		Append(Project::Macros, mdl.moduleName.Chr());
+
+		char moduleNameUpper[64] = {};
+		for (u32 i = 0; i < mdl.moduleName.Length(); i++)
+			moduleNameUpper[i] = toupper(mdl.moduleName.Chr()[i]);
+
+		MemoryBlockArena<char> includePathArena = { 256_kB };
+		char* includePath = (char*)includePathArena.Exhaust();
+		u32 loc = 0;
+
+		const Array<String> commands = mdl.commands["IncludePath"];
+		for (u32 i = 0; i < commands.GetSize(); i++)
+		{
+			loc += snprintf(includePath + loc, commands[i].Length() + 3, "%s", commands[i].Chr());
+			if (commands.GetSize() - 1 != i)
+			{
+				strcat(includePath + loc, ";");
+				loc += 1;
+			}
+		}
+
+		Append(Project::ConfigurationDependentSettings, mdl.moduleName.Chr(), moduleNameUpper, includePath, mdl.moduleName.Chr(), moduleNameUpper, includePath, mdl.moduleName.Chr(), moduleNameUpper, includePath);
+
+		MemoryBlockArena<char> filesArena = { 512_kB };
+		char* filesBuffer = (char*)filesArena.Exhaust();
+		u32 locFiles = 0;
+
+		for (const auto& file : mdl.files)
+		{
+			wchar_t pathTo[MAX_PATH] = {};
+			PathRelativePathToW(pathTo, fullPathToIntermediateDir, FILE_ATTRIBUTE_NORMAL, file, FILE_ATTRIBUTE_NORMAL);
+
+			locFiles += snprintf(filesBuffer + locFiles, 512_kB - locFiles, Project::EntryFormat(Hash(PathFindExtensionW(pathTo))), pathTo);
+		}
+
+		Append(filesBuffer);
+
+		Append(Project::BottomPart);
+
+		DWORD written = 0;
+		WriteFile(proj, xmlBuffer, offset, &written, nullptr);
+
+		CloseHandle(proj);
+		createdFilesCount++;
 	}
 }

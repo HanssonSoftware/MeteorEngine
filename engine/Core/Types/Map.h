@@ -19,6 +19,21 @@ static constexpr u64 Hash(const char* key)
 	return hash;
 }
 
+static constexpr u64 Hash(const wchar_t* key)
+{
+	u64 hash = 0xcbf29ce484222325;
+	constexpr u64 prime = 0x100000001b3;
+
+	while (*key && *key != L'\0')
+	{
+		hash = hash ^ *key;
+		hash *= prime;
+		key++;
+	}
+
+	return hash;
+}
+
 static constexpr u64 operator ""_h(const char* str, u64 len)
 {
 	return Hash(str);

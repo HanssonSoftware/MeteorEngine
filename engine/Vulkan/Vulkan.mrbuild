@@ -5,11 +5,11 @@ Module "Vulkan" : "Meteor"
 		"Core"
 	}
 
-	IncludePaths:
+	IncludePath:
 	{
 		"$(SolutionDir)engine",
 		"$(SolutionDir)engine\Core",
-		"$(VULKAN_SDK)\Include\",
+		"$(VULKAN_SDK)\include",
 		"$(SolutionDir)\engine\Core\Common",
 		"$(SolutionDir)\engine\Core\Layers",
 		"$(SolutionDir)\engine\Core\Logging",

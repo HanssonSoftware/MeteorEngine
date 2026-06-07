@@ -36,11 +36,6 @@ namespace Commands
 		};
 	};
 
-	void MakeModuleToForwardableCommand(Module* module, Array<wchar_t*>& commands)
-	{
-
-	}
-
 	void Build_Cmd()
 	{
 #ifdef MR_PLATFORM_WINDOWS
@@ -48,7 +43,7 @@ namespace Commands
 		STARTUPINFOW si = { sizeof(STARTUPINFOW) };
 
 		wchar_t clangCall[] = L"clang++";
-		if (!CreateProcessW(nullptr, clangCall, nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS | CREATE_UNICODE_ENVIRONMENT, nullptr, nullptr, &si, &pi))
+		if (!CreateProcessW(nullptr, clangCall, nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS, nullptr, nullptr, &si, &pi))
 		{
 			MR_LOG(LogValidator, Fatal, "Check clang++ is installed, or added as environment variable!");
 			return;
@@ -157,7 +152,51 @@ namespace Commands
 			SYSTEM_INFO syi = {};
 			GetSystemInfo(&syi);
 
-			Array<wchar_t*> forwardingCommandsToCompiler;
+			wchar_t exe[MAX_PATH] = {};
+			wchar_t exea[512] = {};
+			GetModuleFileNameW(nullptr, exe, MAX_PATH);
+
+
+			swprintf(exea, L"%s\\..\\%hs\\%hs_Build.rsp", exe, intermediateDirectory.Chr(), Commandlet::Get().Parse("-m").Chr());
+			HANDLE responseFile = CreateFileW(exea, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+			if (responseFile == INVALID_HANDLE_VALUE)
+			{
+				return;
+			}
+
+			MemoryBlockArena<char> buffer = { 1_mB };
+			char* responseBuffer = (char*)buffer.Exhaust();
+
+			const String currentModuleCompile = Commandlet::Get().Parse("-m");
+
+			char moduleNameUpper[64] = {};
+			for (u32 i = 0; i < currentModuleCompile.Length(); i++)
+				moduleNameUpper[i] = toupper(currentModuleCompile.Chr()[i]);
+
+			const u32 debugLevel = GetDebugLevel(Commandlet::Get().Parse("-c").Chr());
+
+			const u32 count = (u32)sprintf(responseBuffer, "-std=c++17 -O%d %s %s -DMR_%s_EXPORT -shared -o %s.dll\n", debugLevel, debugLevel < 3 ? "-g" : "-flto", debugLevel < 3 ? "-DMR_DEBUG" : "", moduleNameUpper, currentModuleCompile.Chr());
+
+			DWORD written = 0;
+			if (!WriteFile(responseFile, responseBuffer, count, &written, nullptr))
+			{
+				MR_LOG(LogBuild, Error, "WriteFile failed with: %s", GetLastErrorString().Chr());
+				return;
+			}
+
+			MemoryBlockArena<char> concatArena = { 512_kB };
+			char* concatBuffer = (char*)concatArena.Exhaust();
+
+			u32 offset = 0;
+			for (const wchar_t* file : files)
+				offset += snprintf(concatBuffer + offset, 512_kB - offset, "%ls\n", file);
+
+			if (!WriteFile(responseFile, concatBuffer, offset, &written, nullptr))
+			{
+				MR_LOG(LogBuild, Error, "WriteFile failed with: %s", GetLastErrorString().Chr());
+				return;
+			}
+
 
 			if (bIsMultiThreadEnabled)
 			{
@@ -165,17 +204,12 @@ namespace Commands
 			}
 			else
 			{
-				
-
-
 				PROCESS_INFORMATION pi2 = {};
 				STARTUPINFOW si2 = { sizeof(STARTUPINFOW) };
 				si2.wShowWindow = SW_HIDE;
 
-				wchar_t* sources;
-
-				wchar_t clangCall[4096] = {};
-				//swprintf(clangCall, L"clang++ %s -O%d -o %s -D%s -shared", ,GetDebugLevel(configuration), L"d.obj", L"exports");
+				wchar_t clangCall[256] = {};
+				//swprintf(clangCall, L"clang++  ", exea, GetDebugLevel(configuration), L"d.dll", L"exports");
 
 				if (!CreateProcessW(nullptr, clangCall, nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS, nullptr, nullptr, &si2, &pi2))
 				{
@@ -187,6 +221,9 @@ namespace Commands
 
 				CloseHandle(pi2.hProcess);
 				CloseHandle(pi2.hThread);
+
+				CloseHandle(responseFile);
+				DeleteFileW(exea);
 			}
 
 #endif // MR_PLATFORM_WINDOWS

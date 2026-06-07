@@ -96,11 +96,7 @@ struct Module
 	Module& operator=(const Module& old) noexcept;
 	Module& operator=(Module&& old) noexcept;
 
-	String moduleName;
-
-	String parent;
-
-	String path;
+	const char* GetModuleName() const { return nullptr; };
 
 	char guid[48] = {};
 #ifdef MR_PLATFORM_WINDOWS
@@ -113,5 +109,5 @@ struct Module
 	static Module MakeModuleFromBuffer(const char* buffer);
 
 protected:
-	MemoryBlockArena<u8> underlyingData = { 1_kB };
+	
 };

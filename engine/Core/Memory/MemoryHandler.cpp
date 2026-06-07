@@ -43,6 +43,15 @@ MemoryHandler::~MemoryHandler() noexcept
 bool MemoryHandler::Initialize()
 {
 #ifdef MR_PLATFORM_WINDOWS
+    MEMORYSTATUSEX ms = { sizeof(MEMORYSTATUSEX) };
+    GlobalMemoryStatusEx(&ms);
+
+    if (ms.ullTotalPhys < 512_mB)
+    {
+        MR_LOG(LogMemory, Fatal, "Your rig is running low on memory!");
+        return false;
+    }
+
     constexpr const u64 fixed512MB = 512_mB;
     constexpr const u64 regionHeaderSize = (2 * sizeof(MemoryRegion));
 

@@ -71,7 +71,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;MR_CORE_ENABLED;MR_PLATFORM_WINDOWS;MR_CORE_EXPORTS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;MR_CORE_ENABLED;MR_PLATFORM_WINDOWS;MR_CORE_EXPORTS;_CRT_SECURE_NO_WARNINGS;MR_CORE_EXPORT</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -99,7 +99,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_CORE_ENABLED;MR_PLATFORM_WINDOWS;MR_CORE_EXPORTS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_CORE_ENABLED;MR_PLATFORM_WINDOWS;MR_CORE_EXPORTS;_CRT_SECURE_NO_WARNINGS;MR_CORE_EXPORT</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)Intermediate\;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -144,6 +144,7 @@
   <ItemGroup>
     <ClInclude Include="engine\Core\Common\Configuration.h" />
     <ClInclude Include="engine\Core\Common\Maths.h" />
+    <ClInclude Include="engine\Core\ImportHelpers.h" />
     <ClInclude Include="engine\Core\Logging\Log.h" />
     <ClInclude Include="engine\Core\Logging\LogMacros.h" />
     <ClInclude Include="engine\Core\Common\Conversions.h" />
@@ -185,7 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resource\DefaultEngineIcon.ico" />
-  </ItemGroup>  
+  </ItemGroup>
   <ItemGroup>
     <BuildMacro Include="ProductDir">
       <Value>$(ProductDir)</Value>
