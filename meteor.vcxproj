@@ -137,7 +137,7 @@
     <ClCompile Include="engine\Core\Special\LaunchMeteorSuite.h" />
     <ClCompile Include="engine\Core\Types\NameCollection.cpp" />
     <ClCompile Include="engine\Core\Memory\MemoryHandler.cpp" />
-    <ClCompile Include="engine\Core\Memory\MemoryRegion.cpp" />
+    <ClCompile Include="engine\Core\Memory\MemoryBlockPool.cpp" />
     <ClCompile Include="engine\Core\Memory\MemoryBlockArena.cpp" />
     <ClCompile Include="engine\Core\Memory\MemoryPackage.cpp" />
   </ItemGroup>
@@ -169,7 +169,7 @@
     <ClInclude Include="engine\Core\Types\Map.h" />
     <ClInclude Include="engine\Core\Types\NameCollection.h" />
     <ClInclude Include="engine\Core\Memory\MemoryHandler.h" />
-    <ClInclude Include="engine\Core\Memory\MemoryRegion.h" />
+    <ClInclude Include="engine\Core\Memory\MemoryBlockPool.h" />
     <ClInclude Include="engine\Core\Memory\MemoryBlockArena.h" />
     <ClInclude Include="engine\Core\Memory\MemoryPackage.h" />
     <ClInclude Include="Resource\EngineResource.h" />

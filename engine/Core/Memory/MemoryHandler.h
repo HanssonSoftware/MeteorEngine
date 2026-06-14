@@ -4,7 +4,7 @@
 #include <Platform/DataTypes.h>
 #include "MemoryPackage.h"
 
-class MemoryRegion;
+class MemoryBlockPool;
 
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)
@@ -12,16 +12,26 @@ class MemoryRegion;
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
 
+enum class MemoryAllocationTag
+{
+	// In the future, this tag list would be expanded!!
+
+	MEM_PHYSICS
+};
+
 class CORE_API MemoryHandler
 {
 public:
+	typedef u32 MemoryIdentifier;
+	typedef MemoryBlockPool MemoryRegion;
+
 	MemoryHandler() = default;
 	virtual ~MemoryHandler() noexcept;
 
 	virtual bool Initialize();
 
-	virtual void* Allocate(const u64 byte);
-	virtual void Deallocate(void* location, const u64 byte);
+	virtual u32 Allocate(const u64 byte);
+	virtual void Deallocate(u32 id);
 
 	virtual bool RequestNewRegion(const u64 newRegionSizeInBytes);
 	virtual bool RequestNewEngineRegion(const u64 newRegionSizeInBytes);
@@ -43,35 +53,15 @@ public:
 		return byte;
 	}
 
-	virtual MemoryPackage AllocateTracked(u64 bytes);
-
 protected:
 	MemoryRegion* engineRegion = nullptr;
 	MemoryRegion* projectRegion = nullptr;
 
 #ifdef MR_WITH_EDITOR
-	static constexpr const u32 MAX_HANDLES = 8192;
+	static inline constexpr const u32 MAX_HANDLES = 8192;
 #else
-	static constexpr const u32 MAX_HANDLES = 4096;
+	static inline constexpr const u32 MAX_HANDLES = 4096;
 #endif // MR_WITH_EDITOR
-
-	struct MemoryTable
-	{
-		void* address = nullptr;
-		u64 size = 0;
-		u16 version = 0;
-		i16 referenceCount = 0;
-		bool bUsed = false;
-
-		static constexpr MemoryTable Invalid() 
-		{
-			return { nullptr, U64_MAX, U16_MAX, -1, false };
-		}
-	};
-
-	MemoryTable list[MAX_HANDLES];
-
-	u32 availableIndex = 0;
 };
 
 constexpr u64 operator""_kB(u64 val)

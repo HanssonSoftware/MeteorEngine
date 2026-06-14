@@ -9,14 +9,18 @@
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
 
-class CORE_API MemoryRegion
+class CORE_API MemoryBlockPool
 {
 	friend class MemoryHandler;
 public:
-	constexpr MemoryRegion() = default;
-	/*virtual*/ ~MemoryRegion() noexcept = default;
+	MemoryBlockPool() = default;
+	virtual ~MemoryBlockPool() noexcept = default;
+	MemoryBlockPool(MemoryBlockPool&& old) = delete;
+	MemoryBlockPool& operator=(MemoryBlockPool&& old) = delete;
+	MemoryBlockPool& operator=(const MemoryBlockPool& old) = delete;
 
-	MemoryRegion(u8* address, u64 regionSizeInBytes)
+
+	MemoryBlockPool(u8* address, u64 regionSizeInBytes)
 		: ptr(address)
 		, size(regionSizeInBytes)
 	{
@@ -27,7 +31,7 @@ protected:
 	u8* ptr = nullptr;
 	u64 offset = 0;
 
-	MemoryRegion* nextRegion = nullptr;
+	MemoryBlockPool* nextRegion = nullptr;
 	u64 size = 0;
 };
 

@@ -48,7 +48,7 @@
     <ClCompile Include="engine\Core\Memory\MemoryHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Memory\MemoryRegion.cpp">
+    <ClCompile Include="engine\Core\Memory\MemoryBlockPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Memory\MemoryBlockArena.cpp">
@@ -131,7 +131,7 @@
     <ClInclude Include="engine\Core\Memory\MemoryHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Memory\MemoryRegion.h">
+    <ClInclude Include="engine\Core\Memory\MemoryBlockPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Memory\MemoryBlockArena.h">

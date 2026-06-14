@@ -104,7 +104,7 @@ struct Module
 #else
 	Array<char*> files;
 #endif // MR_PLATFORM_WINDOWS
-	Map<const char*, Array<String>> commands;
+	Map<const char*, Array<const char*>> commands;
 
 	static Module MakeModuleFromBuffer(const char* buffer);
 

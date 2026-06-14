@@ -23,7 +23,7 @@ MemoryHandler::~MemoryHandler() noexcept
     if (engineRegion && projectRegion)
     {
 #ifdef MR_PLATFORM_WINDOWS
-        MemoryRegion* lastRegion = projectRegion->nextRegion;
+        MemoryBlockPool* lastRegion = projectRegion->nextRegion;
         while (lastRegion)
         {
             lastRegion = lastRegion->nextRegion;
@@ -46,14 +46,14 @@ bool MemoryHandler::Initialize()
     MEMORYSTATUSEX ms = { sizeof(MEMORYSTATUSEX) };
     GlobalMemoryStatusEx(&ms);
 
-    if (ms.ullTotalPhys < 512_mB)
+    if (ms.ullAvailPhys < 512_mB)
     {
         MR_LOG(LogMemory, Fatal, "Your rig is running low on memory!");
         return false;
     }
 
     constexpr const u64 fixed512MB = 512_mB;
-    constexpr const u64 regionHeaderSize = (2 * sizeof(MemoryRegion));
+    constexpr const u64 regionHeaderSize = (2 * sizeof(MemoryBlockPool));
 
     void* startingAddress = VirtualAlloc(nullptr, fixed512MB + regionHeaderSize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
     if (!startingAddress)
@@ -67,8 +67,8 @@ bool MemoryHandler::Initialize()
     constexpr u64 engineSize = fixed512MB / 3ull;
     constexpr u64 projectSize = fixed512MB - engineSize;
 
-    engineRegion = new(startingAddress) MemoryRegion((u8*)startingAddress + sizeof(MemoryRegion), engineSize);
-    projectRegion = new((u8*)startingAddress + engineSize) MemoryRegion((u8*)startingAddress + sizeof(MemoryRegion) + engineSize, projectSize);
+    engineRegion = new(startingAddress) MemoryBlockPool((u8*)startingAddress + sizeof(MemoryBlockPool), engineSize);
+    projectRegion = new((u8*)startingAddress + engineSize) MemoryBlockPool((u8*)startingAddress + sizeof(MemoryBlockPool) + engineSize, projectSize);
 
     return engineRegion && projectRegion;
 #endif // MR_PLATFORM_WINDOWS
@@ -76,46 +76,46 @@ bool MemoryHandler::Initialize()
     return false;
 }
 
-void* MemoryHandler::Allocate(const u64 byte)
+u32 MemoryHandler::Allocate(const u64 byte)
 {
     MR_ASSERT(projectRegion, "Tried accessing to an invalid address, which has not been initialised yet!");
 
     const u64 rounded = RoundToMemoryAlignment(byte);
 
     if (projectRegion->offset + rounded > projectRegion->size)
-        return nullptr;
+        return -1;
 
     void* allocated = projectRegion->ptr + projectRegion->offset;
     if (!allocated)
     {
-        return nullptr;
+        return -1;
     }
 
     memset(allocated, 0, rounded);
     projectRegion->offset += rounded;
 
-    return allocated;
+    return 1;
 }
 
-void MemoryHandler::Deallocate(void* location, const u64 byte)
+void MemoryHandler::Deallocate(u32 id)
 {
-    if (byte == 0)
-    {
-        return;
-    }
+    //if (byte == 0)
+    //{
+    //    return;
+    //}
 
-    memset(location, 0, byte);
+    //memset(location, 0, byte);
     //VirtualFree(location, byte, MEM_DECOMMIT);
 }
 
 bool MemoryHandler::RequestNewRegion(const u64 newRegionSizeInBytes)
 {
-    MemoryRegion* newRegion = nullptr;
-    if (void* regionWithSelfContained = VirtualAlloc(nullptr, newRegionSizeInBytes + sizeof(MemoryRegion), MEM_COMMIT, PAGE_READWRITE))
+    MemoryBlockPool* newRegion = nullptr;
+    if (void* regionWithSelfContained = VirtualAlloc(nullptr, newRegionSizeInBytes + sizeof(MemoryBlockPool), MEM_COMMIT, PAGE_READWRITE))
     {
-        newRegion = new(regionWithSelfContained) MemoryRegion((u8*)regionWithSelfContained + sizeof(MemoryRegion), newRegionSizeInBytes);
+        newRegion = new(regionWithSelfContained) MemoryBlockPool((u8*)regionWithSelfContained + sizeof(MemoryBlockPool), newRegionSizeInBytes);
 
-        MemoryRegion* last = projectRegion->nextRegion;
+        MemoryBlockPool* last = projectRegion->nextRegion;
         while (last) last = last->nextRegion;
 
         last = newRegion;
@@ -126,12 +126,12 @@ bool MemoryHandler::RequestNewRegion(const u64 newRegionSizeInBytes)
 
 bool MemoryHandler::RequestNewEngineRegion(const u64 newRegionSizeInBytes)
 {
-    MemoryRegion* newRegion = nullptr;
-    if (void* regionWithSelfContained = VirtualAlloc(nullptr, newRegionSizeInBytes + sizeof(MemoryRegion), MEM_COMMIT, PAGE_READWRITE))
+    MemoryBlockPool* newRegion = nullptr;
+    if (void* regionWithSelfContained = VirtualAlloc(nullptr, newRegionSizeInBytes + sizeof(MemoryBlockPool), MEM_COMMIT, PAGE_READWRITE))
     {
-        newRegion = new(regionWithSelfContained) MemoryRegion((u8*)regionWithSelfContained + sizeof(MemoryRegion), newRegionSizeInBytes);
+        newRegion = new(regionWithSelfContained) MemoryBlockPool((u8*)regionWithSelfContained + sizeof(MemoryBlockPool), newRegionSizeInBytes);
    
-        MemoryRegion* last = engineRegion->nextRegion;
+        MemoryBlockPool* last = engineRegion->nextRegion;
         while (last) last = last->nextRegion;
     }
 
