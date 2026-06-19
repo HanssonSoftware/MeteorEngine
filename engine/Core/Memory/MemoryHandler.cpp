@@ -4,9 +4,9 @@
 #include <Logging/Log.h>
 #include <new>
 
-#include <Platform/Winapi.h>
+#include "Win32/WinMin.h"
 
-#include "MemoryRegion.h"
+#include "MemoryBlockPool.h"
 #include <memoryapi.h>
 
 LOG_ADDCATEGORY(Memory);
@@ -76,25 +76,25 @@ bool MemoryHandler::Initialize()
     return false;
 }
 
-u32 MemoryHandler::Allocate(const u64 byte)
+void* MemoryHandler::Allocate(const u64 byte)
 {
     MR_ASSERT(projectRegion, "Tried accessing to an invalid address, which has not been initialised yet!");
 
     const u64 rounded = RoundToMemoryAlignment(byte);
 
     if (projectRegion->offset + rounded > projectRegion->size)
-        return -1;
+        return nullptr;
 
     void* allocated = projectRegion->ptr + projectRegion->offset;
     if (!allocated)
     {
-        return -1;
+        return {};
     }
 
     memset(allocated, 0, rounded);
     projectRegion->offset += rounded;
 
-    return 1;
+    return allocated;
 }
 
 void MemoryHandler::Deallocate(u32 id)
@@ -136,22 +136,4 @@ bool MemoryHandler::RequestNewEngineRegion(const u64 newRegionSizeInBytes)
     }
 
     return newRegion;
-}
-
-MemoryPackage MemoryHandler::AllocateTracked(u64 bytes)
-{
-    u32 lastIndex = 0xFFFFFFF;
-    for (u32 i = 0; i < MAX_HANDLES; i++)
-    {
-        MemoryTable& index = list[i];
-        if (!index.bUsed)
-        {
-            lastIndex = i;
-            break;
-        }
-    }
-
-
-
-    return MemoryPackage();
 }

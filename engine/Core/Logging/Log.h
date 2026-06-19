@@ -2,7 +2,7 @@
 
 #pragma once
 //#include <Types/Delegate.h>
-#include <Platform/DataTypes.h>
+#include <HAL/DataTypes.h>
 
 #ifdef MR_DEBUG
 constexpr inline const bool bIsRunningDebugMode = true;

@@ -59,7 +59,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;UNICODE;MR_DEBUG;MR_EDITORAPP_ENABLE;MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(VULKAN_SDK)\Include\;$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty\FreeType\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);$(SolutionDir)Source\ThirdParty\ImGUI\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\Core\HAL;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\Core;$(SolutionDir)Source\ThirdParty\ImGUI\;$(VULKAN_SDK)\Include\;$(SolutionDir)Source\;$(SolutionDir)Source\ThirdParty\FreeType\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);$(SolutionDir)Source\ThirdParty\ImGUI\</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
@@ -79,7 +79,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\Core\HAL;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\Core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PreprocessorDefinitions>;UNICODE;MR_EDITORAPP_ENABLE;MR_PLATFORM_WINDOWS</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>

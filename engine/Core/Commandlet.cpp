@@ -4,9 +4,9 @@
 #include "Commandlet.h"
 #include <Types/String.h>
 #include <Types/Array.h>
-#include <Platform/Platform.h>
+#include <HAL/HAL.h>
 
-#include <Platform/Winapi.h>
+#include "Win32/WinMin.h"
 #include <processenv.h>
 #include <shellapi.h>
 
@@ -44,7 +44,7 @@ String Commandlet::Parse(const char* inParam)
 {
 #ifdef MR_PLATFORM_WINDOWS
 	wchar_t fixBufferForParameter[128] = { L'\0' };
-	Platform::ConvertToWide(fixBufferForParameter, strlen(inParam), inParam);
+	HAL::ConvertToWide(fixBufferForParameter, strlen(inParam), inParam);
 
 	bool bFound = false;
 	for (wchar_t** i = argumentList; *i; i++)
@@ -52,7 +52,7 @@ String Commandlet::Parse(const char* inParam)
 		if (bFound)
 		{
 			char fixBufferForOutputParameter[128] = {};
-			Platform::ConvertToNarrow(fixBufferForOutputParameter, wcslen(*i), *i);
+			HAL::ConvertToNarrow(fixBufferForOutputParameter, wcslen(*i), *i);
 
 			return fixBufferForOutputParameter;
 		}
@@ -70,7 +70,7 @@ bool Commandlet::Check(const char* inParam)
 {
 #ifdef MR_PLATFORM_WINDOWS
 	wchar_t fixBufferForParameter[128] = { L'\0' };
-	Platform::ConvertToWide(fixBufferForParameter, 128, inParam);
+	HAL::ConvertToWide(fixBufferForParameter, 128, inParam);
 
 	if (!argumentList) 
 		return false;
@@ -78,7 +78,7 @@ bool Commandlet::Check(const char* inParam)
 	for (wchar_t** i = argumentList; *i; i++)
 	{
 		char fixBufferForOutputParameter[128] = {};
-		Platform::ConvertToNarrow(fixBufferForOutputParameter, wcslen(*i), *i);
+		HAL::ConvertToNarrow(fixBufferForOutputParameter, wcslen(*i), *i);
 
 		if (strcmp(fixBufferForOutputParameter, inParam) != 0)
 			continue;

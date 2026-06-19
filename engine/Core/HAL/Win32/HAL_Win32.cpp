@@ -2,14 +2,14 @@
 
 #ifdef MR_PLATFORM_WINDOWS
 
-#include "Platform.h"
+#include <HAL/HAL.h>
 #include <Logging/Log.h>
-#include <Platform/Winapi.h>
+#include "WinMin.h"
 #include <stringapiset.h>
 
-LOG_ADDCATEGORY(Platform);
+LOG_ADDCATEGORY(HAL);
 
-void Platform::ConvertToWide(wchar_t* targetBuffer, const u32 size, const char* convertibleBuffer)
+void HAL::ConvertToWide(wchar_t* targetBuffer, const u32 size, const char* convertibleBuffer)
 {
 	if (size && targetBuffer && convertibleBuffer)
 	{
@@ -17,10 +17,10 @@ void Platform::ConvertToWide(wchar_t* targetBuffer, const u32 size, const char* 
 		return;
 	}
 
-	MR_LOG(LogPlatform, Error, "Unable to convert narrow buffer to wide!");
+	MR_LOG(LogHAL, Error, "Unable to convert narrow buffer to wide!");
 }
 
-void Platform::ConvertToNarrow(char* targetBuffer, const u32 size, const wchar_t* convertibleBuffer)
+void HAL::ConvertToNarrow(char* targetBuffer, const u32 size, const wchar_t* convertibleBuffer)
 {
 	if (size && targetBuffer && convertibleBuffer)
 	{
@@ -28,7 +28,7 @@ void Platform::ConvertToNarrow(char* targetBuffer, const u32 size, const wchar_t
 		return;
 	}
 
-	MR_LOG(LogPlatform, Error, "Unable to convert wide buffer to narrow!");
+	MR_LOG(LogHAL, Error, "Unable to convert wide buffer to narrow!");
 }
 
 #endif // MR_PLATFORM_WINDOWS

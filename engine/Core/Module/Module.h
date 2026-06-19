@@ -4,7 +4,7 @@
 #include <Types/String.h>
 //#include <type_traits>
 
-#include <Platform/Winapi.h>
+#include "Win32/WinMin.h"
 // #include <CoreProxy.h>
 
 #ifdef MR_CORE_EXPORTS

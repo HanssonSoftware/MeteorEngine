@@ -1,7 +1,7 @@
 /* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Platform/DataTypes.h>
+#include <HAL/DataTypes.h>
 
 //class String;
 //

@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Platform/DataTypes.h>
+#include <HAL/DataTypes.h>
 #include "MemoryPackage.h"
 
 class MemoryBlockPool;
@@ -11,6 +11,13 @@ class MemoryBlockPool;
 #else
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
+
+struct MemoryMetadata
+{
+	void* ptr;
+
+	static MemoryMetadata Invalid() { return {}; };
+};
 
 enum class MemoryAllocationTag
 {
@@ -30,7 +37,7 @@ public:
 
 	virtual bool Initialize();
 
-	virtual u32 Allocate(const u64 byte);
+	virtual void* Allocate(const u64 byte);
 	virtual void Deallocate(u32 id);
 
 	virtual bool RequestNewRegion(const u64 newRegionSizeInBytes);
@@ -56,12 +63,6 @@ public:
 protected:
 	MemoryRegion* engineRegion = nullptr;
 	MemoryRegion* projectRegion = nullptr;
-
-#ifdef MR_WITH_EDITOR
-	static inline constexpr const u32 MAX_HANDLES = 8192;
-#else
-	static inline constexpr const u32 MAX_HANDLES = 4096;
-#endif // MR_WITH_EDITOR
 };
 
 constexpr u64 operator""_kB(u64 val)

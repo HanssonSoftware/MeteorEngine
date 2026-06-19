@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <stdarg.h>
 #include <stdio.h>
-#include <Platform/DataTypes.h>
+#include <HAL/DataTypes.h>
 #include <cstdlib>
 
 #define MERGE(x, y) x##y

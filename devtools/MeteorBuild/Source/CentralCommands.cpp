@@ -4,7 +4,7 @@
 #include "Commands.h"
 #include <Commandlet.h>
 
-#include <Platform/Winapi.h>
+#include "WinMin.h"
 #include <shlwapi.h>
 #include <pathcch.h>
 

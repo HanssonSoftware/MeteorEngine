@@ -3,7 +3,7 @@
 #include "BuildSystem.h"
 #include <Logging/Log.h>
 #include <Commandlet.h>
-#include <Platform/Platform.h>
+#include <HAL/Platform.h>
 
 #include <CommandRegistry.h>
 

@@ -6,7 +6,7 @@
 
 #include <Commandlet.h>
 #include <Application/Application.h>
-#include <Platform/Winapi.h>
+#include "WinMin.h"
 
 #include <shellapi.h>
 #include <Shlwapi.h>

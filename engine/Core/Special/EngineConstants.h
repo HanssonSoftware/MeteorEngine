@@ -2,11 +2,11 @@
 
 #pragma once
 
-#define COMPANY_NAME_SPACE "Saxon Software"
-#define COMPANY_NAME "SaxonSoftware"
+#define COMPANY_NAME_SPACE "Hansson Software"
+#define COMPANY_NAME "HanssonSoftware"
 
-#define WIDE_COMPANY_NAME_SPACE L"Saxon Software"
-#define WIDE_COMPANY_NAME L"SaxonSoftware"
+#define WIDE_COMPANY_NAME_SPACE L"Hansson Software"
+#define WIDE_COMPANY_NAME L"HanssonSoftware"
 
 #define ENGINE_NAME_SPACE "Meteor Engine"
 #define ENGINE_NAME "MeteorEngine"

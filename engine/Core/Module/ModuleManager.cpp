@@ -1,11 +1,11 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "ModuleManager.h"
-#include <Platform/Platform.h>
+#include <HAL/HAL.h>
 #include <Application/Application.h>
 #include <Special/EngineConstants.h>
 
-#include <Platform/Winapi.h>
+#include "Win32/WinMin.h"
 
 #ifdef MR_PLATFORM_WINDOWS
 #include <libloaderapi.h>

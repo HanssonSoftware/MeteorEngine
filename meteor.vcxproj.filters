@@ -42,9 +42,6 @@
     <ClCompile Include="engine\Core\Types\NameCollection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Platform\Platform_Win32.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Memory\MemoryHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -58,6 +55,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Memory\MemoryPackage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\HAL\Win32\HAL_Win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\HAL\Win32\File_Win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\HAL\Win32\Memory_Win32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -122,10 +128,10 @@
     <ClInclude Include="engine\Core\Common\Configuration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Platform\Platform.h">
+    <ClInclude Include="engine\Core\HAL\Platform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Platform\DataTypes.h">
+    <ClInclude Include="engine\Core\HAL\DataTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Memory\MemoryHandler.h">
@@ -140,7 +146,7 @@
     <ClInclude Include="engine\Core\Types\String.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Platform\Winapi.h">
+    <ClInclude Include="engine\Core\HAL\Win32\WinMin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resource\EngineResource.h">
@@ -153,6 +159,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\ImportHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\HAL\HAL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\HAL\File.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\HAL\Memory.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

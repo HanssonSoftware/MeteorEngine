@@ -9,7 +9,7 @@
 //#include <wchar.h>
 
 #ifdef MR_PLATFORM_WINDOWS
-#include <Platform/Winapi.h>
+#include "Win32/WinMin.h"
 #include <Shlobj.h>
 #include <shlwapi.h>
 #include <pathcch.h>
@@ -301,7 +301,7 @@ void Logger::SendToOutputBuffer(char* buffer, const u32 count)
         }
     }
 
-    if (bShouldUseAllocator) GetMemoryManager()->Deallocate(fixBuffer, (count + 1) * sizeof(wchar_t));
+    //if (bShouldUseAllocator) GetMemoryManager()->Deallocate(fixBuffer, (count + 1) * sizeof(wchar_t));
 #endif // MR_PLATFORM_WINDOWS && MR_DEBUG
 
 }

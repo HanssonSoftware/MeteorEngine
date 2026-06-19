@@ -2,7 +2,7 @@
 
 #pragma once
 #include "MemoryHandler.h"
-#include <DataTypes.h>
+#include <HAL/DataTypes.h>
 
 template<typename T>
 class MemoryBlockArena
@@ -15,18 +15,18 @@ public:
 	MemoryBlockArena& operator=(const MemoryBlockArena&) = delete;
 	MemoryBlockArena& operator=(MemoryBlockArena&&) = delete;
 
+	MemoryBlockArena(const u64 size)
+	{
+		this->size = size;
+		ptr = (T*)GetMemoryManager()->Allocate(size);
+	}
+		
 	virtual ~MemoryBlockArena() noexcept
 	{
 		if (ptr)
 		{
 			GetMemoryManager()->Deallocate(ptr, size);
 		}
-	}
-
-	MemoryBlockArena(const u64 size)
-	{
-		this->size = size;
-		ptr = (T*)GetMemoryManager()->Allocate(size);
 	}
 
 	virtual void* Allocate(const u64 bytes)

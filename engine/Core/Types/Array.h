@@ -27,7 +27,7 @@ public:
 			container[i].~T();
 		}
 
-		GetMemoryManager()->Deallocate(container, capacity * sizeof(T));
+		//GetMemoryManager()->Deallocate(container, capacity * sizeof(T));
 
 		container = nullptr;
 		capacity = 0;
@@ -133,7 +133,7 @@ public:
 		for (u32 i = 0; i < size; i++)
 			newBlock[i] = container[i];
 
-		GetMemoryManager()->Deallocate(container, capacity * sizeof(T));
+		//GetMemoryManager()->Deallocate(container, capacity * sizeof(T));
 
 		container = newBlock;
 		capacity = newCount;

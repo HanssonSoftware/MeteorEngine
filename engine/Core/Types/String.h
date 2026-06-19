@@ -3,7 +3,7 @@
 #pragma once
 #include "Crypto.h"
 #include <string>
-#include <Platform/DataTypes.h>
+#include <HAL/DataTypes.h>
 
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)

@@ -2,7 +2,7 @@
 
 #include "Application.h"
 
-#include <Platform/Winapi.h>
+#include "Win32/WinMin.h"
 #include <Types/Map.h>
 
 #include <Types/Array.h>

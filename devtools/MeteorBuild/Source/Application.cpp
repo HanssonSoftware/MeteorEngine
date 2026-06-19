@@ -5,7 +5,7 @@
 #include <Memory/MemoryHandler.h>
 
 #include <Special/LaunchMeteorSuite.h>
-#include <Platform/Platform.h>
+#include <HAL/Platform.h>
 
 #include <shellapi.h>
 //#pragma comment(lib, "Shell32.lib")

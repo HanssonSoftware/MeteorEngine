@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Platform/DataTypes.h>
+#include <HAL/DataTypes.h>
 
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)
@@ -24,10 +24,15 @@ public:
 		: ptr(address)
 		, size(regionSizeInBytes)
 	{
+		u64 converted = Round(regionSizeInBytes);
+		converted /= 8;
 
+		int J = 43;
 	}
 
 protected:
+	constexpr inline u64 Round(u64 value) { return (value + 7) & ~7; };
+
 	u8* ptr = nullptr;
 	u64 offset = 0;
 

@@ -14,9 +14,9 @@ LOG_ADDCATEGORY(StringSet);
 
 
 String::~String() noexcept
-{
+{/*
 	if (bIsUsingHeap && heapBuffer.ptr)
-		GetMemoryManager()->Deallocate(heapBuffer.ptr, heapBuffer.capacity);
+		GetMemoryManager()->Deallocate(heapBuffer.ptr, heapBuffer.capacity);*/
 
 	NullOut();
 }
@@ -167,7 +167,7 @@ String String::Format(const char* format, ...)
 
 	String stringized(formattedBuffer);
 
-	if (sizeForVA > 256 ) GetMemoryManager()->Deallocate(formattedBuffer, sizeForVA + 1);
+	//if (sizeForVA > 256 ) GetMemoryManager()->Deallocate(formattedBuffer);
 	return stringized;
 }
 
@@ -264,8 +264,8 @@ String& String::operator+=(const String& other)
 
 			strncpy(newPtr + thisLen, otherData, otherLen);
 
-			if (heapBuffer.ptr)
-				GetMemoryManager()->Deallocate(heapBuffer.ptr, heapBuffer.capacity);
+			//if (heapBuffer.ptr)
+				//GetMemoryManager()->Deallocate(heapBuffer.ptr, heapBuffer.capacity);
 
 			heapBuffer.ptr = newPtr;
 			heapBuffer.capacity = newCap;

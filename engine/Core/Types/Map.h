@@ -2,7 +2,7 @@
 
 #pragma once
 #include <Types/Array.h>
-#include <Platform/DataTypes.h>
+#include <HAL/DataTypes.h>
 
 static constexpr u64 Hash(const char* key)
 {
