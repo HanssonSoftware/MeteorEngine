@@ -5,7 +5,7 @@
 #include <Application/Application.h>
 #include <Special/EngineConstants.h>
 
-#include "Win32/WinMin.h"
+#include "Win32/MinimalWin.h"
 
 #ifdef MR_PLATFORM_WINDOWS
 #include <libloaderapi.h>

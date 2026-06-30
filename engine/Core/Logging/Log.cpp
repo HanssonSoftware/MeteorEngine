@@ -1,7 +1,7 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "Log.h"
-#include <Commandlet.h>
+#include <Commandline.h>
 #include <Types/String.h>
 
 #include <Application/Application.h>
@@ -9,7 +9,7 @@
 //#include <wchar.h>
 
 #ifdef MR_PLATFORM_WINDOWS
-#include "Win32/WinMin.h"
+#include "Win32/MinimalWin.h"
 #include <Shlobj.h>
 #include <shlwapi.h>
 #include <pathcch.h>
@@ -62,8 +62,8 @@ void Logger::Initialize()
     LARGE_INTEGER begin, freq, end;
     QueryPerformanceFrequency(&freq);
     QueryPerformanceCounter(&begin);
-
-    if (!Commandlet::Get().Check("-nofilelogging"))
+#if 0
+    if (!Commandline::Get().Check("-nofilelogging"))
     {
         wchar_t* foundPath = nullptr;
 
@@ -127,6 +127,7 @@ void Logger::Initialize()
             CoTaskMemFree(foundPath);
         }
     }
+#endif
 #ifdef MR_DEBUG
     if (!GetConsoleWindow())
     {
@@ -138,12 +139,12 @@ void Logger::Initialize()
         //    {
         //        if (!AttachConsole(ATTACH_PARENT_PROCESS))
         //        {
-        //            Application::RequestExit(-1);
+        //            GetApplication()->RequestExit(-1);
         //        }
         //    }
         //    else
         //    {
-        //        Application::RequestExit(-1);
+        //        GetApplication()->RequestExit(-1);
         //    }
         //}
         //else
@@ -152,7 +153,7 @@ void Logger::Initialize()
 
     if (!SetStdHandle(STD_INPUT_HANDLE, INVALID_HANDLE_VALUE))
     {
-        Application::RequestExit(-1);
+        GetApplication()->RequestExit(-1);
     }
 
     consoleHandle = CreateFileW(L"CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -167,11 +168,11 @@ void Logger::Initialize()
         SetConsoleCursorInfo(consoleHandle, &cf);
 
         if (!SetStdHandle(STD_OUTPUT_HANDLE, consoleHandle))
-            Application::RequestExit(-1);
+            GetApplication()->RequestExit(-1);
 
         wchar_t title[128] = {};
 
-        swprintf(title, 127, L"%hs developer console (output only!)", GetApplication()->GetApplicationName());
+        swprintf(title, 127, L"%hs developer console (output only!)", GetApplication()->GetApplicationName()->ptr);
         SetConsoleTitleW(title);
     }
 

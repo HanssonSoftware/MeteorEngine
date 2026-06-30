@@ -6,6 +6,7 @@
 #include <Memory/MemoryHandler.h>
 #include <Logging/Log.h>
 
+//* An array can store multiple elements of ONE exact type
 template <typename T>
 class Array
 {
@@ -194,7 +195,6 @@ public:
 	const T* end() const { return container + size; }
 
 private:
-
 	T* container = nullptr;
 
 	u32 size = 0;

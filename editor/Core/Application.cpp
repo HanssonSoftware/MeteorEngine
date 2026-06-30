@@ -2,7 +2,7 @@
 
 #include "Application.h"
 
-#include "Win32/WinMin.h"
+#include "Win32/MinimalWin.h"
 #include <Types/Map.h>
 
 #include <Types/Array.h>
@@ -11,9 +11,9 @@
 EditorApplication::EditorApplication() 
 	: Application()
 {
-	appName = "Meteor Editor";
-	appNameNoSpaces = "MeteorEditor";
-	appCodeName = "Astronaut";
+	appName = { "Meteor Editor" };
+	appNameNoSpaces = { "MeteorEditor" };
+	appCodeName = { "Astronaut" };
 }
 
 void EditorApplication::Init()
@@ -44,4 +44,4 @@ void EditorApplication::Shutdown()
 
 #include <Special/LaunchMeteorSuite.h>
 
-IMPLEMENT_WINDOWS_STARTUP("core", EditorApplication);
+IMPLEMENT_APPLICATION_STARTUP("core", EditorApplication);

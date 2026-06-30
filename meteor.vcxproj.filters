@@ -18,13 +18,7 @@
     <ClCompile Include="engine\Core\Application\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Commandlet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Types\String.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Types\Vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Module\ModuleManager.cpp">
@@ -66,12 +60,18 @@
     <ClCompile Include="engine\Core\HAL\Win32\Memory_Win32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\Core\HAL\Win32\Window_Win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\HAL\Win32\Commandline_Win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Application\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Commandlet.h">
+    <ClInclude Include="engine\Core\HAL\Commandline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\Types\Array.h">
@@ -146,19 +146,16 @@
     <ClInclude Include="engine\Core\Types\String.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\HAL\Win32\WinMin.h">
+    <ClInclude Include="engine\Core\HAL\Win32\MinimalWin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resource\EngineResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Types\Crypto.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Memory\MemoryPackage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\ImportHelpers.h">
+    <ClInclude Include="engine\Core\Special\ImportHelpers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\HAL\HAL.h">
@@ -168,6 +165,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="engine\Core\HAL\Memory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\HAL\Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Types\StringView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

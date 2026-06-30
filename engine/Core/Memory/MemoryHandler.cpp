@@ -3,11 +3,15 @@
 #include "MemoryHandler.h"
 #include <Logging/Log.h>
 #include <new>
+#include <HAL/Memory.h>
 
-#include "Win32/WinMin.h"
+#include "Win32/MinimalWin.h"
 
 #include "MemoryBlockPool.h"
+
+#ifdef MR_PLATFORM_WINDOWS
 #include <memoryapi.h>
+#endif // MR_PLATFORM_WINDOWS
 
 LOG_ADDCATEGORY(Memory);
 
@@ -22,21 +26,17 @@ MemoryHandler::~MemoryHandler() noexcept
 {
     if (engineRegion && projectRegion)
     {
-#ifdef MR_PLATFORM_WINDOWS
         MemoryBlockPool* lastRegion = projectRegion->nextRegion;
         while (lastRegion)
         {
             lastRegion = lastRegion->nextRegion;
-            VirtualFree(lastRegion, 0, MEM_RELEASE);
+            HAL::OSDealloc(lastRegion, 0);
 
             lastRegion = nullptr;
         }
 
-        if (!VirtualFree(engineRegion, 0, MEM_RELEASE) && !VirtualFree(projectRegion, 0, MEM_RELEASE))
-        {
-
-        }
-#endif // MR_PLATFORM_WINDOWS
+        HAL::OSDealloc(engineRegion, 0);
+        HAL::OSDealloc(projectRegion, 0);
     }
 }
 
@@ -51,11 +51,13 @@ bool MemoryHandler::Initialize()
         MR_LOG(LogMemory, Fatal, "Your rig is running low on memory!");
         return false;
     }
+#endif // MR_PLATFORM_WINDOWS
+
 
     constexpr const u64 fixed512MB = 512_mB;
     constexpr const u64 regionHeaderSize = (2 * sizeof(MemoryBlockPool));
 
-    void* startingAddress = VirtualAlloc(nullptr, fixed512MB + regionHeaderSize, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+    void* startingAddress = HAL::OSAlloc(nullptr, fixed512MB + regionHeaderSize);
     if (!startingAddress)
     {
         MR_LOG(LogMemory, Fatal, "Failed to reserve %llu bytes!", fixed512MB);
@@ -71,9 +73,6 @@ bool MemoryHandler::Initialize()
     projectRegion = new((u8*)startingAddress + engineSize) MemoryBlockPool((u8*)startingAddress + sizeof(MemoryBlockPool) + engineSize, projectSize);
 
     return engineRegion && projectRegion;
-#endif // MR_PLATFORM_WINDOWS
-
-    return false;
 }
 
 void* MemoryHandler::Allocate(const u64 byte)

@@ -19,7 +19,7 @@ struct MemoryMetadata
 	static MemoryMetadata Invalid() { return {}; };
 };
 
-enum class MemoryAllocationTag
+enum class MemoryAllocationTag : u16
 {
 	// In the future, this tag list would be expanded!!
 

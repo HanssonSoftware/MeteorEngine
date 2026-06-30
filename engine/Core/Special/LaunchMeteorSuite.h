@@ -9,7 +9,7 @@
 
 struct Application;
 
-extern "C" __declspec(dllimport) int LaunchApplication(Application* instance, int argc, char argv[]);
+extern "C" __declspec(dllimport) int LaunchApplication(Application* instance, int argc, char** argv);
           
 #ifdef MR_PLATFORM_WINDOWS
 #define	WIN32_LEAN_AND_MEAN
@@ -63,11 +63,11 @@ extern "C" __declspec(dllimport) int LaunchApplication(Application* instance, in
 #ifdef MR_PLATFORM_WINDOWS
 #pragma warning(disable : 6387)
 
-#define IMPLEMENT_WINDOWS_STARTUP(libName, applicationClass)                                                                             \
-    int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)                                      \
+#define IMPLEMENT_APPLICATION_STARTUP(libName, applicationClass)                                                                         \
+    int main(int argc, char* argv[])                                                                                                     \
     {                                                                                                                                    \
-        wchar_t path[512] = {};                                                                                                          \
-        DWORD count = GetModuleFileNameW(hInstance, path, 512);                                                                          \
+        wchar_t path[2048] = {};                                                                                                         \
+        DWORD count = GetModuleFileNameW(nullptr, path, 2047);                                                                           \
         if (FAILED(PathCchRemoveFileSpec(path, count)))                                                                                  \
         {                                                                                                                                \
             MessageBoxW(nullptr, L"Unable to canonicalize engine path!", L"Engine Error!", MB_OK);                                       \
@@ -78,13 +78,13 @@ extern "C" __declspec(dllimport) int LaunchApplication(Application* instance, in
         HMODULE entryPoint = LoadLibraryExW(L##libName, nullptr, LOAD_LIBRARY_SEARCH_APPLICATION_DIR | LOAD_LIBRARY_SEARCH_USER_DIRS);   \
         if (entryPoint != nullptr)                                                                                                       \
         {                                                                                                                                \
-            typedef int (*ProxyFunction)(Application*, int, wchar_t*);                                                                   \
+            typedef int (*ProxyFunction)(Application*, int, char**);                                                                     \
             ProxyFunction externalLinkageFunction = (ProxyFunction)GetProcAddress(entryPoint, "LaunchApplication");                      \
             if (externalLinkageFunction)                                                                                                 \
             {                                                                                                                            \
                 applicationClass* application = new applicationClass;                                                                    \
                                                                                                                                          \
-                int Result = externalLinkageFunction(application, -1, pCmdLine);                                                         \
+                int Result = externalLinkageFunction(application, argc, argv);                                                           \
                                                                                                                                          \
                 if (!FreeLibrary(entryPoint))                                                                                            \
                     return -1;                                                                                                           \

@@ -5,10 +5,10 @@
 
 namespace HAL
 {
-	/** Calls your operating system specific memory allocation function.*/
+	//* Calls your operating system specific memory allocation function.
 	void* OSAlloc(void* specificLocationToStart, const u64 size);
 
-	/** Calls your operating system specific memory deallocation function. Be advised that if this called, your variable should NOT be used again. */
+	//* Calls your operating system specific memory deallocation function. Be advised that if this called, your variable should NOT be used again.
 	void OSDealloc(void* location, const u64 size);
 }
 

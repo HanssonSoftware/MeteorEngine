@@ -6,7 +6,7 @@
 
 #include <Commandlet.h>
 #include <Application/Application.h>
-#include "WinMin.h"
+#include "Win32/MinimalWin.h"
 
 #include <shellapi.h>
 #include <Shlwapi.h>
@@ -34,8 +34,8 @@ namespace Commands
 		LARGE_INTEGER startTime, endTime, frequency;
 		QueryPerformanceCounter(&startTime);
 
-		const String sourceDirectory = Commandlet::Get().Parse("-s");
-		const String intermediateDirectory = Commandlet::Get().Parse("-i");
+		const String sourceDirectory = Commandline::Get().Parse("-s");
+		const String intermediateDirectory = Commandline::Get().Parse("-i");
 
 		// Arena allocates bytes, so equal size will be allocated!
 		// WChar: 32 MB (Char / 2)
@@ -128,7 +128,7 @@ namespace Commands
 			{
 				wchar_t exeLocation[MAX_PATH] = {};
 
-				wcscpy_s(exeLocation, MAX_PATH, Commandlet::Get().GetArgs()[0]);
+				wcscpy_s(exeLocation, MAX_PATH, Commandline::Get().GetArgs()[0]);
 				PathRemoveFileSpecW(exeLocation);
 
 				const u32 combinedDirectorySize = (u32)wcslen(exeLocation) + (u32)wcslen(intermediateDirectoryW);
@@ -196,7 +196,7 @@ namespace Commands
 
 	void AddSolution(const Array<Module>* modules)
 	{
-		const String path = Commandlet::Get().Check("-sln") ? Commandlet::Get().Parse("-sln") : Commandlet::Get().Parse("-s");
+		const String path = Commandline::Get().Check("-sln") ? Commandline::Get().Parse("-sln") : Commandline::Get().Parse("-s");
 		if (path.IsEmpty())
 		{
 			MR_LOG(LogFileConstruct, Error, "Failed to find source/sln parameter!");
@@ -212,7 +212,7 @@ namespace Commands
 		{
 			wchar_t exeLocation[MAX_PATH] = {};
 
-			wcscpy_s(exeLocation, MAX_PATH, Commandlet::Get().GetArgs()[0]);
+			wcscpy_s(exeLocation, MAX_PATH, Commandline::Get().GetArgs()[0]);
 			PathRemoveFileSpecW(exeLocation);
 
 			const u32 combinedDirectorySize = (u32)wcslen(exeLocation) + (u32)wcslen(convertedPath);
@@ -237,7 +237,7 @@ namespace Commands
 			MemoryBlockArena<char> outputFileBuffer = { 8_mB };
 			MemoryBlockArena<wchar_t> pathCreating = { 1_mB };
 			
-			const String intermediateDir = Commandlet::Get().Parse("-i");
+			const String intermediateDir = Commandline::Get().Parse("-i");
 
 			wchar_t* intermediateDirectoryW = (wchar_t*)pathCreating.Allocate(intermediateDir.Length() * sizeof(wchar_t));
 			if (!MultiByteToWideChar(CP_UTF8, 0, intermediateDir, intermediateDir.Length(), intermediateDirectoryW, intermediateDir.Length()))
@@ -344,7 +344,7 @@ namespace Commands
 			MR_LOG(LogFileConstruct, Error, "CreateFileW failed with: %s", GetLastErrorString().Chr());
 		}
 
-		if (Commandlet::Get().Check("-o"))
+		if (Commandline::Get().Check("-o"))
 		{
 			MR_LOG(LogBuild, Log, "Opening trophy: %ls", fullPathToSln);
 			ShellExecuteW(nullptr, L"open", fullPathToSln, nullptr, nullptr, SW_SHOWNORMAL);

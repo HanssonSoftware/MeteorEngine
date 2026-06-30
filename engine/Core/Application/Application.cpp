@@ -2,7 +2,8 @@
 
 #include "Application.h"
 #include <Memory/MemoryHandler.h>
-#include "Commandlet.h"
+#include "Commandline.h"
+#include <Special/ImportHelpers.h>
 
 #ifdef MR_DEBUG
 #include <crtdbg.h>
@@ -10,10 +11,16 @@
 
 #include <Module/ModuleManager.h>
 
-void Application::RequestExit(int Code)
+static inline Application* appFramework = nullptr;
+
+Application* Application::Get()
 {
-    appFramework->exitCode = Code;
-    appFramework->SetAppState(ECurrentApplicationState::SHUTDOWN);
+    return appFramework;
+}
+
+Application::Application()
+{
+    appFramework = this;
 }
 
 void Application::Init()
@@ -22,22 +29,18 @@ void Application::Init()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
 #endif // MR_DEBUG
     
+    GetMemoryManager()->Initialize();
     Logger::Get()->Initialize();
-
-    SetAppState(ECurrentApplicationState::RUNNING);
 }
 
 void Application::Run()
 {
-    while (GetAppState() == ECurrentApplicationState::RUNNING)
-    {
-        appFramework->Run();
-    }
+    appFramework->Run();
 }
 
 void Application::Shutdown()
 {
-    if (GetAppState() == ECurrentApplicationState::RESTARTING)
+    if (currentState == State::Running)
     {
         MR_LOG(LogApplication, Log, "Restarting application!");
 
@@ -59,25 +62,18 @@ void Application::Shutdown()
 #endif // MR_DEBUG 
 }
 
-#ifdef MR_PLATFORM_WINDOWS
-extern "C" __declspec(dllexport) int LaunchApplication(Application* instance, int argc, wchar_t argv[])
-#else
-extern "C" __declspec(dllexport) int LaunchApplication(Application* instance, int argc, char argv[])
-#endif // MR_PLATFORM_WINDOWS
+void Application::RequestExit(u32 code)
+{
+
+}
+
+extern "C" LIBRARY_OUT int LaunchApplication(Application* instance, int argc, char** argv)
 {	
 #ifdef MR_PLATFORM_WINDOWS
     
 #endif // MR_PLATFORM_WINDOWS
+    instance->GetCommandline()->Init(argc, argv);
+    instance->Init();
 
-    int returnCode = 0xDEADBEEF; 
-    if (instance != nullptr)
-    {
-        Commandlet::Get().Initialize(argc, argv);
-        GetMemoryManager()->Initialize();
-        instance->Init();
-        returnCode = instance->GetRequestExitCode();
-        Commandlet::Get().Shutdown();
-    }
-
-    return returnCode; 
+    return 0; 
 }

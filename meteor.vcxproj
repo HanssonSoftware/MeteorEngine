@@ -126,14 +126,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="engine\Core\Application\Application.cpp" />
-    <ClCompile Include="engine\Core\Commandlet.cpp" />
+    <ClCompile Include="engine\Core\HAL\Win32\Commandline_Win32.cpp" />
     <ClCompile Include="engine\Core\HAL\Win32\File_Win32.cpp" />
     <ClCompile Include="engine\Core\HAL\Win32\HAL_Win32.cpp" />
     <ClCompile Include="engine\Core\HAL\Win32\Memory_Win32.cpp" />
     <ClCompile Include="engine\Core\Logging\Log.cpp" />
     <ClCompile Include="engine\Core\Types\Name.cpp" />
     <ClCompile Include="engine\Core\Types\String.cpp" />
-    <ClCompile Include="engine\Core\Types\Vector.cpp" />
     <ClCompile Include="engine\Core\Module\ModuleManager.cpp" />
     <ClCompile Include="engine\Core\Module\Module.cpp" />
     <ClCompile Include="engine\Core\Special\LaunchMeteorSuite.h" />
@@ -142,6 +141,7 @@
     <ClCompile Include="engine\Core\Memory\MemoryBlockPool.cpp" />
     <ClCompile Include="engine\Core\Memory\MemoryBlockArena.cpp" />
     <ClCompile Include="engine\Core\Memory\MemoryPackage.cpp" />
+    <ClCompile Include="engine\Core\HAL\Win32\Window_Win32.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Common\Configuration.h" />
@@ -149,21 +149,21 @@
     <ClInclude Include="engine\Core\HAL\File.h" />
     <ClInclude Include="engine\Core\HAL\HAL.h" />
     <ClInclude Include="engine\Core\HAL\Memory.h" />
-    <ClInclude Include="engine\Core\ImportHelpers.h" />
+    <ClInclude Include="engine\Core\Special\ImportHelpers.h" />
     <ClInclude Include="engine\Core\Logging\Log.h" />
     <ClInclude Include="engine\Core\Logging\LogMacros.h" />
     <ClInclude Include="engine\Core\Common\Conversions.h" />
     <ClInclude Include="engine\Core\Application\Application.h" />
-    <ClInclude Include="engine\Core\Commandlet.h" />
+    <ClInclude Include="engine\Core\HAL\Commandline.h" />
     <ClInclude Include="engine\Core\HAL\Platform.h" />
-    <ClInclude Include="engine\Core\HAL\Win32\WinMin.h" />
+    <ClInclude Include="engine\Core\HAL\Win32\MinimalWin.h" />
     <ClInclude Include="engine\Core\Special\EngineConstants.h" />
     <ClInclude Include="engine\Core\Types\Array.h" />
     <ClInclude Include="engine\Core\HAL\DataTypes.h" />
-    <ClInclude Include="engine\Core\Types\Crypto.h" />
     <ClInclude Include="engine\Core\Types\Delegate.h" />
     <ClInclude Include="engine\Core\Types\Name.h" />
     <ClInclude Include="engine\Core\Types\String.h" />
+    <ClInclude Include="engine\Core\Types\StringView.h" />
     <ClInclude Include="engine\Core\Types\Traits.h" />
     <ClInclude Include="engine\Core\Types\Vector.h" />
     <ClInclude Include="engine\Core\Special\Version.h" />
@@ -178,6 +178,7 @@
     <ClInclude Include="engine\Core\Memory\MemoryBlockArena.h" />
     <ClInclude Include="engine\Core\Memory\MemoryPackage.h" />
     <ClInclude Include="Resource\EngineResource.h" />
+    <ClInclude Include="engine\Core\HAL\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="engine\Engine.mrbuild" />

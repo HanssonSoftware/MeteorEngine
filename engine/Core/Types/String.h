@@ -1,8 +1,8 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include "Crypto.h"
 #include <string>
+#include "StringView.h"
 #include <HAL/DataTypes.h>
 
 #ifdef MR_CORE_EXPORTS
@@ -11,28 +11,7 @@
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
 
-struct CORE_API StringView
-{
-	StringView() = delete;
-
-	StringView(const char* data, u32 length)
-		: ptr(data)
-		, size(length)
-	{
-
-	}
-
-	~StringView() = default;
-
-	const char* ptr = nullptr;
-
-	const u32 size = 0;
-
-	const char* begin() const { return ptr; };
-	const char* end() const { return ptr + size; };
-};
-
-/** Human readable piece of text. */
+// * Human readable piece of text
 class CORE_API String
 {
 public:
@@ -131,11 +110,10 @@ public:
 		return bIsUsingHeap ? (u32)heapBuffer.length : (u32)stackBuffer.length;
 	}
 	
-	/** */
+	// * 
 	static String Format(const char* format, ...);
 
 	char* Data() { return bIsUsingHeap ? heapBuffer.ptr : stackBuffer.ptr; };
-
 
 	const char* begin() const { return Chr(); };
 	const char* end() const { return Chr() + Length(); };

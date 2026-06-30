@@ -3,7 +3,7 @@
 #include "BuildSystem.h"
 #include <Logging/Log.h>
 #include <Commandlet.h>
-#include <HAL/Platform.h>
+#include <HAL/HAL.h>
 
 #include <CommandRegistry.h>
 
@@ -12,7 +12,7 @@ void BuildSystem::CallRequiredMode()
 	if (Commandlet::Get().GetArgs()[1] != nullptr)
 	{
 		char commandBuffer[128] = {};
-		Platform::ConvertToNarrow(commandBuffer, wcslen(Commandlet::Get().GetArgs()[1]), Commandlet::Get().GetArgs()[1]);
+		HAL::ConvertToNarrow(commandBuffer, wcslen(Commandlet::Get().GetArgs()[1]), Commandlet::Get().GetArgs()[1]);
 
 		CommandRegistry::Get().CallFunctionOnCommand(commandBuffer);
 	}

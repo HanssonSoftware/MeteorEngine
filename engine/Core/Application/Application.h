@@ -1,10 +1,11 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include "Logging/Log.h"
-
-#include "Commandlet.h"
 #include <cstdint>
+#include <Types/Delegate.h>
+
+#include "Logging/Log.h"
+#include <HAL/Commandline.h>
 // #include <CoreProxy.h>
 
 #ifdef MR_CORE_EXPORT
@@ -17,11 +18,23 @@ LOG_ADDCATEGORY(Application);
 
 struct CORE_API Application
 {
-	enum class ECurrentApplicationState { NONE, STARTUP, RUNNING, RESTARTING, SHUTDOWN, DEAD };
+	enum class State : i8 
+	{ 
+		Dead = -1, 
+		None, 
+		Startup, 
+		Running, 
+		Restarting, 
+		Shutdown 
+	};
 
-	Application() { appFramework = this; };
+	static Application* Get();
+
+	Application();
 
 	Application(const Application&) = delete;
+
+	Application(Application&&) = delete;
 
 	virtual ~Application() noexcept = default;
 
@@ -31,43 +44,32 @@ struct CORE_API Application
 
 	virtual void Shutdown();
 
-	const char* GetApplicationName() const { return appName; };
+	void RequestExit(u32 code);
 
-	const char* GetApplicationCodeName() const { return appCodeName; };
+	const StringView* GetApplicationName() const { return &appName; };
 
-	const char* GetApplicationNameNoSpaces() const { return appNameNoSpaces; };
+	const StringView* GetApplicationCodeName() const { return &appCodeName; };
 
-	static void RequestExit(int Code);
+	const StringView* GetApplicationNameNoSpaces() const { return &appNameNoSpaces; };
 
-	int GetRequestExitCode() const { return appFramework->exitCode; };
-
-	inline ECurrentApplicationState GetAppState() const { return state; };
-
-	void SetAppState(const ECurrentApplicationState& newState) { state = newState; };
-
-	static Application& Get() { return *appFramework; }
+	Commandline* GetCommandline() { return &cli; };
 protected:
-	struct
-	{
-		/** Application name, this would be appearing on the created window. */
-		const char* appName = nullptr;
-		const char* appNameNoSpaces = nullptr;
+	State currentState;
 
-		/** Useful for directories. */
-		const char* appCodeName = nullptr;
-	};
+	//* Application name, this would be appearing on the created window
+	StringView appName;
+	StringView appNameNoSpaces;
 
-	int exitCode = 0;
+	//* Useful for directories
+	StringView appCodeName;
 
-	ECurrentApplicationState state = ECurrentApplicationState::NONE;
-
-	static inline Application* appFramework = nullptr;
+	Commandline cli;
 };
 
 template<typename T = Application>
 static T* GetApplication()
 {
-	return (T*)&Application::Get();
+	return (T*)Application::Get();
 }
 
 //#define IMPLEMENT_APPLICATION(ApplicationClass) \

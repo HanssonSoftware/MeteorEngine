@@ -8,7 +8,7 @@
 #include "CommandRegistry.h"
 #include "Module.h"
 
-#include "WinMin.h"
+#include "MinimalWin.h"
 #include <Shlwapi.h>
 #include <PathCch.h>
 

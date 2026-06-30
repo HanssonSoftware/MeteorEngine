@@ -4,7 +4,7 @@
 
 #include <HAL/HAL.h>
 #include <Logging/Log.h>
-#include "WinMin.h"
+#include "MinimalWin.h"
 #include <stringapiset.h>
 
 LOG_ADDCATEGORY(HAL);

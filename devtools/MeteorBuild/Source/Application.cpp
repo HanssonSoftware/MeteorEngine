@@ -5,7 +5,7 @@
 #include <Memory/MemoryHandler.h>
 
 #include <Special/LaunchMeteorSuite.h>
-#include <HAL/Platform.h>
+#include <HAL/HAL.h>
 
 #include <shellapi.h>
 //#pragma comment(lib, "Shell32.lib")
@@ -30,7 +30,7 @@ void BuildSystemApplication::Run()
 {
 
 
-	Application::RequestExit(0);
+	GetApplication()->RequestExit(0);
 }
 
 void BuildSystemApplication::Shutdown()

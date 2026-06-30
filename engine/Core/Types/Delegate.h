@@ -1,106 +1,77 @@
 /* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include "Traits.h"
 
-constexpr inline int MR_DEFAULT_DELEGATE_SIZE = 512;
-constexpr inline int MR_GIGANTIC_DELEGATE_SIZE = 4096;
-
-template<typename RetVal, int MaxBindings = MR_DEFAULT_DELEGATE_SIZE, typename... Args>
+//* What the hell is this?
+template<typename ReturnType, typename... Args>
 class Delegate
 {
-    using StubType = RetVal(*)(void*, Args...);
+private:
+	using ThunkType = ReturnType(*)(void*, Args...);
 
-    struct Binding
-    {
-        void* m_Object = nullptr;
-        StubType m_Stub = nullptr;
-    };
+	void* m_Instance = nullptr;
+	ThunkType m_Thunk = nullptr;
 
-    template<RetVal(*StaticFunc)(Args...)>
-    static RetVal StaticStub(void* obj, Args... args)
-    {
-        return (StaticFunc)(args...);
-    }
+	template<class T, ReturnType(T::*Func)(Args...)>
+	static ReturnType MethodThunk(void* instance, Args... args)
+	{
+		return (static_cast<T*>(instance)->*Func)(args...);
+	}
 
-    template<class C, RetVal(C::*MemberFunc)(Args...)>
-    static RetVal MemberStub(void* obj, Args... args)
-    {
-        C* realObject = static_cast<C*>(obj);
-        return (realObject->*MemberFunc)(args...);
-    }
+	template<class T, ReturnType(T::* Func)(Args...) const>
+	static ReturnType ConstMethodThunk(void* instance, Args... args)
+	{
+		return (static_cast<const T*>(instance)->*Func)(args...);
+	}
+
+	template<ReturnType(*Func)(Args...)>
+	static ReturnType StaticThunk(void*, Args... args)
+	{
+		return Func(args...);
+	}
 
 public:
-    constexpr Delegate() 
-        : m_Count(0) 
-    {
-    
-    }
+	Delegate() noexcept = default;
 
-    template<RetVal(*StaticFunc)(Args...)>
-    void Bind()
-    {
-        if (m_Count >= MaxBindings) return;
+	template<class T, ReturnType(T::* Func)(Args...)>
+	void Bind(T* instance) noexcept
+	{
+		m_Instance = instance;
+		m_Thunk = &MethodThunk<T, Func>;
+	}
 
-        m_Bindings[m_Count].m_Object = nullptr;
-        m_Bindings[m_Count].m_Stub = &StaticStub<StaticFunc>;
-        m_Count++;
-    }
+	template<class T, ReturnType(T::* Func)(Args...) const>
+	void Bind(const T* instance) noexcept
+	{
+		m_Instance = const_cast<void*>(static_cast<const void*>(instance));
+		m_Thunk = &ConstMethodThunk<T, Func>;
+	}
 
-    template<class C, RetVal(C::* MemberFunc)(Args...)>
-    void Bind(C* object)
-    {
-        if (m_Count >= MaxBindings) return;
+	template<ReturnType(*Func)(Args...)>
+	void Bind() noexcept
+	{
+		m_Instance = nullptr;
+		m_Thunk = &StaticThunk<Func>;
+	}
 
-        m_Bindings[m_Count].m_Object = object;
-        m_Bindings[m_Count].m_Stub = &MemberStub<C, MemberFunc>;
-        m_Count++;
-    }
+	void Unbind() noexcept
+	{
+		m_Instance = nullptr;
+		m_Thunk = nullptr;
+	}
 
-    RetVal Broadcast(Args... args)
-    {
-        if constexpr (same_v<RetVal, void>)
-        {
-            for (int i = 0; i < m_Count; ++i)
-            {
-                m_Bindings[i].m_Stub(m_Bindings[i].m_Object, args...);
-            }
+	inline bool IsBound() const noexcept
+	{
+		return m_Thunk != nullptr;
+	}
 
-            return;
-        }
-        else
-        {
-            RetVal result = RetVal();
-            for (int i = 0; i < m_Count; ++i)
-            {
-                result = m_Bindings[i].m_Stub(m_Bindings[i].m_Object, args...);
-            }
+	inline ReturnType Execute(Args... args) const
+	{
+		return m_Thunk(m_Instance, args...);
+	}
 
-            return result;
-        }
-    }
-
-    constexpr void Clear()
-    {
-        m_Count = 0;
-    }
-
-    constexpr int GetSize() const
-    {
-        return m_Count;
-    }
-
-private:
-    Binding m_Bindings[MaxBindings]{};
-    int m_Count = 0;
+	inline ReturnType operator()(Args... args) const
+	{
+		return Execute(args...);
+	}
 };
-
-
-#define CREATE_DELEGATE(Name, ...) \
-    typedef Delegate<void, MR_DEFAULT_DELEGATE_SIZE, __VA_ARGS__> Del##Name
-
-#define CREATE_DELEGATE_RETVAL(RetVal, Name, ...) \
-    typedef Delegate<RetVal, MR_DEFAULT_DELEGATE_SIZE, __VA_ARGS__> DelRet##Name
-
-#define CREATE_GIGANTIC_DELEGATE(Name, ...) \
-    typedef Delegate<void, MR_GIGANTIC_DELEGATE_SIZE, __VA_ARGS__> DelGig##Name

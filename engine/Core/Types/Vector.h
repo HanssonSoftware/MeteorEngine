@@ -7,38 +7,33 @@ struct Vector2
 {
 	T x, y;
 
-	Vector2();
+	constexpr Vector2() noexcept = default;
 
-	Vector2(const Vector2& Copy)
+	~Vector2() noexcept = default;
+
+	constexpr Vector2(const Vector2& copy)
 	{
-		x = Copy.x;
-		y = Copy.y;
+		x = copy.x;
+		y = copy.y;
 	}
 
-	Vector2(T x, T y)
-		:x(x), y(y)
-	{
-
-	}
-
-	Vector2(T all)
-		:x(all), y(all)
+	constexpr Vector2(T x, T y)
+		: x(x)
+		, y(y)
 	{
 
 	}
 
-	~Vector2()
+	constexpr Vector2(T all)
+		: x(all)
+		, y(all)
 	{
 
 	}
 
-	const Vector2 operator+(Vector2& Add)
+	constexpr const Vector2 operator+(const Vector2& add)
 	{
-		Vector2 Temp;
-		Temp.x = this->x + Add.x;
-		Temp.y = this->y + Add.y;
-
-		return Temp;
+		return Vector2(this->x + add.x, this->y + add.y);
 	}	
 	
 	const void operator+=(Vector2& Add)
@@ -265,13 +260,6 @@ struct Vector4
 	}
 
 };
-
-template<typename T>
-inline Vector2<T>::Vector2()
-{
-	x = 0;
-	y = 0;
-}
 
 template<typename T>
 inline Vector3<T>::Vector3()
