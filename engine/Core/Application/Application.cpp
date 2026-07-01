@@ -21,6 +21,10 @@ Application* Application::Get()
 Application::Application()
 {
     appFramework = this;
+
+    appName = { "Meteor Suite(R) application" };
+    appNameNoSpaces = { "MeteorSuite(R)app" };
+    appCodeName = { "MRAPP" };
 }
 
 void Application::Init()
@@ -69,9 +73,8 @@ void Application::RequestExit(u32 code)
 
 extern "C" LIBRARY_OUT int LaunchApplication(Application* instance, int argc, char** argv)
 {	
-#ifdef MR_PLATFORM_WINDOWS
-    
-#endif // MR_PLATFORM_WINDOWS
+    GetMemoryManager()->Initialize();
+
     instance->GetCommandline()->Init(argc, argv);
     instance->Init();
 

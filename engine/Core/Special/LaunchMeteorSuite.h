@@ -82,14 +82,13 @@ extern "C" __declspec(dllimport) int LaunchApplication(Application* instance, in
             ProxyFunction externalLinkageFunction = (ProxyFunction)GetProcAddress(entryPoint, "LaunchApplication");                      \
             if (externalLinkageFunction)                                                                                                 \
             {                                                                                                                            \
-                applicationClass* application = new applicationClass;                                                                    \
+                applicationClass application;                                                                  \
                                                                                                                                          \
-                int Result = externalLinkageFunction(application, argc, argv);                                                           \
+                int Result = externalLinkageFunction(&application, argc, argv);                                                          \
                                                                                                                                          \
                 if (!FreeLibrary(entryPoint))                                                                                            \
                     return -1;                                                                                                           \
                                                                                                                                          \
-                delete application;                                                                                                      \
                 return Result;                                                                                                           \
             }                                                                                                                            \
         }                                                                                                                                \

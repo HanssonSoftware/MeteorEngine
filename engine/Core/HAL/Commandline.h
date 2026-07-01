@@ -14,18 +14,14 @@ LOG_ADDCATEGORY(Commandlet);
 
 struct CORE_API Commandline
 {
-	static Commandline& Get()
-	{
-		static Commandline instance;
-		return instance;
-	}
-
 	void Init(int argc, char** argv);
 
+	bool Check(const char* command);
+
+	StringView Get(const char* command);
+
 protected:
-	char** list;
+	char** list = nullptr;
 
 	u32 count = 0;
-
-	bool bIsInited = false;
 };

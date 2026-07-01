@@ -3,6 +3,7 @@
 #pragma once
 #include <cstdint>
 #include <Types/Delegate.h>
+#include <Types/StringView.h>
 
 #include "Logging/Log.h"
 #include <HAL/Commandline.h>
@@ -54,7 +55,7 @@ struct CORE_API Application
 
 	Commandline* GetCommandline() { return &cli; };
 protected:
-	State currentState;
+	State currentState = { State::None };
 
 	//* Application name, this would be appearing on the created window
 	StringView appName;
@@ -64,6 +65,8 @@ protected:
 	StringView appCodeName;
 
 	Commandline cli;
+
+	//MemoryHandler memoryAllocator;
 };
 
 template<typename T = Application>

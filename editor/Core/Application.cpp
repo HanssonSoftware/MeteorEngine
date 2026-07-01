@@ -20,6 +20,11 @@ void EditorApplication::Init()
 {
 	Application::Init();
 
+	cli.Check("-maxram");
+	auto a = cli.Get("-maxram");
+
+	int J = 4;
+
 	Array<String> val;
 	val.Add("gecifasz");
 	val.Add("lurko");
@@ -28,7 +33,6 @@ void EditorApplication::Init()
 
 	Array<String> va = val;
 
-	int J = 3;
 }
 
 void EditorApplication::Run()
