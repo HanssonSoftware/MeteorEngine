@@ -3,6 +3,7 @@
 #ifdef MR_PLATFORM_WINDOWS
 #include <HAL/Commandline.h>
 #include <Logging/Log.h>
+#include <Application/Application.h>
 
 #include <Win32/MinimalWin.h>
 #include <shellapi.h>
@@ -13,35 +14,49 @@ void Commandline::Init(int argc, char** argv)
 	list = argv;
 }
 
-bool Commandline::Check(const char* command)
+bool Commandline::Check(const StringView& command)
 {
-	MR_ASSERT(count > 0 && list != nullptr, "Early command check happened!");
+	MR_ASSERT(count > 0 && list != nullptr, "Command check happened too early");
 
 	for (u32 i = 0; i < count; i++)
 	{
-		if (strcmp(list[i], command) == 0)
+		if (strncmp(list[i], command.ptr, command.size) == 0)
 			return true;
 	}
 
 	return false;
 }
 
-StringView Commandline::Get(const char* command)
+StringView Commandline::Get(const StringView& command)
 {
-	MR_ASSERT(count > 0 && list != nullptr, "Early command check happened!");
+	MR_ASSERT(count > 0 && list != nullptr, "Command check happened too early!");
 
-	for (u32 i = 0; i < count; i++)
+	if (/*GetApplication()->GetCurrentState() == Application::State::PreStartup*/ true)
 	{
-		bool a = strcmp(list[i], command) == 0;
-		bool b = *list[i++ % count] != '-';
-
-		if (a &&b)
+		for (u32 i = 0; i < count; i++)
 		{
-			return { nullptr };
+			const char* flagFound = list[i % count];
+			const char* flagValueFound = *list[(i + 1) % count] != '-' ? list[(i + 1) % count] : "";
+
+			const bool bflagFound = strncmp(flagFound, command.ptr, command.size) == 0;
+			const bool bflagValueFound = flagValueFound != "";
+
+			if (bflagFound && bflagValueFound)
+			{
+				return { list[(i + 1) % count] };
+			}
+			else if (bflagFound && !bflagValueFound)
+			{
+				MR_LOG(LogCommandline, Warn, "%s found but hasn't got any value!", flagFound);
+			}
 		}
 	}
+	else
+	{
 
-	return { nullptr };
+	}
+
+	return { "" };
 }
 
 #endif // MR_PLATFORM_WINDOWS

@@ -23,7 +23,9 @@ struct CORE_API Application
 	{ 
 		Dead = -1, 
 		None, 
+		PreStartup, 
 		Startup, 
+		PostStartup, 
 		Running, 
 		Restarting, 
 		Shutdown 
@@ -46,6 +48,10 @@ struct CORE_API Application
 	virtual void Shutdown();
 
 	void RequestExit(u32 code);
+
+	Application::State GetCurrentState() const { return currentState; };
+
+	void SetCurrentState(const State newState) { currentState = newState; };
 
 	const StringView* GetApplicationName() const { return &appName; };
 

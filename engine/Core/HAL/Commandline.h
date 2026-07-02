@@ -2,7 +2,7 @@
 
 #pragma once
 #include <Logging/Log.h>
-#include <Types/String.h>
+#include <Types/StringView.h>
 
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)
@@ -10,18 +10,20 @@
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
 
-LOG_ADDCATEGORY(Commandlet);
+LOG_ADDCATEGORY(Commandline);
 
 struct CORE_API Commandline
 {
 	void Init(int argc, char** argv);
 
-	bool Check(const char* command);
+	bool Check(const StringView& command);
 
-	StringView Get(const char* command);
+	StringView Get(const StringView& command);
 
 protected:
 	char** list = nullptr;
 
 	u32 count = 0;
+
+	//bool bIsApplicationInWarmup = true;
 };

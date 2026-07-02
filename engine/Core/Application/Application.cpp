@@ -33,7 +33,6 @@ void Application::Init()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
 #endif // MR_DEBUG
     
-    GetMemoryManager()->Initialize();
     Logger::Get()->Initialize();
 }
 
@@ -68,15 +67,22 @@ void Application::Shutdown()
 
 void Application::RequestExit(u32 code)
 {
+    SetCurrentState(Application::State::Shutdown);
 
 }
 
 extern "C" LIBRARY_OUT int LaunchApplication(Application* instance, int argc, char** argv)
 {	
+    instance->SetCurrentState(Application::State::PreStartup);
     GetMemoryManager()->Initialize();
 
     instance->GetCommandline()->Init(argc, argv);
+
+    instance->SetCurrentState(Application::State::Startup);
     instance->Init();
+
+    if (instance->GetCurrentState() == Application::State::Dead)
+        return -1;
 
     return 0; 
 }

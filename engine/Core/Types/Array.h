@@ -140,7 +140,7 @@ public:
 		capacity = newCount;
 	}
 
-	/** Empties your array, after this you should not use it anymore. */
+	//* Empties your array, after this you should not use it anymore
 	void Clear()
 	{
 		if (container)

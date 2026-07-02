@@ -4,6 +4,7 @@
 
 #include "Win32/MinimalWin.h"
 #include <Types/Map.h>
+#include <HAL/Window.h>
 
 #include <Types/Array.h>
 #include <Memory/MemoryBlockArena.h>
@@ -13,25 +14,19 @@ EditorApplication::EditorApplication()
 {
 	appName = { "Meteor Editor" };
 	appNameNoSpaces = { "MeteorEditor" };
-	appCodeName = { "Astronaut" };
+	appCodeName = { "Satellite" };
 }
 
 void EditorApplication::Init()
 {
 	Application::Init();
 
+	Window splash({ "" }, 3, 32);
+
 	cli.Check("-maxram");
 	auto a = cli.Get("-maxram");
 
 	int J = 4;
-
-	Array<String> val;
-	val.Add("gecifasz");
-	val.Add("lurko");
-	val.Add("furko");
-	val.Add("dakó");
-
-	Array<String> va = val;
 
 }
 
