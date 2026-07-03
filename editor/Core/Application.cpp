@@ -21,13 +21,15 @@ void EditorApplication::Init()
 {
 	Application::Init();
 
-	Window splash({ "" }, 3, 32);
+	Window* splash = Window::Create({ "valami" }, 620, 300, GetSystemMetrics(SM_CXSCREEN) / 2, GetSystemMetrics(SM_CYSCREEN) / 2);
+	splash->Show();
 
 	cli.Check("-maxram");
 	auto a = cli.Get("-maxram");
 
 	int J = 4;
 
+	splash->Destroy();
 }
 
 void EditorApplication::Run()

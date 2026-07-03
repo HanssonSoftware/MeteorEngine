@@ -15,30 +15,44 @@ struct CORE_API StringView
 	constexpr StringView() noexcept = default;
 
 	constexpr StringView(const char* data, u32 length)
-		: ptr(data)
+		: ptr((u8*)data)
 		, size(length)
 	{
 
 	}
 
 	constexpr StringView(const char* data)
-		: ptr(data)
-		, size(Count(data))
+		: ptr((u8*)data)
+		, size(Count((u8*)data))
 	{
 
 	}
 
+	//constexpr StringView(const u8* data, u32 length)
+	//	: ptr(data)
+	//	, size(length)
+	//{
+
+	//}
+
+	//constexpr StringView(const u8* data)
+	//	: ptr(data)
+	//	, size(Count(data))
+	//{
+
+	//}
+
 	~StringView() = default;
 
-	const char* ptr = nullptr;
+	const u8* ptr = nullptr;
 
 	u32 size = 0;
 
-	constexpr const char* begin() const { return ptr; };
-	constexpr const char* end() const { return ptr + size; };
+	constexpr const u8* begin() const { return ptr; };
+	constexpr const u8* end() const { return ptr + size; };
 
 private:
-	static constexpr u32 Count(const char* data) noexcept
+	static constexpr u32 Count(const u8* data) noexcept
 	{
 		u32 count = 0;
 		while (*data)

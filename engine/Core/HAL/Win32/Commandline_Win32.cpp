@@ -20,7 +20,7 @@ bool Commandline::Check(const StringView& command)
 
 	for (u32 i = 0; i < count; i++)
 	{
-		if (strncmp(list[i], command.ptr, command.size) == 0)
+		if (strncmp(list[i], (char*)command.ptr, command.size) == 0)
 			return true;
 	}
 
@@ -38,7 +38,7 @@ StringView Commandline::Get(const StringView& command)
 			const char* flagFound = list[i % count];
 			const char* flagValueFound = *list[(i + 1) % count] != '-' ? list[(i + 1) % count] : "";
 
-			const bool bflagFound = strncmp(flagFound, command.ptr, command.size) == 0;
+			const bool bflagFound = strncmp(flagFound, (char*)command.ptr, command.size) == 0;
 			const bool bflagValueFound = flagValueFound != "";
 
 			if (bflagFound && bflagValueFound)

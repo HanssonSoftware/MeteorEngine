@@ -2,10 +2,13 @@
 
 #pragma once
 #include <HAL/DataTypes.h>
+#include <Types/StringView.h>
 
 namespace HAL
 {
-	void ConvertToWide(wchar_t* targetBuffer, const u32 size, const char* convertibleBuffer);
+	bool ConvertToWide(wchar_t* targetBuffer, const u32 size, const char* convertibleBuffer);
 
-	void ConvertToNarrow(char* targetBuffer, const u32 size, const wchar_t* convertibleBuffer);
+	bool ConvertToNarrow(char* targetBuffer, const u32 size, const wchar_t* convertibleBuffer);
+
+	StringView LocalizeErrorCode(i64 code);
 };

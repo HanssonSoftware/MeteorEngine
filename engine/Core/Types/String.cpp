@@ -113,7 +113,7 @@ String::String(const StringView& str)
 		return;
 
 	char* direct = DetermineLocation(str.size);
-	strncpy(direct, str.ptr, str.size);
+	strncpy(direct, (char*)str.ptr, str.size);
 }
 
 String String::operator+(const String& Other)
@@ -230,12 +230,12 @@ String& String::operator=(const String& other)
 
 String& String::operator=(const StringView& other)
 {
-	if (strcmp(Chr(), other.ptr) == 0)
+	if (strcmp(Chr(), (char*)other.ptr) == 0)
 		return *this;
 
 
 	char* target = DetermineLocation(other.size);
-	strncpy(target, other.ptr, other.size);
+	strncpy(target, (char*)other.ptr, other.size);
 
 	return *this;
 }

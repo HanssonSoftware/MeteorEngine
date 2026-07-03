@@ -4,12 +4,26 @@
 #include <Types/StringView.h>
 #include <Types/Vector.h>
 
-#undef CreateWindow
+#ifdef MR_CORE_EXPORT
+#define CORE_API __declspec(dllexport)
+#else
+#define CORE_API __declspec(dllimport)
+#endif // MR_CORE_EXPORTS
 
-class Window
+class CORE_API Window
 {
 public:
-	static Window* CreateWindow(const StringView& name, const u32 sx, const u32 sy, const u32 px, const u32 py);
+	static Window* Create(const StringView& name, const u32 sx, const u32 sy, const u32 px, const u32 py);
+
+	void Show();
+
+	void Hide();
+
+	void Rename(const StringView& newName);
+
+	void Resize(const Vector2<u32>& newSize);
+
+	void Destroy();
 protected:
 
 	Window() noexcept = default;
