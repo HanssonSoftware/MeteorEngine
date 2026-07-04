@@ -35,9 +35,9 @@ bool HAL::ConvertToNarrow(char* targetBuffer, const u32 size, const wchar_t* con
 
 StringView HAL::LocalizeErrorCode(i64 code)
 {
-	char final[512] = {};
+	wchar_t final[512] = {};
 
-	const DWORD count = FormatMessageA(
+	const DWORD count = FormatMessageW(
 		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 		nullptr,
 		(DWORD)code,
@@ -53,10 +53,10 @@ StringView HAL::LocalizeErrorCode(i64 code)
 		return { "" };
 	}
 
-	//char end[512] = {};
-	//ConvertToNarrow(end, count - 2, final);
+	char end[512] = {};
+	ConvertToNarrow(end, count - 2, final);
 
-	return { final, count - 2 };
+	return { end, count - 2 };
 }
 
 #endif // MR_PLATFORM_WINDOWS

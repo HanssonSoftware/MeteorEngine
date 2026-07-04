@@ -56,8 +56,13 @@ void Logger::Shutdown()
     bIsInitialized = false;
 }
 
-void Logger::Initialize()
+void Logger::Init()
 {
+    if (GetMemoryManager()->RequestNewEngineRegion("Logger Region", MAX_LOG_ENTRIES * sizeof(LogEntry)))
+    {
+        int J = 53;
+    }
+
 #ifdef MR_PLATFORM_WINDOWS
     LARGE_INTEGER begin, freq, end;
     QueryPerformanceFrequency(&freq);
@@ -207,14 +212,14 @@ u32 Logger::FormatLogMessage(char* buffer, LogFormatting format, LogDescriptor* 
 
             if (consoleHandle)
             {
-                switch (descriptor->severityNum)
-                {
-                    case 1: SetConsoleTextAttribute(consoleHandle, 0xf); break;
-                    case 2: SetConsoleTextAttribute(consoleHandle, 0x9); break;
-                    case 3: SetConsoleTextAttribute(consoleHandle, 0x6); break;
-                    case 4: SetConsoleTextAttribute(consoleHandle, 0x4); break;
-                    case 5: SetConsoleTextAttribute(consoleHandle, 0x4); break;
-                }
+                //switch (descriptor->severityNum)
+                //{
+                //    case 1: SetConsoleTextAttribute(consoleHandle, 0xf); break;
+                //    case 2: SetConsoleTextAttribute(consoleHandle, 0x9); break;
+                //    case 3: SetConsoleTextAttribute(consoleHandle, 0x6); break;
+                //    case 4: SetConsoleTextAttribute(consoleHandle, 0x4); break;
+                //    case 5: SetConsoleTextAttribute(consoleHandle, 0x4); break;
+                //}
             }
 
             return (u32)snprintf(buffer, 32, "[%02u-%02u-%02u %02u:%02u:%02u]", (u16)st.wYear, (u16)st.wMonth, (u16)st.wDay, (u16)st.wHour, (u16)st.wMinute, (u16)st.wSecond);
@@ -223,7 +228,7 @@ u32 Logger::FormatLogMessage(char* buffer, LogFormatting format, LogDescriptor* 
         case LogFormatting::Severity:
         {
 #ifdef MR_PLATFORM_WINDOWS
-            return (u32)snprintf(buffer, 8, "%s: ", descriptor->severity);
+            //return (u32)snprintf(buffer, 8, "%s: ", descriptor->severity);
 #endif // MR_PLATFORM_WINDOWS
         }
         case LogFormatting::Message:

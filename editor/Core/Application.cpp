@@ -28,6 +28,7 @@ void EditorApplication::Init()
 	auto a = cli.Get("-maxram");
 
 	int J = 4;
+	Sleep(10000);
 
 	splash->Destroy();
 }

@@ -25,8 +25,27 @@ struct LogAssertion;
 
 struct LogEntry {};
 
+// Logger definition is split exclusively into seperate .cpp OS specific files
+//
+
+// * awd
 class CORE_API Logger
 {
+	static constexpr const u32 MAX_LOG_ENTRIES = 1024;
+
+	/* u8 why ? : category(enum : u8 also)	(reserved)
+				  0							0000000		*/
+	struct LogEntry
+	{
+		struct
+		{
+			//u8 
+		} payload;
+
+		//void* payload;
+		u8 flag;
+	};
+
 public:
 	static Logger* Get();
 
@@ -38,7 +57,7 @@ public:
 
 	virtual ~Logger() noexcept;
 
-	virtual void Initialize();
+	virtual void Init();
 	virtual void Shutdown();
 
 	virtual u32 FormatLogMessage(char* buffer, LogFormatting format, LogDescriptor* descriptor);

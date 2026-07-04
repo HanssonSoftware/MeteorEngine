@@ -2,6 +2,7 @@
 
 #pragma once
 #include <HAL/DataTypes.h>
+#include <Types/StringView.h>
 #include "MemoryPackage.h"
 
 class MemoryBlockPool;
@@ -28,6 +29,7 @@ enum class MemoryAllocationTag : u16
 
 class CORE_API MemoryHandler
 {
+	friend class Logger;
 public:
 	typedef u32 MemoryIdentifier;
 	typedef MemoryBlockPool MemoryRegion;
@@ -40,8 +42,8 @@ public:
 	virtual void* Allocate(const u64 byte);
 	virtual void Deallocate(u32 id);
 
-	virtual bool RequestNewRegion(const u64 newRegionSizeInBytes);
-	virtual bool RequestNewEngineRegion(const u64 newRegionSizeInBytes);
+	virtual bool RequestNewRegion(const StringView& regionName, const u64 newRegionSizeInBytes);
+	virtual bool RequestNewEngineRegion(const StringView& regionName, const u64 newRegionSizeInBytes);
 
 	static inline constexpr u64 RoundToMemoryAlignment(u64 byte)
 	{
@@ -61,6 +63,8 @@ public:
 	}
 
 protected:
+	virtual void* AllocateFromEngine(const u64 byte);
+
 	MemoryRegion* engineRegion = nullptr;
 	MemoryRegion* projectRegion = nullptr;
 };

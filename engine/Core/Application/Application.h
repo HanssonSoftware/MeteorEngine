@@ -7,6 +7,7 @@
 
 #include "Logging/Log.h"
 #include <HAL/Commandline.h>
+
 // #include <CoreProxy.h>
 
 #ifdef MR_CORE_EXPORT
@@ -71,8 +72,6 @@ protected:
 	StringView appCodeName;
 
 	Commandline cli;
-
-	//MemoryHandler memoryAllocator;
 };
 
 template<typename T = Application>

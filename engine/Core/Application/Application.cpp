@@ -43,7 +43,7 @@ void Application::Init()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
 #endif // MR_DEBUG
     
-    Logger::Get()->Initialize();
+    Logger::Get()->Init();
 
 #ifdef MR_PLATFORM_WINDOWS
     if (!bIsWindowsApplicationClassRegistered)

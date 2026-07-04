@@ -2,11 +2,15 @@
 
 #pragma once
 #include <cmath>
+#include <HAL/DataTypes.h>
 
-struct Math
+namespace Math
 {
 	template <typename T = float>
-	static T EaseInOut(T num);
+	static T EaseInOut(T num)
+	{
+		return (T)sin(1.5707963 * num);
+	}
 
 	template <typename T>
 	static constexpr T Max(T value, T min, T max)
@@ -14,13 +18,17 @@ struct Math
 		return value <= min ? min : value >= max ? max : value;
 	}
 
-	static constexpr const float GetPI() { return PI; };
-private:
 	static constexpr const float PI = 3.14159265359f;
-};
 
-template<typename T>
-inline T Math::EaseInOut(T num)
-{
-	return (T)sin(1.5707963 * num);
-}
+	static constexpr u32 Count(const char* data) noexcept
+	{
+		u32 count = 0;
+		while (*data)
+		{
+			data++;
+			count++;
+		}
+
+		return count;
+	}
+};

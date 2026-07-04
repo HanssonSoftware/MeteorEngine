@@ -129,6 +129,7 @@
     <ClCompile Include="engine\Core\HAL\Win32\Commandline_Win32.cpp" />
     <ClCompile Include="engine\Core\HAL\Win32\File_Win32.cpp" />
     <ClCompile Include="engine\Core\HAL\Win32\HAL_Win32.cpp" />
+    <ClCompile Include="engine\Core\HAL\Win32\Logging_Win32.cpp" />
     <ClCompile Include="engine\Core\HAL\Win32\Memory_Win32.cpp" />
     <ClCompile Include="engine\Core\Logging\Log.cpp" />
     <ClCompile Include="engine\Core\Types\Name.cpp" />
@@ -144,8 +145,7 @@
     <ClCompile Include="engine\Core\HAL\Win32\Window_Win32.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="engine\Core\Common\Configuration.h" />
-    <ClInclude Include="engine\Core\Common\Maths.h" />
+    <ClInclude Include="engine\Core\Types\Math.h" />
     <ClInclude Include="engine\Core\HAL\File.h" />
     <ClInclude Include="engine\Core\HAL\HAL.h" />
     <ClInclude Include="engine\Core\HAL\Memory.h" />

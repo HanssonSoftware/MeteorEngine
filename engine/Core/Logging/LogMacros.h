@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <HAL/DataTypes.h>
 #include <cstdlib>
+#include <Types/Math.h>
 
 #define MERGE(x, y) x##y
 #define MERGE2(x) #x
@@ -58,10 +59,12 @@ enum LogFormatting
     Message
 };
 
+static constexpr const u32 MESSAGE_BUFFER_SIZE = 256;
+
 struct LogDescriptor
 {
     constexpr LogDescriptor(const char* category, const char* severity, const u32 severityNum, const char* function, const char* file, int line)
-        : team(category), severity(severity), severityNum(severityNum), function(function), file(file), line(line)
+        : team(category)/*, severity(severity), severityNum(severityNum), function(function), file(file), line(line)*/
     {
 
     }
@@ -70,34 +73,30 @@ struct LogDescriptor
 
     constexpr void SetValues(const char* category,const char* severity, const char* function, const char* file, const u32 line) noexcept
     {
-        this->line = line;
-        this->severity = severity;
-        this->function = function;
-        this->file = file;
-        this->team = category;
+        //this->line = line;
+        //this->severity = severity;
+        //this->function = function;
+        //this->file = file;
+        //this->team = category;
     }
 
     void SetMessage(const char* message, ...)
     {
         va_list d = nullptr;
         va_start(d, message);
-        vsnprintf(this->message, bIsRunningDebugMode ? 512 : 128, message, d);
+        vsnprintf(this->message, MESSAGE_BUFFER_SIZE, message, d);
         va_end(d);
     }
 
-    const char* severity;
-    u32 severityNum;
-
-    u32 line;
+    //struct
+    //{
+    //    u8 time : 7;
+    //    u8 severity : 1;
+    //} Miscellaneous;
 
     const char* team;
 
-//#ifdef MR_DEBUG
-    const char* function;
-    const char* file;
-//#endif // MR_DEBUG
-
-    char message[bIsRunningDebugMode ? 512 : 128] = { '\0' };
+    char message[MESSAGE_BUFFER_SIZE] = {};
 };
 
 
@@ -108,15 +107,15 @@ struct LogDescriptor
 	{ \
         static constexpr const char* GetName() { return #CategoryName; }; \
         static constexpr const wchar_t* GetNameW() { return L#CategoryName; }; \
-    }
+        static constexpr const u32 Count = Math::Count(#CategoryName); \
+    };
 
-LOG_ADDCATEGORY(Temp);
+//LOG_ADDCATEGORY(Temp);
 
 #define LINE _CRT_WIDE(__LINE__)
 #define Lize(x) L##x
 
 #define MR_LOG(CategoryName, severity, message, ...) \
-    static_assert(std::is_base_of<LogEntry, CategoryName>::value, "Category must inherit from LogEntry (Use LOG_ADDCATEGORY() macro)"); \
     if constexpr (bIsRunningDebugMode || severity != Fatal) \
     {\
         do \
