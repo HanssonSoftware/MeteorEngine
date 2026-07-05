@@ -5,6 +5,7 @@
 #include "Win32/MinimalWin.h"
 #include <Types/Map.h>
 #include <HAL/Window.h>
+#include <HAL/HAL.h>
 
 #include <Types/Array.h>
 #include <Memory/MemoryBlockArena.h>
@@ -21,21 +22,20 @@ void EditorApplication::Init()
 {
 	Application::Init();
 
-	Window* splash = Window::Create({ "valami" }, 620, 300, GetSystemMetrics(SM_CXSCREEN) / 2, GetSystemMetrics(SM_CYSCREEN) / 2);
-	splash->Show();
-
 	cli.Check("-maxram");
 	auto a = cli.Get("-maxram");
 
 	int J = 4;
-	Sleep(10000);
 
-	splash->Destroy();
+	editorWindow = Window::Create({ "Editor" }, 300, 300, 1600, 900);
+	editorWindow->Show();
 }
 
 void EditorApplication::Run()
 {	
 	Application::Run();
+
+	int J = 35;
 }
 
 void EditorApplication::Shutdown()
@@ -43,6 +43,7 @@ void EditorApplication::Shutdown()
 
 	Application::Shutdown();
 }
+
 
 #include <Special/LaunchMeteorSuite.h>
 

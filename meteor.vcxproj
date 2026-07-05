@@ -177,7 +177,6 @@
     <ClInclude Include="engine\Core\Memory\MemoryBlockPool.h" />
     <ClInclude Include="engine\Core\Memory\MemoryBlockArena.h" />
     <ClInclude Include="engine\Core\Memory\MemoryPackage.h" />
-    <ClInclude Include="Resource\EngineResource.h" />
     <ClInclude Include="engine\Core\HAL\Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -186,12 +185,6 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="engine\Core\Core.natvis" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Resource\EngineResource.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Resource\DefaultEngineIcon.ico" />
   </ItemGroup>
   <ItemGroup>
     <BuildMacro Include="ProductDir">

@@ -24,6 +24,8 @@ public:
 	void Resize(const Vector2<u32>& newSize);
 
 	void Destroy();
+
+	void* GetNativeHandle() const { return windowsAPIHandle; };
 protected:
 
 	Window() noexcept = default;

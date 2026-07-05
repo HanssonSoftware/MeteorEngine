@@ -7,6 +7,7 @@
 
 #include "Logging/Log.h"
 #include <HAL/Commandline.h>
+#include <HAL/HAL.h>
 
 // #include <CoreProxy.h>
 
@@ -20,6 +21,8 @@ LOG_ADDCATEGORY(Application);
 
 struct CORE_API Application
 {
+	friend void HAL::InitEssential();
+
 	enum class State : i8 
 	{ 
 		Dead = -1, 
@@ -61,7 +64,10 @@ struct CORE_API Application
 	const StringView* GetApplicationNameNoSpaces() const { return &appNameNoSpaces; };
 
 	Commandline* GetCommandline() { return &cli; };
+
+	void Tick();
 protected:
+
 	State currentState = { State::None };
 
 	//* Application name, this would be appearing on the created window
@@ -70,6 +76,8 @@ protected:
 
 	//* Useful for directories
 	StringView appCodeName;
+
+	bool bUseSplash = false;
 
 	Commandline cli;
 };

@@ -28,7 +28,7 @@ ModuleManager& ModuleManager::Get()
 
 ModuleManager::~ModuleManager() noexcept
 {
-    for (EngineModule*& module : modules)
+    for (Module*& module : modules)
     {
         module->ShutdownModule(); 
 
@@ -44,18 +44,18 @@ ModuleManager::~ModuleManager() noexcept
     //modules.Reset();
 }
 
-typedef EngineModule* (*fv)();
+typedef Module* (*fv)();
 
-bool ModuleManager::LoadModule(const String& moduleName)
+bool ModuleManager::LoadModule(const StringView& moduleName)
 {
     if (IsModuleLoaded(moduleName))
         return true;
 
 #ifdef MR_PLATFORM_WINDOWS
     wchar_t libraryName[512] = {};
-    const auto resultCount = swprintf(libraryName, 511, L"%s-%hs.dll", WIDE_ENGINE_NAME, *moduleName);
-
-    MR_ASSERT(resultCount > 512, "Library formatting buffer is too small! (%d)", resultCount);
+    //const auto resultCount = swprintf(libraryName, 511, L"%s-%hs.dll", WIDE_ENGINE_NAME, moduleName.ptr);
+    //MR_ASSERT(resultCount < 512, "Library formatting buffer is too small! (%d)", resultCount);
+    HAL::ConvertToWide(libraryName, moduleName.size, (char*)moduleName.ptr);
 
     HMODULE module = LoadLibraryW(libraryName);
     if (module != nullptr)
@@ -64,7 +64,7 @@ bool ModuleManager::LoadModule(const String& moduleName)
 
         if (moduleInstantiation)
         {
-            EngineModule* newModule = moduleInstantiation();
+            Module* newModule = moduleInstantiation();
             newModule->name = moduleName;
             //newModule->library = module;
             newModule->StartupModule();
@@ -86,7 +86,7 @@ bool ModuleManager::UnloadModule(const String& moduleName)
     const uint32_t moduleSize = modules.GetSize();
     for (uint32_t i = 0; i < moduleSize; i++)
     {
-        EngineModule*& module = modules[i];
+        Module*& module = modules[i];
         
         if (module)
         {
@@ -114,13 +114,13 @@ bool ModuleManager::UnloadModule(const String& moduleName)
     return true;
 }
 
-bool ModuleManager::IsModuleLoaded(const String& moduleName)
+bool ModuleManager::IsModuleLoaded(const StringView& moduleName)
 {
-    for (EngineModule*& mdl : modules)
+    for (Module*& mdl : modules)
     {
         if (!mdl) continue;
 
-        if (mdl->GetName() == moduleName)
+        if (mdl->GetName().Chr() == (char*)moduleName.ptr)
         {
             return mdl->moduleState == ELoadState::ENABLED;
         }

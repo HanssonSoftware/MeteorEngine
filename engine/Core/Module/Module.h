@@ -4,7 +4,7 @@
 #include <Types/String.h>
 //#include <type_traits>
 
-#include "Win32/MinimalWin.h"
+#include "HAL/Win32/MinimalWin.h"
 // #include <CoreProxy.h>
 
 #ifdef MR_CORE_EXPORTS
@@ -22,7 +22,7 @@ enum class ELoadState
 	UNLOADED
 };
 
-class CORE_API EngineModule
+class CORE_API Module
 {
 	friend class ModuleManager;
 public:
@@ -45,8 +45,7 @@ protected:
 };
 
 #define IMPLEMENT_MODULE(ModuleClass)																		 \
-	static_assert(std::is_base_of<EngineModule, ModuleClass>::value, "ModuleClass does not inherit from Module!"); \
-	extern "C" __declspec(dllimport) EngineModule* InitialiseModule()												 \
+	extern "C" __declspec(dllexport) Module* InitialiseModule()												 \
 	{																										 \
 		return new ModuleClass();																			 \
 	}

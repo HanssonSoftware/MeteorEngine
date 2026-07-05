@@ -6,57 +6,126 @@
 #include <Logging/Log.h>
 #include "MinimalWin.h"
 #include <stringapiset.h>
+#include <Application/Application.h>
 
 LOG_ADDCATEGORY(HAL);
 
-bool HAL::ConvertToWide(wchar_t* targetBuffer, const u32 size, const char* convertibleBuffer)
+static LRESULT CALLBACK GlobalWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	if (size && targetBuffer && convertibleBuffer)
+	switch (msg)
 	{
-		MultiByteToWideChar(CP_UTF8, 0, convertibleBuffer, size, targetBuffer, size);
-		return true;
+	case WM_DESTROY:
+		GetApplication()->SetCurrentState(Application::State::Shutdown);
+		GetApplication()->Shutdown();
+		return 0;
+	default:
+		return DefWindowProcW(hwnd, msg, wparam, lparam);
 	}
 
-	MR_LOG(LogHAL, Error, "Conversion error! MultiByteToWideChar[%d:%s]", GetLastError(), LocalizeErrorCode(GetLastError()));
-	return false;
+	return 0;
 }
 
-bool HAL::ConvertToNarrow(char* targetBuffer, const u32 size, const wchar_t* convertibleBuffer)
+namespace HAL
 {
-	if (size && targetBuffer && convertibleBuffer)
+
+	bool ConvertToWide(wchar_t* targetBuffer, const u32 size, const char* convertibleBuffer)
 	{
-		WideCharToMultiByte(CP_UTF8, 0, convertibleBuffer, size, targetBuffer, size, nullptr, nullptr);
-		return true;
+		if (size && targetBuffer && convertibleBuffer)
+		{
+			MultiByteToWideChar(CP_UTF8, 0, convertibleBuffer, size, targetBuffer, size);
+			return true;
+		}
+
+		MR_LOG(LogHAL, Error, "Conversion error! MultiByteToWideChar[%d:%s]", GetLastError(), LocalizeErrorCode(GetLastError()));
+		return false;
 	}
 
-	MR_LOG(LogHAL, Error, "Conversion error! WideCharToMultiByte[%d:%s]", GetLastError(), LocalizeErrorCode(GetLastError()));
-	return false;
-}
+	bool ConvertToNarrow(char* targetBuffer, const u32 size, const wchar_t* convertibleBuffer)
+	{
+		if (size && targetBuffer && convertibleBuffer)
+		{
+			WideCharToMultiByte(CP_UTF8, 0, convertibleBuffer, size, targetBuffer, size, nullptr, nullptr);
+			return true;
+		}
 
-StringView HAL::LocalizeErrorCode(i64 code)
-{
-	wchar_t final[512] = {};
+		MR_LOG(LogHAL, Error, "Conversion error! WideCharToMultiByte[%d:%s]", GetLastError(), LocalizeErrorCode(GetLastError()));
+		return false;
+	}
 
-	const DWORD count = FormatMessageW(
-		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		nullptr,
-		(DWORD)code,
-		LANG_USER_DEFAULT,
-		final,
-		511,
-		nullptr
+	StringView LocalizeErrorCode(i64 code)
+	{
+		wchar_t final[512] = {};
+
+		const DWORD count = FormatMessageW(
+			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+			nullptr,
+			(DWORD)code,
+			LANG_USER_DEFAULT,
+			final,
+			511,
+			nullptr
 		);
 
-	if (count == 0)
-	{
-		MR_LOG(LogHAL, Error, "Conversion error! WideCharToMultiByte[%d:%s]");
-		return { "" };
+		if (count == 0)
+		{
+			MR_LOG(LogHAL, Error, "Conversion error! WideCharToMultiByte[%d:%s]");
+			return { "" };
+		}
+
+		char end[512] = {};
+		ConvertToNarrow(end, count - 2, final);
+
+		return { end, count - 2 };
 	}
 
-	char end[512] = {};
-	ConvertToNarrow(end, count - 2, final);
+	bool PeekOSMessageQueue()
+	{
+		MSG msg;
+		if (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessageW(&msg);
+		}
 
-	return { end, count - 2 };
+		return true;
+	}
+
+	void InitEssential()
+	{
+		const StringView* codeName = GetApplication()->GetApplicationCodeName();
+
+		wchar_t buffer[256] = {};
+		MultiByteToWideChar(CP_UTF8, 0, (char*)codeName->ptr, codeName->size, buffer, codeName->size);
+
+		WNDCLASSEXW registerData = {};
+		registerData.cbSize = sizeof(WNDCLASSEXW);
+		registerData.hInstance = GetModuleHandleW(nullptr);
+		registerData.lpfnWndProc = GlobalWndProc;
+		registerData.lpszClassName = buffer;
+
+		if (!RegisterClassExW(&registerData))
+		{
+			MR_LOG(LogApplication, Fatal, "Unable to register engine critical component to Windows! RegisterClassExW=%d", GetLastError());
+		}
+
+		if (GetApplication()->bUseSplash)
+		{
+
+		}
+	}
+
+	void ShutdownEssential()
+	{
+		const StringView* codeName = GetApplication()->GetApplicationCodeName();
+
+		wchar_t buffer[256] = {};
+		MultiByteToWideChar(CP_UTF8, 0, (char*)codeName->ptr, codeName->size, buffer, codeName->size);
+
+		if (!UnregisterClassW(buffer, GetModuleHandleW(nullptr)))
+		{
+			MR_LOG(LogApplication, Fatal, "Failed to unregister engine critical component from Windows! UnregisterClassW=%d", GetLastError());
+		}
+	}
 }
 
 #endif // MR_PLATFORM_WINDOWS

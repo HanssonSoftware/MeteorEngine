@@ -11,15 +11,15 @@ class ModuleManager
 public:
 	static ModuleManager& Get();
 
-	virtual bool LoadModule(const String& moduleName);
+	virtual bool LoadModule(const StringView& moduleName);
 
 	virtual bool UnloadModule(const String& moduleName);
 
-	virtual bool IsModuleLoaded(const String& moduleName);
+	virtual bool IsModuleLoaded(const StringView& moduleName);
 protected:
 	virtual ~ModuleManager() noexcept;
 
-	Array<EngineModule*> modules;
+	Array<Module*> modules;
 
 private:
 	static ModuleManager* object; // This must be an extensible class!

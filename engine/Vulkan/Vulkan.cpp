@@ -1,9 +1,9 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #include "Vulkan.h"
-#include "Platform/PlatformLayout.h"
 
 #ifdef MR_PLATFORM_WINDOWS
+#include <HAL/Win32/MinimalWin.h>
 #include <vulkan/vulkan_win32.h>
 #endif // MR_PLATFORM_WINDOWS
 

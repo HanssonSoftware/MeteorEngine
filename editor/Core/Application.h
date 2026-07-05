@@ -8,6 +8,8 @@
 
 LOG_ADDCATEGORY(EditorApplication);
 
+class Window;
+
 class EditorApplication : public Application
 {
 public:
@@ -18,4 +20,7 @@ public:
 	virtual void Run() override;
 
 	virtual void Shutdown() override;
+
+protected:
+	Window* editorWindow;
 }; 

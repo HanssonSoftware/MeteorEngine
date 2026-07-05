@@ -46,7 +46,7 @@ Window* Window::Create(const StringView& name, const u32 sx, const u32 sy, const
 
 	HWND winHandle = ::CreateWindowExW(WS_EX_ACCEPTFILES, className, windowName, WS_OVERLAPPEDWINDOW, sx, sy, px, py, nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
 
-	MR_LOG(LogWindowing, Log, "%s", HAL::LocalizeErrorCode(125));
+	MR_LOG(LogWindowing, Log, "%d", GetLastError());
 
 	Window* newWindowHandle = (Window*)GetMemoryManager()->Allocate(sizeof(Window));
 	newWindowHandle->windowName = name;

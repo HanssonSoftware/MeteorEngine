@@ -1,12 +1,11 @@
 /* Copyright 2020 - 2025, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Renderer/Renderer.h>
 #include <Types/Array.h>
-
+#include <Module/Module.h>
 #include <vulkan/vulkan.h>
 
-class Vulkan
+class Vulkan : public Module
 {
 public:
 	virtual void StartupModule();
@@ -22,5 +21,5 @@ protected:
 	Array<const char*> enabledExtensions;
 };
 
-
-//IMPLEMENT_MODULE(Vulkan);
+//
+IMPLEMENT_MODULE(Vulkan);

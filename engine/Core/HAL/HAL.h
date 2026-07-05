@@ -11,4 +11,10 @@ namespace HAL
 	bool ConvertToNarrow(char* targetBuffer, const u32 size, const wchar_t* convertibleBuffer);
 
 	StringView LocalizeErrorCode(i64 code);
+
+	bool PeekOSMessageQueue();
+
+	void InitEssential();
+
+	void ShutdownEssential();
 };
