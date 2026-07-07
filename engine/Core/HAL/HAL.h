@@ -2,7 +2,7 @@
 
 #pragma once
 #include <HAL/DataTypes.h>
-#include <Types/StringView.h>
+#include <Types/String.h>
 
 namespace HAL
 {
@@ -10,7 +10,7 @@ namespace HAL
 
 	bool ConvertToNarrow(char* targetBuffer, const u32 size, const wchar_t* convertibleBuffer);
 
-	StringView LocalizeErrorCode(i64 code);
+	String LocalizeErrorCode(i64 code);
 
 	bool PeekOSMessageQueue();
 

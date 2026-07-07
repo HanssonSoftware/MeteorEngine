@@ -125,6 +125,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="engine\Core\Memory\BootMemoryManager.cpp" />
     <ClCompile Include="engine\Core\Application\Application.cpp" />
     <ClCompile Include="engine\Core\HAL\Win32\Commandline_Win32.cpp" />
     <ClCompile Include="engine\Core\HAL\Win32\File_Win32.cpp" />
@@ -145,6 +146,7 @@
     <ClCompile Include="engine\Core\HAL\Win32\Window_Win32.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="engine\Core\Memory\BootMemoryManager.h" />
     <ClInclude Include="engine\Core\Types\Math.h" />
     <ClInclude Include="engine\Core\HAL\File.h" />
     <ClInclude Include="engine\Core\HAL\HAL.h" />

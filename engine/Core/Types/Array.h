@@ -13,12 +13,7 @@ class Array
 public:
 	Array()
 	{
-		Resize(2);
-
-		for (u32 i = 0; i < size; i++)
-		{
-			new(&container[i]) T();
-		}
+		container = (T*)GetMemoryManager()->Allocate(sizeof(T));
 	};
 
 	~Array()
@@ -31,7 +26,7 @@ public:
 		//GetMemoryManager()->Deallocate(container, capacity * sizeof(T));
 
 		container = nullptr;
-		capacity = 0;
+		capacity = 1;
 		size = 0;
 	};
 
@@ -41,7 +36,7 @@ public:
 		size = copy.size;
 		if (capacity > 0) 
 		{
-			container = (T*)GetMemoryManager()->Allocate(capacity * sizeof(T));
+			container = (T*)GetMemoryManager()->Allocate(capacity * sizeof(T), GetMemoryManager()->GetProjectRegion());
 
 			for (u32 i = 0; i < size; i++) 
 			{
@@ -56,7 +51,7 @@ public:
 		, size(move.size)
 	{		
 		move.container = nullptr;
-		move.capacity = 0;
+		move.capacity = 1;
 		move.size = 0;
 	}
 
@@ -93,7 +88,7 @@ public:
 			size = old.size;
 
 			old.container = nullptr;
-			old.capacity = 0;
+			old.capacity = 1;
 			old.size = 0;
 		}
 
@@ -103,7 +98,7 @@ public:
 	void Add(T&& elementToAdd)
 	{
 		if (size + 1 > capacity)
-			Resize(capacity + (size / 2));
+			Resize(capacity * 2);
 
 		container[size++] = std::move(elementToAdd);
 	}
@@ -111,7 +106,7 @@ public:
 	void Add(const T& elementToAdd)
 	{
 		if (size + 1 > capacity)
-			Resize(capacity + (size / 2));
+			Resize(capacity * 2);
 
 		new (&container[size++]) T(std::forward<T>(elementToAdd));
 	}
@@ -130,7 +125,7 @@ public:
 	{
 		MR_ASSERT(capacity < newCount, "Old array cap is higher than new!");
 
-		T* newBlock = (T*)GetMemoryManager()->Allocate(newCount * sizeof(T));
+		T* newBlock = (T*)GetMemoryManager()->Allocate(newCount * sizeof(T), GetMemoryManager()->GetProjectRegion());
 		for (u32 i = 0; i < size; i++)
 			newBlock[i] = container[i];
 
@@ -150,12 +145,12 @@ public:
 				container[i].~T();
 			}
 
-			GetMemoryManager()->Deallocate(container, capacity * sizeof(T));
+			GetMemoryManager()->Deallocate(5);
 			container = nullptr;
 		}
 
 		size = 0;
-		capacity = 0;
+		capacity = 1;
 	}
 
 	T* Data() noexcept { return container; }
@@ -199,5 +194,5 @@ private:
 
 	u32 size = 0;
 
-	u32 capacity = 0;
+	u32 capacity = 1;
 }; 

@@ -23,9 +23,12 @@ Application::Application()
 {
     appFramework = this;
 
-    appName = { "Meteor Suite(R) application" };
-    appNameNoSpaces = { "MeteorSuite(R)app" };
-    appCodeName = { "MRAPP" };
+    SetCurrentState(Application::State::PreStartup);
+    GetMemoryManager()->Initialize();
+
+    appName = "Meteor Suite(R) application";
+    appNameNoSpaces = "MeteorSuite(R)app";
+    appCodeName = "MRAPP";
 }
 
 void Application::Init()
@@ -92,9 +95,6 @@ void Application::Tick()
 
 extern "C" LIBRARY_OUT int LaunchApplication(Application* instance, int argc, char** argv)
 {	
-    instance->SetCurrentState(Application::State::PreStartup);
-    GetMemoryManager()->Initialize();
-
     instance->GetCommandline()->Init(argc, argv);
 
     instance->SetCurrentState(Application::State::Startup);

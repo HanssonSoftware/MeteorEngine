@@ -57,11 +57,11 @@ struct CORE_API Application
 
 	void SetCurrentState(const State newState) { currentState = newState; };
 
-	const StringView* GetApplicationName() const { return &appName; };
+	const String* GetApplicationName() const { return &appName; };
 
-	const StringView* GetApplicationCodeName() const { return &appCodeName; };
+	const String* GetApplicationCodeName() const { return &appCodeName; };
 
-	const StringView* GetApplicationNameNoSpaces() const { return &appNameNoSpaces; };
+	const String* GetApplicationNameNoSpaces() const { return &appNameNoSpaces; };
 
 	Commandline* GetCommandline() { return &cli; };
 
@@ -71,11 +71,11 @@ protected:
 	State currentState = { State::None };
 
 	//* Application name, this would be appearing on the created window
-	StringView appName;
-	StringView appNameNoSpaces;
+	String appName;
+	String appNameNoSpaces;
 
 	//* Useful for directories
-	StringView appCodeName;
+	String appCodeName;
 
 	bool bUseSplash = false;
 

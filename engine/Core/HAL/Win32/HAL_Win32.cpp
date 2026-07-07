@@ -27,7 +27,6 @@ static LRESULT CALLBACK GlobalWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 
 namespace HAL
 {
-
 	bool ConvertToWide(wchar_t* targetBuffer, const u32 size, const char* convertibleBuffer)
 	{
 		if (size && targetBuffer && convertibleBuffer)
@@ -52,7 +51,7 @@ namespace HAL
 		return false;
 	}
 
-	StringView LocalizeErrorCode(i64 code)
+	String LocalizeErrorCode(i64 code)
 	{
 		wchar_t final[512] = {};
 
@@ -80,22 +79,31 @@ namespace HAL
 
 	bool PeekOSMessageQueue()
 	{
+		i32 returnStatement = 0;
 		MSG msg;
-		if (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
+		while ((returnStatement = GetMessageW(&msg, GetActiveWindow(), 0, 0)) != 0)
 		{
-			TranslateMessage(&msg);
-			DispatchMessageW(&msg);
+			if (returnStatement == -1)
+			{
+				return false;
+			}
+			else
+			{
+				TranslateMessage(&msg);
+				DispatchMessageW(&msg);
+				return true;
+			}
 		}
 
-		return true;
+		return false;
 	}
 
 	void InitEssential()
 	{
-		const StringView* codeName = GetApplication()->GetApplicationCodeName();
+		const String* codeName = GetApplication()->GetApplicationCodeName();
 
 		wchar_t buffer[256] = {};
-		MultiByteToWideChar(CP_UTF8, 0, (char*)codeName->ptr, codeName->size, buffer, codeName->size);
+		MultiByteToWideChar(CP_UTF8, 0, (char*)codeName->Chr(), codeName->Length(), buffer, codeName->Length());
 
 		WNDCLASSEXW registerData = {};
 		registerData.cbSize = sizeof(WNDCLASSEXW);
@@ -116,10 +124,10 @@ namespace HAL
 
 	void ShutdownEssential()
 	{
-		const StringView* codeName = GetApplication()->GetApplicationCodeName();
+		const String* codeName = GetApplication()->GetApplicationCodeName();
 
 		wchar_t buffer[256] = {};
-		MultiByteToWideChar(CP_UTF8, 0, (char*)codeName->ptr, codeName->size, buffer, codeName->size);
+		MultiByteToWideChar(CP_UTF8, 0, (char*)codeName->Chr(), codeName->Length(), buffer, codeName->Length());
 
 		if (!UnregisterClassW(buffer, GetModuleHandleW(nullptr)))
 		{

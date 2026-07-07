@@ -58,7 +58,7 @@ void Logger::Shutdown()
 
 void Logger::Init()
 {
-    if (GetMemoryManager()->RequestNewEngineRegion("Logger Region", MAX_LOG_ENTRIES * sizeof(LogEntry)))
+    if (GetMemoryManager()->RequestNewRegion("Logger Region", MAX_LOG_ENTRIES * sizeof(LogEntry)))
     {
         int J = 53;
     }
@@ -177,7 +177,7 @@ void Logger::Init()
 
         wchar_t title[128] = {};
 
-        swprintf(title, 127, L"%hs developer console (output only!)", GetApplication()->GetApplicationName()->ptr);
+        swprintf(title, 127, L"%hs developer console (output only!)", GetApplication()->GetApplicationName()->Chr());
         SetConsoleTitleW(title);
     }
 
@@ -270,7 +270,7 @@ void Logger::SendToOutputBuffer(char* buffer, const u32 count)
     bool bShouldUseAllocator = count > 256 ? true : false;
     wchar_t fixedBuffer[256 + 1] = { L'\0' };
     
-    wchar_t* fixBuffer = bShouldUseAllocator ? (wchar_t*)GetMemoryManager()->Allocate((count + 1) * sizeof(wchar_t)) : fixedBuffer;
+    wchar_t* fixBuffer = bShouldUseAllocator ? (wchar_t*)GetMemoryManager()->Allocate((count + 1) * sizeof(wchar_t), GetMemoryManager()->GetProjectRegion()) : fixedBuffer;
 
     if (!MultiByteToWideChar(CP_UTF8, 0, buffer, count * sizeof(char), fixBuffer, count))
     {

@@ -80,7 +80,7 @@ String::String(const String& other)
 	{
 		heapBuffer.capacity = other.heapBuffer.capacity;
 		heapBuffer.length = other.heapBuffer.length;
-		heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(heapBuffer.capacity);
+		heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
 
 		memset(heapBuffer.ptr, 0, heapBuffer.capacity);
 		strncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
@@ -160,7 +160,7 @@ String String::Format(const char* format, ...)
 	const int sizeForVA = vsnprintf(nullptr, 0, format, a);
 
 	char fixedFormattingBuffer[256 + 1] = {'\0'};
-	char* formattedBuffer = sizeForVA <= 256 ? fixedFormattingBuffer : (char*)GetMemoryManager()->Allocate(sizeForVA + 1);
+	char* formattedBuffer = sizeForVA <= 256 ? fixedFormattingBuffer : (char*)GetMemoryManager()->Allocate(sizeForVA + 1, GetMemoryManager()->GetProjectRegion());
 
 	const int result = vsnprintf(formattedBuffer, sizeForVA + 1, format, a);
 	va_end(a);
@@ -191,7 +191,7 @@ char* String::DetermineLocation(u32 size)
 	if (bIsUsingHeap)
 	{
 		heapBuffer.capacity = size * 2;
-		heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(heapBuffer.capacity);
+		heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
 		heapBuffer.length = size;
 
 		memset(heapBuffer.ptr, 0, heapBuffer.capacity);
@@ -211,7 +211,7 @@ String& String::operator=(const String& other)
 		{
 			heapBuffer.capacity = other.heapBuffer.capacity;
 			heapBuffer.length = other.heapBuffer.length;
-			heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(heapBuffer.capacity);
+			heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
 
 			memset(heapBuffer.ptr, 0, heapBuffer.capacity);
 			strncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
@@ -224,6 +224,16 @@ String& String::operator=(const String& other)
 			strncpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
 		}
 	}
+
+	return *this;
+}
+
+String& String::operator=(const char* other)
+{
+	const u32 otherSize = strlen(other);
+
+	char* target = DetermineLocation(otherSize);
+	strncpy(target, other, otherSize);
 
 	return *this;
 }
@@ -256,7 +266,7 @@ String& String::operator+=(const String& other)
 		if (heapBuffer.capacity <= newLen)
 		{
 			const u32 newCap = newLen * 2;
-			char* newPtr = (char*)GetMemoryManager()->Allocate(newCap);
+			char* newPtr = (char*)GetMemoryManager()->Allocate(newCap, GetMemoryManager()->GetProjectRegion());
 			memset(newPtr, 0, newCap);
 
 			if (heapBuffer.ptr && thisLen > 0)
@@ -289,7 +299,7 @@ String& String::operator+=(const String& other)
 		else
 		{
 			const uint32_t newCap = newLen * 2;
-			char* newPtr = (char*)GetMemoryManager()->Allocate(newCap * sizeof(char));
+			char* newPtr = (char*)GetMemoryManager()->Allocate(newCap * sizeof(char), GetMemoryManager()->GetProjectRegion());
 			memset(newPtr, 0, newCap);
 
 			if (thisLen > 0)

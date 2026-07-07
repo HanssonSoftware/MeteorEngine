@@ -40,6 +40,8 @@ public:
 
 	String& operator=(const String& other);
 
+	String& operator=(const char* other);
+
 	String operator+(const String& Other);
 
 	String& operator=(const StringView& other);

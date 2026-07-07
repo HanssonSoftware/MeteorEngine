@@ -19,7 +19,7 @@ bool Window::CallOSInsider()
 
 Window* Window::Create(const StringView& name, const u32 sx, const u32 sy, const u32 px, const u32 py)
 {
-	const bool bApplicationCodeNameTooBig = GetApplication()->GetApplicationCodeName()->size > 64;
+	const bool bApplicationCodeNameTooBig = GetApplication()->GetApplicationCodeName()->Length() > 64;
 	const bool bNewWindowNameTooBig = name.size > 256;
 
 	if (bApplicationCodeNameTooBig && bNewWindowNameTooBig)
@@ -39,7 +39,7 @@ Window* Window::Create(const StringView& name, const u32 sx, const u32 sy, const
 	}
 
 	wchar_t className[64] = {};
-	HAL::ConvertToWide(className, GetApplication()->GetApplicationCodeName()->size, (char*)GetApplication()->GetApplicationCodeName()->ptr);
+	HAL::ConvertToWide(className, GetApplication()->GetApplicationCodeName()->Length(), (char*)GetApplication()->GetApplicationCodeName()->Chr());
 
 	wchar_t windowName[256] = {};
 	HAL::ConvertToWide(windowName, name.size, (char*)name.ptr);
@@ -48,7 +48,7 @@ Window* Window::Create(const StringView& name, const u32 sx, const u32 sy, const
 
 	MR_LOG(LogWindowing, Log, "%d", GetLastError());
 
-	Window* newWindowHandle = (Window*)GetMemoryManager()->Allocate(sizeof(Window));
+	Window* newWindowHandle = (Window*)GetMemoryManager()->Allocate(sizeof(Window), GetMemoryManager()->GetProjectRegion());
 	newWindowHandle->windowName = name;
 	newWindowHandle->windowSize = { sx, sy };
 	newWindowHandle->windowsAPIHandle = winHandle;

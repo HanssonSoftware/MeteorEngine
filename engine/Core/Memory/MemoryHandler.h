@@ -13,6 +13,8 @@ class MemoryBlockPool;
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
 
+class MemoryHandler;
+
 struct MemoryMetadata
 {
 	void* ptr;
@@ -27,6 +29,8 @@ enum class MemoryAllocationTag : u16
 	MEM_PHYSICS
 };
 
+extern CORE_API MemoryHandler* GetMemoryManager();
+
 class CORE_API MemoryHandler
 {
 	friend class Logger;
@@ -39,16 +43,15 @@ public:
 
 	virtual bool Initialize();
 
-	virtual void* Allocate(const u64 byte);
+	virtual void* Allocate(const u64 byte, MemoryRegion* whichRegion = GetMemoryManager()->GetProjectRegion());
 	virtual void Deallocate(u32 id);
 
-	virtual bool RequestNewRegion(const StringView& regionName, const u64 newRegionSizeInBytes);
-	virtual bool RequestNewEngineRegion(const StringView& regionName, const u64 newRegionSizeInBytes);
+	virtual MemoryBlockPool* RequestNewRegion(const StringView& regionName, const u64 newRegionSizeInBytes);
 
 	static inline constexpr u64 RoundToMemoryAlignment(u64 byte)
 	{
 		if (byte == 0)
-			return 1;
+			return 0;
 
 		byte--;
 		byte |= byte >> 1;
@@ -62,9 +65,10 @@ public:
 		return byte;
 	}
 
-protected:
-	virtual void* AllocateFromEngine(const u64 byte);
+	MemoryRegion* GetEngineRegion() const { return engineRegion; };
+	MemoryRegion* GetProjectRegion() const { return projectRegion; };
 
+protected:
 	MemoryRegion* engineRegion = nullptr;
 	MemoryRegion* projectRegion = nullptr;
 };
@@ -83,5 +87,3 @@ constexpr u64 operator""_gB(u64 val)
 {
 	return val * 1024 * 1024 * 1024;
 }
-
-extern CORE_API MemoryHandler* GetMemoryManager();

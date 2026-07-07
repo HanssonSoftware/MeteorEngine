@@ -30,13 +30,13 @@ MemoryHandler::~MemoryHandler() noexcept
         while (lastRegion)
         {
             lastRegion = lastRegion->nextRegion;
-            HAL::OSDealloc(lastRegion, 0);
+            HAL::OSDealloc(lastRegion, lastRegion->size);
 
             lastRegion = nullptr;
         }
 
-        HAL::OSDealloc(engineRegion, 0);
-        HAL::OSDealloc(projectRegion, 0);
+        HAL::OSDealloc(engineRegion, engineRegion->size);
+        HAL::OSDealloc(projectRegion, projectRegion->size);
     }
 }
 
@@ -52,7 +52,6 @@ bool MemoryHandler::Initialize()
         return false;
     }
 #endif // MR_PLATFORM_WINDOWS
-
 
     constexpr const u64 fixed512MB = 512_mB;
     constexpr const u64 regionHeaderSize = (2 * sizeof(MemoryBlockPool));
@@ -75,23 +74,23 @@ bool MemoryHandler::Initialize()
     return engineRegion && projectRegion;
 }
 
-void* MemoryHandler::Allocate(const u64 byte)
+void* MemoryHandler::Allocate(const u64 byte, MemoryRegion* whichRegion)
 {
     MR_ASSERT(projectRegion, "Tried accessing to an invalid address, which has not been initialised yet!");
 
     const u64 rounded = RoundToMemoryAlignment(byte);
 
-    if (projectRegion->offset + rounded > projectRegion->size)
+    if (whichRegion->offset + rounded > whichRegion->size)
         return nullptr;
 
-    void* allocated = projectRegion->ptr + projectRegion->offset;
+    void* allocated = whichRegion->ptr + whichRegion->offset;
     if (!allocated)
-    {
-        return {};
-    }
+        return nullptr;
+
+    new(allocated) void*;
 
     memset(allocated, 0, rounded);
-    projectRegion->offset += rounded;
+    whichRegion->offset += rounded;
 
     return allocated;
 }
@@ -107,10 +106,10 @@ void MemoryHandler::Deallocate(u32 id)
     //VirtualFree(location, byte, MEM_DECOMMIT);
 }
 
-bool MemoryHandler::RequestNewRegion(const StringView& regionName, const u64 newRegionSizeInBytes)
+MemoryBlockPool* MemoryHandler::RequestNewRegion(const StringView& regionName, const u64 newRegionSizeInBytes)
 {
     MemoryBlockPool* newRegion = nullptr;
-    if (void* regionWithSelfContained = VirtualAlloc(nullptr, newRegionSizeInBytes + sizeof(MemoryBlockPool), MEM_COMMIT, PAGE_READWRITE))
+    if (void* regionWithSelfContained = HAL::OSAlloc(nullptr, newRegionSizeInBytes + sizeof(MemoryBlockPool)))
     {
         newRegion = new(regionWithSelfContained) MemoryBlockPool((u8*)regionWithSelfContained + sizeof(MemoryBlockPool), newRegionSizeInBytes);
 
@@ -121,39 +120,4 @@ bool MemoryHandler::RequestNewRegion(const StringView& regionName, const u64 new
     }
 
     return newRegion;
-}
-
-bool MemoryHandler::RequestNewEngineRegion(const StringView& regionName, const u64 newRegionSizeInBytes)
-{
-    MemoryBlockPool* newRegion = nullptr;
-    if (void* regionWithSelfContained = VirtualAlloc(nullptr, newRegionSizeInBytes + sizeof(MemoryBlockPool), MEM_COMMIT, PAGE_READWRITE))
-    {
-        newRegion = new(regionWithSelfContained) MemoryBlockPool((u8*)regionWithSelfContained + sizeof(MemoryBlockPool), newRegionSizeInBytes);
-   
-        MemoryBlockPool* last = engineRegion->nextRegion;
-        while (last) last = last->nextRegion;
-    }
-
-    return newRegion;
-}
-
-void* MemoryHandler::AllocateFromEngine(const u64 byte)
-{
-    MR_ASSERT(engineRegion, "Tried accessing to an invalid address, which has not been initialised yet!");
-
-    const u64 rounded = RoundToMemoryAlignment(byte);
-
-    if (engineRegion->offset + rounded > engineRegion->size)
-        return nullptr;
-
-    void* allocated = engineRegion->ptr + engineRegion->offset;
-    if (!allocated)
-    {
-        return nullptr;
-    }
-
-    memset(allocated, 0, rounded);
-    engineRegion->offset += rounded;
-
-    return allocated;
 }
