@@ -2,6 +2,7 @@
 
 #include "String.h"
 #include <Logging/Log.h>
+#include <cstdarg>
 
 #include <Memory/MemoryHandler.h>
 
@@ -13,41 +14,40 @@ LOG_ADDCATEGORY(StringSet);
 // BE ADVISED!	Allocate/Deallocate asks for bytes, well char size is 1 byte everywhere I think?
 
 
+constexpr String::String()
+	: internalBuffers()
+{
+
+}
+
 String::~String() noexcept
 {/*
-	if (bIsUsingHeap && heapBuffer.ptr)
-		GetMemoryManager()->Deallocate(heapBuffer.ptr, heapBuffer.capacity);*/
+	if (bIsUsingHeap && internalBuffers.heapBuffer.ptr)
+		GetMemoryManager()->Deallocate(internalBuffers.heapBuffer.ptr, internalBuffers.heapBuffer.capacity);*/
 
 	NullOut();
 }
 
-String::String(const char* Input)
+constexpr String::String(const char* Input)
 {
-	NullOut();
-
-	if (!Input || *Input == '\0')
-		return;
-
-	const u32 size = (u32)strlen(Input);
-	char* target = DetermineLocation(size);
-
-	strncpy(target, Input, size);
+	char* target = GetRecommendedBufferBySize(Count(Input));
+	StringCopy(Input, target);
 }
 
 String::String(int Input)
 {
-	//swprintf(stackBuffer.ptr, SSO_MAX_CHARS, L"%d", Input);
+	//swprintf(internalBuffers.stackBuffer.ptr, SSO_MAX_CHARS, L"%d", Input);
 }
 
 String::String(u32 Input)
 {
-	//sprintf(stackBuffer.ptr, SSO_MAX_CHARS, L"%ud", Input);
+	//sprintf(internalBuffers.stackBuffer.ptr, SSO_MAX_CHARS, L"%ud", Input);
 
 }
 
 String::String(float Input)
 {
-	//sprintf(stackBuffer.ptr, SSO_MAX_CHARS, L"%f", Input);
+	//sprintf(internalBuffers.stackBuffer.ptr, SSO_MAX_CHARS, L"%f", Input);
 }
 
 String::String(String&& other) noexcept
@@ -58,12 +58,12 @@ String::String(String&& other) noexcept
 
 	if (bIsUsingHeap)
 	{
-		heapBuffer.capacity = other.heapBuffer.capacity;
-		heapBuffer.length = other.heapBuffer.length;
+		internalBuffers.heapBuffer.capacity = other.internalBuffers.heapBuffer.capacity;
+		internalBuffers.heapBuffer.length = other.internalBuffers.heapBuffer.length;
 	}
 	else
 	{
-		stackBuffer.length = other.stackBuffer.length;
+		internalBuffers.stackBuffer.length = other.internalBuffers.stackBuffer.length;
 	}
 
 	char* determined = DetermineLocation(Length());
@@ -78,19 +78,19 @@ String::String(const String& other)
 	bIsUsingHeap = other.bIsUsingHeap;
 	if (bIsUsingHeap)
 	{
-		heapBuffer.capacity = other.heapBuffer.capacity;
-		heapBuffer.length = other.heapBuffer.length;
-		heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
+		internalBuffers.heapBuffer.capacity = other.internalBuffers.heapBuffer.capacity;
+		internalBuffers.heapBuffer.length = other.internalBuffers.heapBuffer.length;
+		internalBuffers.heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(internalBuffers.heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
 
-		memset(heapBuffer.ptr, 0, heapBuffer.capacity);
-		strncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
+		memset(internalBuffers.heapBuffer.ptr, 0, internalBuffers.heapBuffer.capacity);
+		strncpy(internalBuffers.heapBuffer.ptr, other.internalBuffers.heapBuffer.ptr, internalBuffers.heapBuffer.length);
 	}
 	else
 	{
-		stackBuffer.length = other.stackBuffer.length;
+		internalBuffers.stackBuffer.length = other.internalBuffers.stackBuffer.length;
 
-		memset(stackBuffer.ptr, 0, stackBuffer.length);
-		strncpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
+		memset(internalBuffers.stackBuffer.ptr, 0, internalBuffers.stackBuffer.length);
+		strncpy(internalBuffers.stackBuffer.ptr, other.internalBuffers.stackBuffer.ptr, internalBuffers.stackBuffer.length);
 	}
 }
 
@@ -177,12 +177,12 @@ void String::NullOut()
 
 	bIsUsingHeap = false;
 
-	heapBuffer.ptr = nullptr;
-	heapBuffer.capacity = 0;
-	heapBuffer.length = 0;
+	internalBuffers.heapBuffer.ptr = nullptr;
+	internalBuffers.heapBuffer.capacity = 0;
+	internalBuffers.heapBuffer.length = 0;
 
-	memset(stackBuffer.ptr, 0, SSO_MAX_CHARS + 1);
-	stackBuffer.length = 0;
+	memset(internalBuffers.stackBuffer.ptr, 0, SSO_MAX_CHARS + 1);
+	internalBuffers.stackBuffer.length = 0;
 }
 
 char* String::DetermineLocation(u32 size)
@@ -190,16 +190,16 @@ char* String::DetermineLocation(u32 size)
 	bIsUsingHeap = size > SSO_MAX_CHARS;
 	if (bIsUsingHeap)
 	{
-		heapBuffer.capacity = size * 2;
-		heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
-		heapBuffer.length = size;
+		internalBuffers.heapBuffer.capacity = size * 2;
+		internalBuffers.heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(internalBuffers.heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
+		internalBuffers.heapBuffer.length = size;
 
-		memset(heapBuffer.ptr, 0, heapBuffer.capacity);
-		return heapBuffer.ptr;
+		memset(internalBuffers.heapBuffer.ptr, 0, internalBuffers.heapBuffer.capacity);
+		return internalBuffers.heapBuffer.ptr;
 	}
 
-	stackBuffer.length = size;
-	return stackBuffer.ptr;
+	internalBuffers.stackBuffer.length = size;
+	return internalBuffers.stackBuffer.ptr;
 }
 
 String& String::operator=(const String& other)
@@ -209,31 +209,31 @@ String& String::operator=(const String& other)
 		bIsUsingHeap = other.bIsUsingHeap;
 		if (bIsUsingHeap)
 		{
-			heapBuffer.capacity = other.heapBuffer.capacity;
-			heapBuffer.length = other.heapBuffer.length;
-			heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
+			internalBuffers.heapBuffer.capacity = other.internalBuffers.heapBuffer.capacity;
+			internalBuffers.heapBuffer.length = other.internalBuffers.heapBuffer.length;
+			internalBuffers.heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(internalBuffers.heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
 
-			memset(heapBuffer.ptr, 0, heapBuffer.capacity);
-			strncpy(heapBuffer.ptr, other.heapBuffer.ptr, heapBuffer.length);
+			memset(internalBuffers.heapBuffer.ptr, 0, internalBuffers.heapBuffer.capacity);
+			strncpy(internalBuffers.heapBuffer.ptr, other.internalBuffers.heapBuffer.ptr, internalBuffers.heapBuffer.length);
 		}
 		else
 		{
-			stackBuffer.length = other.stackBuffer.length;
+			internalBuffers.stackBuffer.length = other.internalBuffers.stackBuffer.length;
 			
-			memset(stackBuffer.ptr, 0, stackBuffer.length);
-			strncpy(stackBuffer.ptr, other.stackBuffer.ptr, stackBuffer.length);
+			memset(internalBuffers.stackBuffer.ptr, 0, internalBuffers.stackBuffer.length);
+			strncpy(internalBuffers.stackBuffer.ptr, other.internalBuffers.stackBuffer.ptr, internalBuffers.stackBuffer.length);
 		}
 	}
 
 	return *this;
 }
 
-String& String::operator=(const char* other)
+constexpr String& String::operator=(const char* other)
 {
-	const u32 otherSize = strlen(other);
+	const u32 otherSize = Count(other);
 
-	char* target = DetermineLocation(otherSize);
-	strncpy(target, other, otherSize);
+	char* target = GetRecommendedBufferBySize(otherSize);
+	StringCopy(other, target);
 
 	return *this;
 }
@@ -259,42 +259,42 @@ String& String::operator+=(const String& other)
 	const u32 otherLen = other.Length();
 	const u32 newLen = thisLen + otherLen;
 
-	const char* otherData = other.bIsUsingHeap ? other.heapBuffer.ptr : other.stackBuffer.ptr;
+	const char* otherData = other.bIsUsingHeap ? other.internalBuffers.heapBuffer.ptr : other.internalBuffers.stackBuffer.ptr;
 
 	if (bIsUsingHeap)
 	{
-		if (heapBuffer.capacity <= newLen)
+		if (internalBuffers.heapBuffer.capacity <= newLen)
 		{
 			const u32 newCap = newLen * 2;
 			char* newPtr = (char*)GetMemoryManager()->Allocate(newCap, GetMemoryManager()->GetProjectRegion());
 			memset(newPtr, 0, newCap);
 
-			if (heapBuffer.ptr && thisLen > 0)
-				strncpy(newPtr, heapBuffer.ptr, thisLen);
+			if (internalBuffers.heapBuffer.ptr && thisLen > 0)
+				strncpy(newPtr, internalBuffers.heapBuffer.ptr, thisLen);
 
 			strncpy(newPtr + thisLen, otherData, otherLen);
 
-			//if (heapBuffer.ptr)
-				//GetMemoryManager()->Deallocate(heapBuffer.ptr, heapBuffer.capacity);
+			//if (internalBuffers.heapBuffer.ptr)
+				//GetMemoryManager()->Deallocate(internalBuffers.heapBuffer.ptr, internalBuffers.heapBuffer.capacity);
 
-			heapBuffer.ptr = newPtr;
-			heapBuffer.capacity = newCap;
+			internalBuffers.heapBuffer.ptr = newPtr;
+			internalBuffers.heapBuffer.capacity = newCap;
 		}
 		else
 		{
-			strncpy(heapBuffer.ptr + thisLen, otherData, otherLen);
+			strncpy(internalBuffers.heapBuffer.ptr + thisLen, otherData, otherLen);
 		}
 
-		heapBuffer.length = newLen;
-		heapBuffer.ptr[newLen] = '\0';
+		internalBuffers.heapBuffer.length = newLen;
+		internalBuffers.heapBuffer.ptr[newLen] = '\0';
 	}
 	else
 	{
 		if (newLen <= SSO_MAX_CHARS)
 		{
-			strncpy(stackBuffer.ptr + thisLen, otherData, otherLen);
-			stackBuffer.length = newLen;
-			stackBuffer.ptr[newLen] = '\0';
+			strncpy(internalBuffers.stackBuffer.ptr + thisLen, otherData, otherLen);
+			internalBuffers.stackBuffer.length = newLen;
+			internalBuffers.stackBuffer.ptr[newLen] = '\0';
 		}
 		else
 		{
@@ -303,13 +303,13 @@ String& String::operator+=(const String& other)
 			memset(newPtr, 0, newCap);
 
 			if (thisLen > 0)
-				strncpy(newPtr, stackBuffer.ptr, thisLen);
+				strncpy(newPtr, internalBuffers.stackBuffer.ptr, thisLen);
 
 			strncpy(newPtr + thisLen, otherData, otherLen);
 
-			heapBuffer.ptr = newPtr;
-			heapBuffer.capacity = newCap;
-			heapBuffer.length = newLen;
+			internalBuffers.heapBuffer.ptr = newPtr;
+			internalBuffers.heapBuffer.capacity = newCap;
+			internalBuffers.heapBuffer.length = newLen;
 
 			bIsUsingHeap = true;
 		}

@@ -4,6 +4,8 @@
 #include <Logging/Log.h>
 #include <new>
 #include <HAL/Memory.h>
+#include <Memory/MemoryBlockBase.h>
+#include <Memory/MemoryBlockPool.h>
 
 #include "Win32/MinimalWin.h"
 
@@ -26,10 +28,10 @@ MemoryHandler::~MemoryHandler() noexcept
 {
     if (engineRegion && projectRegion)
     {
-        MemoryBlockPool* lastRegion = projectRegion->nextRegion;
+        MemoryBlockBase* lastRegion = projectRegion->next;
         while (lastRegion)
         {
-            lastRegion = lastRegion->nextRegion;
+            lastRegion = lastRegion->next;
             HAL::OSDealloc(lastRegion, lastRegion->size);
 
             lastRegion = nullptr;
@@ -87,8 +89,6 @@ void* MemoryHandler::Allocate(const u64 byte, MemoryRegion* whichRegion)
     if (!allocated)
         return nullptr;
 
-    new(allocated) void*;
-
     memset(allocated, 0, rounded);
     whichRegion->offset += rounded;
 
@@ -104,20 +104,4 @@ void MemoryHandler::Deallocate(u32 id)
 
     //memset(location, 0, byte);
     //VirtualFree(location, byte, MEM_DECOMMIT);
-}
-
-MemoryBlockPool* MemoryHandler::RequestNewRegion(const StringView& regionName, const u64 newRegionSizeInBytes)
-{
-    MemoryBlockPool* newRegion = nullptr;
-    if (void* regionWithSelfContained = HAL::OSAlloc(nullptr, newRegionSizeInBytes + sizeof(MemoryBlockPool)))
-    {
-        newRegion = new(regionWithSelfContained) MemoryBlockPool((u8*)regionWithSelfContained + sizeof(MemoryBlockPool), newRegionSizeInBytes);
-
-        MemoryBlockPool* last = projectRegion->nextRegion;
-        while (last) last = last->nextRegion;
-
-        last = newRegion;
-    }
-
-    return newRegion;
 }

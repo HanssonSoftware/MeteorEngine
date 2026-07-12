@@ -122,7 +122,7 @@ bool ModuleManager::IsModuleLoaded(const StringView& moduleName)
 
         if (mdl->GetName().Chr() == (char*)moduleName.ptr)
         {
-            return mdl->moduleState == ELoadState::ENABLED;
+            return mdl->moduleState == Module::ModuleState::Enabled;
         }
     }
 

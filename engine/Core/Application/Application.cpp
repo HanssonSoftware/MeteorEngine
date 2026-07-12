@@ -4,6 +4,7 @@
 #include <Memory/MemoryHandler.h>
 #include "Commandline.h"
 #include <Special/ImportHelpers.h>
+#include <HAL/Window.h>
 #include <HAL/HAL.h>
 
 #ifdef MR_DEBUG
@@ -39,6 +40,20 @@ void Application::Init()
     Logger::Get()->Init();
     HAL::InitEssential();
 
+    if (!bHideWindow) mainWindow = Window::Create("", 10, 10, 200, 200);
+    MR_LOG(LogApplication, Log, "Restarting application!");
+    //LogApplication app;
+
+    do
+    {
+        if constexpr (bIsRunningDebugMode || 4 == 5)
+        {
+
+        }
+    } while (0);
+
+
+    // this is hardcoded!
     ModuleManager::Get().LoadModule("vulkan");
 }
 
@@ -82,8 +97,10 @@ void Application::RequestExit(u32 code)
 
 }
 
-void Application::Tick()
+void Application::ApplicationLoopFunction()
 {
+    if (mainWindow) mainWindow->Show();
+
     while (GetCurrentState() == State::Running)
     {
         if (HAL::PeekOSMessageQueue())
@@ -104,7 +121,7 @@ extern "C" LIBRARY_OUT int LaunchApplication(Application* instance, int argc, ch
         return -1;
 
     instance->SetCurrentState(Application::State::Running);
-    instance->Tick();
+    instance->ApplicationLoopFunction();
 
     return 0; 
 }

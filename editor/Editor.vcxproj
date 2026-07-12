@@ -101,11 +101,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core/Application.cpp" />
-    <ClCompile Include="Core\EditorLayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Core/Application.h" />
-    <ClInclude Include="Core\EditorLayer.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

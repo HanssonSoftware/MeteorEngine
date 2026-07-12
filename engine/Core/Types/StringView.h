@@ -2,6 +2,7 @@
 
 #pragma once
 #include <HAL/DataTypes.h>
+#include <Types/StringUtils.h>
 
 #ifdef MR_CORE_EXPORT
 #define CORE_API __declspec(dllexport)
@@ -23,7 +24,7 @@ struct CORE_API StringView
 
 	constexpr StringView(const char* data)
 		: ptr((u8*)data)
-		, size(Count((u8*)data))
+		, size(StringLength(data))
 	{
 
 	}
@@ -51,16 +52,8 @@ struct CORE_API StringView
 	constexpr const u8* begin() const { return ptr; };
 	constexpr const u8* end() const { return ptr + size; };
 
-private:
-	static constexpr u32 Count(const u8* data) noexcept
+	operator bool() const
 	{
-		u32 count = 0;
-		while (*data)
-		{
-			data++;
-			count++;
-		}
-
-		return count;
+		return ptr != nullptr;
 	}
 };

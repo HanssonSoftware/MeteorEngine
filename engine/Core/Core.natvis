@@ -15,11 +15,11 @@
 	</Type>
 	
 	<Type Name="Array&lt;*&gt;">
-		<DisplayString>{{ptr={container + capacity} size={size} cap={capacity}}}</DisplayString>
+		<DisplayString>{{ptr={container} size={size} cap={capacity}}}</DisplayString>
 		<Expand>
 			<ArrayItems>
-				<Size>size</Size>
-				<ValuePointer>container</ValuePointer>
+				<Size>last - begin</Size>
+				<ValuePointer>begin</ValuePointer>
 			</ArrayItems>
 		</Expand>
 	</Type>

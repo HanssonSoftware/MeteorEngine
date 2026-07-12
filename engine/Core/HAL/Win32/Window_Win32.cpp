@@ -50,7 +50,8 @@ Window* Window::Create(const StringView& name, const u32 sx, const u32 sy, const
 
 	Window* newWindowHandle = (Window*)GetMemoryManager()->Allocate(sizeof(Window), GetMemoryManager()->GetProjectRegion());
 	newWindowHandle->windowName = name;
-	newWindowHandle->windowSize = { sx, sy };
+	newWindowHandle->x = sx;
+	newWindowHandle->y = sy;
 	newWindowHandle->windowsAPIHandle = winHandle;
 
 	return newWindowHandle;
@@ -60,7 +61,7 @@ void Window::Show()
 {
 	if (!windowsAPIHandle)
 	{
-		MR_LOG(LogWindowing, Error, "OS Specific handle is invalid for window: %s", windowName.ptr);
+		MR_LOG(LogWindowing, Error, "OS Specific handle is invalid for window: %s", windowName.Chr());
 		return;
 	}
 
@@ -71,7 +72,7 @@ void Window::Hide()
 {
 	if (!windowsAPIHandle)
 	{
-		MR_LOG(LogWindowing, Error, "OS Specific handle is invalid for window: %s", windowName.ptr);
+		MR_LOG(LogWindowing, Error, "OS Specific handle is invalid for window: %s", windowName.Chr());
 		return;
 	}
 
@@ -82,7 +83,7 @@ void Window::Rename(const StringView& newName)
 {
 	if (!windowsAPIHandle)
 	{
-		MR_LOG(LogWindowing, Error, "OS Specific handle is invalid for window: %s", windowName.ptr);
+		MR_LOG(LogWindowing, Error, "OS Specific handle is invalid for window: %s", windowName.Chr());
 		return;
 	}
 
@@ -98,9 +99,10 @@ void Window::Rename(const StringView& newName)
 	::SetWindowTextW((HWND)windowsAPIHandle, fixed);
 }
 
-void Window::Resize(const Vector2<u32>& newSize)
+void Window::Resize(const u32 x, const u32 y)
 {
-	windowSize = newSize;
+	this->x = x;
+	this->y = y;
 
 	/*if (!windowsAPIHandle)
 	{
@@ -112,7 +114,7 @@ void Window::Destroy()
 {
 	if (!windowsAPIHandle)
 	{
-		MR_LOG(LogWindowing, Error, "OS Specific handle is invalid for window: %s", windowName.ptr);
+		MR_LOG(LogWindowing, Error, "OS Specific handle is invalid for window: %s", windowName.Chr());
 		return;
 	}
 

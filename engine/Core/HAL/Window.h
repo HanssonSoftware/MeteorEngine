@@ -2,7 +2,7 @@
 
 #pragma once
 #include <Types/StringView.h>
-#include <Types/Vector.h>
+#include <Types/String.h>
 
 #ifdef MR_CORE_EXPORT
 #define CORE_API __declspec(dllexport)
@@ -21,7 +21,7 @@ public:
 
 	void Rename(const StringView& newName);
 
-	void Resize(const Vector2<u32>& newSize);
+	void Resize(const u32 x, const u32 y);
 
 	void Destroy();
 
@@ -32,12 +32,14 @@ protected:
 	Window(const StringView& name, const u32 x, const u32 y)
 		: windowName(name)
 	{
-		windowSize = { x, y };
+		this->x = x;
+		this->y = y;
 	}
 
 	Window(const Window& old)
 		: windowName(old.windowName)
-		, windowSize(old.windowSize)
+		, x(old.x)
+		, y(old.y)
 	{
 
 	}
@@ -46,8 +48,8 @@ protected:
 
 	void* windowsAPIHandle = nullptr;
 
-	StringView windowName;
+	String windowName;
 	
-	Vector2<u32> windowSize;
+	u32 x, y;
 };
 

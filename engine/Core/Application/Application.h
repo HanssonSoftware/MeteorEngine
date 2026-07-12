@@ -3,7 +3,7 @@
 #pragma once
 #include <cstdint>
 #include <Types/Delegate.h>
-#include <Types/StringView.h>
+//#include <Types/StringView.h>
 
 #include "Logging/Log.h"
 #include <HAL/Commandline.h>
@@ -16,6 +16,8 @@
 #else
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
+
+class Window;
 
 LOG_ADDCATEGORY(Application);
 
@@ -63,12 +65,20 @@ struct CORE_API Application
 
 	const String* GetApplicationNameNoSpaces() const { return &appNameNoSpaces; };
 
+	const bool GetIsWindowHiddenFromStart() const { return bHideWindow; };
+
+	const void* GetApplicationNativeHandle() const { return applicationHandle; };
+
+	Window* GetMainWindow() const { return mainWindow; };
+
 	Commandline* GetCommandline() { return &cli; };
 
-	void Tick();
-protected:
+	void ApplicationLoopFunction();
 
+protected:
 	State currentState = { State::None };
+
+	bool bHideWindow = false;
 
 	//* Application name, this would be appearing on the created window
 	String appName;
@@ -77,9 +87,11 @@ protected:
 	//* Useful for directories
 	String appCodeName;
 
-	bool bUseSplash = false;
-
 	Commandline cli;
+
+	void* applicationHandle;
+
+	Window* mainWindow;
 };
 
 template<typename T = Application>

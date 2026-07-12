@@ -22,13 +22,11 @@ namespace Math
 
 	static constexpr u32 Count(const char* data) noexcept
 	{
-		u32 count = 0;
-		while (*data)
-		{
-			data++;
-			count++;
-		}
+		const char* start = data;
 
-		return count;
+		while (*data)
+			data++;
+
+		return (u32)(data - start);
 	}
 };

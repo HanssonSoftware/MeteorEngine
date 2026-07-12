@@ -33,16 +33,7 @@
     <ClCompile Include="engine\Core\Types\Name.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Types\NameCollection.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="engine\Core\Memory\MemoryHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Memory\MemoryBlockPool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\Core\Memory\MemoryBlockArena.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="engine\Core\Logging\Log.cpp">
@@ -69,7 +60,10 @@
     <ClCompile Include="engine\Core\HAL\Win32\Logging_Win32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\Core\Memory\BootMemoryManager.cpp">
+    <ClCompile Include="engine\Core\HAL\Win32\Paths_Win32.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Core\HAL\Win32\Timer_Win32.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -125,9 +119,6 @@
     <ClInclude Include="engine\Core\Types\Name.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Types\NameCollection.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="engine\Core\Special\EngineConstants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -173,7 +164,16 @@
     <ClInclude Include="engine\Core\Types\StringView.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="engine\Core\Memory\BootMemoryManager.h">
+    <ClInclude Include="engine\Core\HAL\Paths.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Types\StringUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\HAL\Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Memory\MemoryBlockBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,6 +3,7 @@
 #pragma once
 //#include <Types/Delegate.h>
 #include <HAL/DataTypes.h>
+#include <Memory/MemoryBlockArena.h>
 
 #ifdef MR_DEBUG
 constexpr inline const bool bIsRunningDebugMode = true;
@@ -10,10 +11,7 @@ constexpr inline const bool bIsRunningDebugMode = true;
 constexpr inline const bool bIsRunningDebugMode = false;
 #endif // MR_DEBUG
 
-class String;
-struct LogDescriptor;
-enum LogFormatting;
-struct LogAssertion;
+class MemoryBlockPool;
 
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)
@@ -25,13 +23,10 @@ struct LogAssertion;
 
 struct LogEntry {};
 
-// Logger definition is split exclusively into seperate .cpp OS specific files
-//
-
-// * awd
+// * Logger the Core's beloved logging system, use MR_LOG() to log your wants.
 class CORE_API Logger
 {
-	static constexpr const u32 MAX_LOG_ENTRIES = 1024;
+	static constexpr const u32 MAX_LOG_ENTRIES = 2048;
 
 	/* u8 why ? : category(enum : u8 also)	(reserved)
 				  0							0000000		*/
@@ -44,6 +39,16 @@ class CORE_API Logger
 
 		//void* payload;
 		u8 flag;
+	};
+
+	enum LogSeverity : u8
+	{
+		Log = 1,
+		Info = Log,
+		Verbose,
+		Warn,
+		Error,
+		Fatal
 	};
 
 public:
@@ -60,37 +65,39 @@ public:
 	virtual void Init();
 	virtual void Shutdown();
 
-	virtual u32 FormatLogMessage(char* buffer, LogFormatting format, LogDescriptor* descriptor);
-	virtual void TransmitAssertion(const LogAssertion* Info);
-	virtual void SendToOutputBuffer(char* buffer, const u32 count);
-	virtual void HandleFatal(LogDescriptor* Descriptor);
+	void LogStandard(LogEntry* category, LogSeverity severity, const char* message, ...);
+	void LogFatal(LogEntry* category, LogSeverity severity, const char* message, const u64 time, const char* function, const u32 line, const char* file, ...);
+	void LogAssert();
 
+	void SendToOutputBuffer(void* buffer, const u32 count);
 
 protected:
+	static bool PrepareLoggingSystem();
+
 	bool bIsInitialized = false;
 
+	static constexpr inline const char* FormatSeverity(LogSeverity Severity) noexcept
+	{
+		switch (Severity)
+		{
+		case Log:
+			return "Log";
+		case Warn:
+			return "Warning";
+		case Error:
+			return "Error";
+		case Fatal:
+			return "Fatal";
+		case Verbose:
+			return "Verbose";
+		}
+
+		return "???";
+	}
 private:
+	MemoryBlockArena* loggingArena;
+
 	static inline Logger* instance = nullptr;
 };
 
 #include "LogMacros.h"
-
-static constexpr inline const char* FormatSeverity(LogSeverity Severity) noexcept
-{
-	switch (Severity)
-	{
-	case Log:
-		return "Log";
-	case Warn:
-		return "Warning";
-	case Error:
-		return "Error";
-	case Fatal:
-		return "Fatal";
-	case Verbose:
-		return "Verbose";
-	}
-
-	return "???";
-}
-

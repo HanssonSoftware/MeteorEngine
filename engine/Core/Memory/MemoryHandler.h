@@ -2,10 +2,12 @@
 
 #pragma once
 #include <HAL/DataTypes.h>
+#include <HAL/Memory.h>
 #include <Types/StringView.h>
 #include "MemoryPackage.h"
+#include "MemoryBlockPool.h"
 
-class MemoryBlockPool;
+class MemoryBlockBase;
 
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)
@@ -35,7 +37,6 @@ class CORE_API MemoryHandler
 {
 	friend class Logger;
 public:
-	typedef u32 MemoryIdentifier;
 	typedef MemoryBlockPool MemoryRegion;
 
 	MemoryHandler() = default;
@@ -46,7 +47,26 @@ public:
 	virtual void* Allocate(const u64 byte, MemoryRegion* whichRegion = GetMemoryManager()->GetProjectRegion());
 	virtual void Deallocate(u32 id);
 
-	virtual MemoryBlockPool* RequestNewRegion(const StringView& regionName, const u64 newRegionSizeInBytes);
+	template<typename T = MemoryBlockBase>
+	T* RequestNewRegion(const StringView& regionName, const u64 newRegionSizeInBytes)
+	{
+		T* newRegion = nullptr;
+		if (void* regionWithSelfContained = HAL::OSAlloc(nullptr, newRegionSizeInBytes + sizeof(T)))
+		{
+			newRegion = new(regionWithSelfContained) T;
+
+			// 1. Get projectRegion's nextRegion
+			// 2. Find the nextRegion is nullptr
+			// 3. If yes then set the new value to the nextRegion (where null)
+
+			MemoryBlockBase* last = projectRegion->next;
+			while (last) last = last->next;
+
+			last = newRegion;
+		}
+
+		return newRegion;
+	}
 
 	static inline constexpr u64 RoundToMemoryAlignment(u64 byte)
 	{
@@ -65,12 +85,12 @@ public:
 		return byte;
 	}
 
-	MemoryRegion* GetEngineRegion() const { return engineRegion; };
-	MemoryRegion* GetProjectRegion() const { return projectRegion; };
+	MemoryBlockPool* GetEngineRegion() const { return engineRegion; };
+	MemoryBlockPool* GetProjectRegion() const { return projectRegion; };
 
 protected:
-	MemoryRegion* engineRegion = nullptr;
-	MemoryRegion* projectRegion = nullptr;
+	MemoryBlockPool* engineRegion = nullptr;
+	MemoryBlockPool* projectRegion = nullptr;
 };
 
 constexpr u64 operator""_kB(u64 val)

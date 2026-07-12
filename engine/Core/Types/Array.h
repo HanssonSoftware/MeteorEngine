@@ -1,16 +1,22 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-
 #include "Iterator.h"
 #include <Memory/MemoryHandler.h>
 #include <Logging/Log.h>
+#include <type_traits>
 
 //* An array can store multiple elements of ONE exact type
 template <typename T>
 class Array
 {
 public:
+	explicit Array(u32 count)
+	{
+		capacity = count;
+		container = (T*)GetMemoryManager()->Allocate(capacity * sizeof(T));
+	}
+
 	Array()
 	{
 		container = (T*)GetMemoryManager()->Allocate(sizeof(T));

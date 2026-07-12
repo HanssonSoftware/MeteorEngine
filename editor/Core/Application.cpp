@@ -6,6 +6,7 @@
 #include <Types/Map.h>
 #include <HAL/Window.h>
 #include <HAL/HAL.h>
+#include <HAL/Paths.h>
 
 #include <Types/Array.h>
 #include <Memory/MemoryBlockArena.h>
@@ -13,9 +14,10 @@
 EditorApplication::EditorApplication() 
 	: Application()
 {
-	appName = { "Meteor Editor" };
-	appNameNoSpaces = { "MeteorEditor" };
+	appName = { "Meteor Editor fdg" };
+	appNameNoSpaces = "MeteorEditor";
 	appCodeName = { "Satellite" };
+
 }
 
 void EditorApplication::Init()

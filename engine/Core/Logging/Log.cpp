@@ -3,6 +3,7 @@
 #include "Log.h"
 #include <Commandline.h>
 #include <Types/String.h>
+#include <Memory/MemoryBlockArena.h>
 
 #include <Application/Application.h>
 #include <Special/EngineConstants.h>
@@ -10,12 +11,7 @@
 
 #ifdef MR_PLATFORM_WINDOWS
 #include "Win32/MinimalWin.h"
-#include <Shlobj.h>
-#include <shlwapi.h>
-#include <pathcch.h>
 
-#pragma comment(lib, "OneCore.Lib")
-#pragma comment(lib, "Pathcch.lib")
 
 static HANDLE consoleHandle;
 static HANDLE fileHandle;
@@ -25,13 +21,11 @@ static HANDLE fileHandle;
 LOG_ADDCATEGORY(Logging);
 LOG_ADDCATEGORY(LoggingIO);
 
-static Logger* instance = nullptr;
-
 Logger* Logger::Get()
 {
     if (!instance)
     {
-        instance = new Logger;
+        PrepareLoggingSystem();
     }
 
     return instance;
@@ -44,270 +38,98 @@ Logger::Logger(Logger* newInstance)
 
 Logger::~Logger() noexcept
 {
+    Shutdown();
+}
+
+void Logger::LogStandard(LogEntry* category, LogSeverity severity, const char* message, ...)
+{
+    if constexpr (true)
+    {
+
+    }
+}
+
+void Logger::LogFatal(LogEntry* category, LogSeverity severity, const char* message, const u64 time, const char* function, const u32 line, const char* file, ...)
+{
 
 }
 
-void Logger::Shutdown()
+bool Logger::PrepareLoggingSystem()
 {
-    CloseHandle(fileHandle);
-    CloseHandle(consoleHandle);
+    MemoryBlockArena* logArena = (MemoryBlockArena*)GetMemoryManager()->RequestNewRegion<MemoryBlockArena>("Logger Region", MAX_LOG_ENTRIES * sizeof(LogEntry) + sizeof(Logger));
 
+    if (logArena)
+    {
+        instance = (Logger*)logArena;
+        instance->loggingArena = logArena;
+        return true;
+    }
 
-    bIsInitialized = false;
+    return false;
 }
 
-void Logger::Init()
-{
-    if (GetMemoryManager()->RequestNewRegion("Logger Region", MAX_LOG_ENTRIES * sizeof(LogEntry)))
-    {
-        int J = 53;
-    }
-
-#ifdef MR_PLATFORM_WINDOWS
-    LARGE_INTEGER begin, freq, end;
-    QueryPerformanceFrequency(&freq);
-    QueryPerformanceCounter(&begin);
-#if 0
-    if (!Commandline::Get().Check("-nofilelogging"))
-    {
-        wchar_t* foundPath = nullptr;
-
-        if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_LocalAppData, 0, nullptr, &foundPath)))
-        {
-            wchar_t path[512 + 1] = { L'\0' };
-            wcscpy(path, foundPath);
-
-            constexpr const wchar_t pathToCat[] = L"\\" WIDE_COMPANY_NAME L"\\";
-            wcscat(path, pathToCat);
-
-            const u32 appNameLength = (u32)strlen(GetApplication()->GetApplicationNameNoSpaces());
-            const bool bIsUsingHeap = appNameLength > 256 ? true : false;
-            wchar_t appNameStack[256 + 1] = { L'\0' };
-
-            wchar_t* appName = bIsUsingHeap ? (wchar_t*)GetMemoryManager()->Allocate((appNameLength + 1) * sizeof(wchar_t)) : appNameStack;
-
-            if (!MultiByteToWideChar(CP_UTF8, 0, GetApplication()->GetApplicationNameNoSpaces(), appNameLength, appName, appNameLength))
-            {
-                wchar_t chars[256] = { L'\0' };
-
-                chars[FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, GetLastError(), LANG_USER_DEFAULT, chars, 256, nullptr) - 2] = L'\0';
-
-                MR_LOG(LogTemp, Error, "%ls", chars);
-            }
-
-            wcsncat(path, appName, appNameLength);
-
-            SHCreateDirectoryExW(nullptr, path, nullptr);
-
-            constexpr const wchar_t pathToCat2[] = L"\\" L"Logs" L"\\";
-            wcsncat(path, pathToCat2, sizeof(pathToCat2) / sizeof(pathToCat2[0]));
-            SHCreateDirectoryExW(nullptr, path, nullptr);
-
-            SYSTEMTIME st = {};
-            GetLocalTime(&st);
-
-            wchar_t date[32] = { L'\0' };
-            swprintf(date, 32, L"%02d%02d%02d-%02d%02d%02d.txt", st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
-            wcsncat(path, date, 32);
-
-            fileHandle = CreateFileW(path, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN | FILE_FLAG_NO_BUFFERING, nullptr);
-            if (fileHandle == INVALID_HANDLE_VALUE)
-            {
-                wchar_t chars[256] = { L'\0' };
-
-                FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, GetLastError(), LANG_USER_DEFAULT, chars, 256, nullptr);
-
-                MR_LOG(LogTemp, Error, "%ls", chars);
-            }
-
-            constexpr const char fileBeginFormatting[] = "Logging started at: %02d/%02d/%02d %02d:%02d:%02d\n";
-            char fileBeginFormatted[64] = "\0";
-
-            const u32 count = snprintf(fileBeginFormatted, 64, fileBeginFormatting, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
-
-            DWORD toWrite = 0;
-            WriteFile(fileHandle, fileBeginFormatted, count, &toWrite, nullptr);
-            FlushFileBuffers(fileHandle);
-
-            CoTaskMemFree(foundPath);
-        }
-    }
-#endif
-#ifdef MR_DEBUG
-    if (!GetConsoleWindow())
-    {
-        //FreeConsole();
-
-        //if (!AllocConsole())
-        //{
-        //    if (GetLastError() == ERROR_ACCESS_DENIED)
-        //    {
-        //        if (!AttachConsole(ATTACH_PARENT_PROCESS))
-        //        {
-        //            GetApplication()->RequestExit(-1);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        GetApplication()->RequestExit(-1);
-        //    }
-        //}
-        //else
-        //{
-    }
-
-    if (!SetStdHandle(STD_INPUT_HANDLE, INVALID_HANDLE_VALUE))
-    {
-        GetApplication()->RequestExit(-1);
-    }
-
-    consoleHandle = CreateFileW(L"CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
-    if (consoleHandle != INVALID_HANDLE_VALUE)
-    {
-        SetConsoleOutputCP(CP_UTF8);
-
-        CONSOLE_CURSOR_INFO cf;
-        GetConsoleCursorInfo(consoleHandle, &cf);
-        cf.bVisible = false;
-
-        SetConsoleCursorInfo(consoleHandle, &cf);
-
-        if (!SetStdHandle(STD_OUTPUT_HANDLE, consoleHandle))
-            GetApplication()->RequestExit(-1);
-
-        wchar_t title[128] = {};
-
-        swprintf(title, 127, L"%hs developer console (output only!)", GetApplication()->GetApplicationName()->Chr());
-        SetConsoleTitleW(title);
-    }
-
-#endif // MR_DEBUG
-
-    QueryPerformanceCounter(&end);
-    MR_LOG(LogLogging, Info, "Logger system is instantiated in %.3f seconds!", ((double)end.QuadPart - (double)begin.QuadPart) / (double)freq.QuadPart);
-#endif // MR_PLATFORM_WINDOWS
-
-}
-
-void Logger::HandleFatal(LogDescriptor* Descriptor)
-{
-    
-}
-
-u32 Logger::FormatLogMessage(char* buffer, LogFormatting format, LogDescriptor* descriptor)
-{
-    switch (format)
-    {
-        case LogFormatting::Category:
-        {
-#ifdef MR_PLATFORM_WINDOWS
-            return (u32)snprintf(buffer, 64, "[%s] ", descriptor->team);
-#endif // MR_PLATFORM_WINDOWS
-        }
-        case LogFormatting::Time:
-        {
-#ifdef MR_PLATFORM_WINDOWS
-            SYSTEMTIME st = {};
-            GetLocalTime(&st);
-
-            if (consoleHandle)
-            {
-                //switch (descriptor->severityNum)
-                //{
-                //    case 1: SetConsoleTextAttribute(consoleHandle, 0xf); break;
-                //    case 2: SetConsoleTextAttribute(consoleHandle, 0x9); break;
-                //    case 3: SetConsoleTextAttribute(consoleHandle, 0x6); break;
-                //    case 4: SetConsoleTextAttribute(consoleHandle, 0x4); break;
-                //    case 5: SetConsoleTextAttribute(consoleHandle, 0x4); break;
-                //}
-            }
-
-            return (u32)snprintf(buffer, 32, "[%02u-%02u-%02u %02u:%02u:%02u]", (u16)st.wYear, (u16)st.wMonth, (u16)st.wDay, (u16)st.wHour, (u16)st.wMinute, (u16)st.wSecond);
-#endif // MR_PLATFORM_WINDOWS
-        }
-        case LogFormatting::Severity:
-        {
-#ifdef MR_PLATFORM_WINDOWS
-            //return (u32)snprintf(buffer, 8, "%s: ", descriptor->severity);
-#endif // MR_PLATFORM_WINDOWS
-        }
-        case LogFormatting::Message:
-        {
-#ifdef MR_PLATFORM_WINDOWS
-            return (u32)snprintf(buffer, (bIsRunningDebugMode ? 512 : 128) + 3, "%s\n", descriptor->message);
-#endif // MR_PLATFORM_WINDOWS
-        }
-    }
-
-    return (u32)0;
-}
-
-void Logger::TransmitAssertion(const LogAssertion* Info)
+void Logger::LogAssert()
 {
 #ifdef MR_PLATFORM_WINDOWS
-    static constexpr const wchar_t title[] = WIDE_ENGINE_NAME_SPACE L" - Assertion error";
-    wchar_t fixed[bIsRunningDebugMode ? 256 : 128] = { L'\0' };
-    MultiByteToWideChar(CP_UTF8, 0, Info->message, bIsRunningDebugMode ? 256 : 128, fixed, bIsRunningDebugMode ? 256 : 128);
+    //static constexpr const wchar_t title[] = WIDE_ENGINE_NAME_SPACE L" - Assertion error";
+    //wchar_t fixed[bIsRunningDebugMode ? 256 : 128] = { L'\0' };
+    //MultiByteToWideChar(CP_UTF8, 0, Info->message, bIsRunningDebugMode ? 256 : 128, fixed, bIsRunningDebugMode ? 256 : 128);
 
-    MessageBoxW(nullptr, fixed, title, MB_OK);
+    //MessageBoxW(nullptr, fixed, title, MB_OK);
 #endif // MR_PLATFORM_WINDOWS
 
-    char hitMessageBuffer[bIsRunningDebugMode ? 2048 : 1024] = { '\0' };
+    //char hitMessageBuffer[bIsRunningDebugMode ? 2048 : 1024] = { '\0' };
 
-    const u32 result = (u32)snprintf(hitMessageBuffer, bIsRunningDebugMode ? 2048 : 1024, "*** AN ASSERT WAS HIT! *** [%s][%s:%u]\n", Info->assertStatement, Info->assertLocationInFile, Info->assertLineInFile);
+    //const u32 result = (u32)snprintf(hitMessageBuffer, bIsRunningDebugMode ? 2048 : 1024, "*** AN ASSERT WAS HIT! *** [%s][%s:%u]\n", Info->assertStatement, Info->assertLocationInFile, Info->assertLineInFile);
    
-    SendToOutputBuffer(hitMessageBuffer, result);
-
-#ifdef MR_PLATFORM_WINDOWS
-    DebugBreak();
-#endif
+    //SendToOutputBuffer(hitMessageBuffer, result);
 }
-
-void Logger::SendToOutputBuffer(char* buffer, const u32 count)
-{
-#if defined(MR_PLATFORM_WINDOWS) && defined(MR_DEBUG)
-
-    bool bShouldUseAllocator = count > 256 ? true : false;
-    wchar_t fixedBuffer[256 + 1] = { L'\0' };
-    
-    wchar_t* fixBuffer = bShouldUseAllocator ? (wchar_t*)GetMemoryManager()->Allocate((count + 1) * sizeof(wchar_t), GetMemoryManager()->GetProjectRegion()) : fixedBuffer;
-
-    if (!MultiByteToWideChar(CP_UTF8, 0, buffer, count * sizeof(char), fixBuffer, count))
-    {
-        MR_ASSERT(false, "fs");
-    }
-
-    OutputDebugStringW(fixBuffer);
-
-    if (consoleHandle)
-    {
-        DWORD written = 0;
-        WriteConsoleW(consoleHandle, (wchar_t*)fixBuffer, (DWORD)count, &written, nullptr);
-    }   
-
-    static bool bFileHandlingState = true;
-    if (fileHandle && bFileHandlingState)
-    {
-        static u32 bytes = 0;
-        DWORD written = 0;
-
-        if (!WriteFile(fileHandle, buffer, count, &written, nullptr))
-        {
-            bFileHandlingState = false;
-
-            CloseHandle(fileHandle);
-            return;
-        }
-
-        bytes += (u32)written;
-        if (bytes > 512)
-        {
-            if (FlushFileBuffers(fileHandle))
-                bytes = 0;
-        }
-    }
-
-    //if (bShouldUseAllocator) GetMemoryManager()->Deallocate(fixBuffer, (count + 1) * sizeof(wchar_t));
-#endif // MR_PLATFORM_WINDOWS && MR_DEBUG
-
-}
+//
+//void Logger::SendToOutputBuffer(char* buffer, const u32 count)
+//{
+//#if defined(MR_PLATFORM_WINDOWS) && defined(MR_DEBUG)
+//
+//    bool bShouldUseAllocator = count > 256 ? true : false;
+//    wchar_t fixedBuffer[256 + 1] = { L'\0' };
+//    
+//    wchar_t* fixBuffer = bShouldUseAllocator ? (wchar_t*)GetMemoryManager()->Allocate((count + 1) * sizeof(wchar_t), GetMemoryManager()->GetProjectRegion()) : fixedBuffer;
+//
+//    if (!MultiByteToWideChar(CP_UTF8, 0, buffer, count * sizeof(char), fixBuffer, count))
+//    {
+//        MR_ASSERT(false, "fs");
+//    }
+//
+//    OutputDebugStringW(fixBuffer);
+//
+//    if (consoleHandle)
+//    {
+//        DWORD written = 0;
+//        WriteConsoleW(consoleHandle, (wchar_t*)fixBuffer, (DWORD)count, &written, nullptr);
+//    }   
+//
+//    static bool bFileHandlingState = true;
+//    if (fileHandle && bFileHandlingState)
+//    {
+//        static u32 bytes = 0;
+//        DWORD written = 0;
+//
+//        if (!WriteFile(fileHandle, buffer, count, &written, nullptr))
+//        {
+//            bFileHandlingState = false;
+//
+//            CloseHandle(fileHandle);
+//            return;
+//        }
+//
+//        bytes += (u32)written;
+//        if (bytes > 512)
+//        {
+//            if (FlushFileBuffers(fileHandle))
+//                bytes = 0;
+//        }
+//    }
+//
+//    //if (bShouldUseAllocator) GetMemoryManager()->Deallocate(fixBuffer, (count + 1) * sizeof(wchar_t));
+//#endif // MR_PLATFORM_WINDOWS && MR_DEBUG
+//
+//}

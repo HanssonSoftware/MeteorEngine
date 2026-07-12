@@ -100,6 +100,8 @@ namespace HAL
 
 	void InitEssential()
 	{
+		GetApplication()->applicationHandle = GetModuleHandleW(nullptr);
+
 		const String* codeName = GetApplication()->GetApplicationCodeName();
 
 		wchar_t buffer[256] = {};
@@ -115,11 +117,6 @@ namespace HAL
 		{
 			MR_LOG(LogApplication, Fatal, "Unable to register engine critical component to Windows! RegisterClassExW=%d", GetLastError());
 		}
-
-		if (GetApplication()->bUseSplash)
-		{
-
-		}
 	}
 
 	void ShutdownEssential()
@@ -134,6 +131,12 @@ namespace HAL
 			MR_LOG(LogApplication, Fatal, "Failed to unregister engine critical component from Windows! UnregisterClassW=%d", GetLastError());
 		}
 	}
+#ifdef MR_DEBUG
+	void DebugBreak()
+	{
+		::DebugBreak();
+	}
+#endif // MR_DEBUG
 }
 
 #endif // MR_PLATFORM_WINDOWS

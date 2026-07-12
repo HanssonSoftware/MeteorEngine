@@ -13,20 +13,32 @@
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
 
-enum class ELoadState
-{
-	NONE,
-	LOADING,
-	ENABLED,
-	DISABLED,
-	UNLOADED
-};
-
 class CORE_API Module
 {
 	friend class ModuleManager;
+protected:
+
+	enum class ModuleState
+	{
+		None,
+		Loading,
+		Running,
+		Enabled,
+		Disabled,
+		Unloaded
+	};
+
 public:
-	virtual void StartupModule() = 0;
+	Module() = default;
+	virtual ~Module() noexcept = default;
+
+	Module(const Module&) = delete;
+	Module(Module&&) = delete;
+	
+	Module& operator=(const Module&) = delete;
+	Module& operator=(Module&&) = delete;
+
+	virtual bool StartupModule() = 0;
 
 	virtual void ShutdownModule() = 0;
 
@@ -34,18 +46,16 @@ public:
 
 	String GetName() const { return name; }
 
-protected:
-#ifdef MR_PLATFORM_WINDOWS
-	//HMODULE library;
-#endif // MR_PLATFORM_WINDOWS
+	ModuleState GetModuleState() const { return moduleState; };
 
-	ELoadState moduleState;
+protected:
+	ModuleState moduleState = ModuleState::None;
 
 	String name;
 };
 
 #define IMPLEMENT_MODULE(ModuleClass)																		 \
 	extern "C" __declspec(dllexport) Module* InitialiseModule()												 \
-	{																										 \
+	{									\
 		return new ModuleClass();																			 \
 	}

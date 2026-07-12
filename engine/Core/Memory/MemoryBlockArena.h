@@ -1,31 +1,43 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
+#include "MemoryBlockBase.h"
 #include "MemoryHandler.h"
 #include <HAL/DataTypes.h>
 
-template<typename T>
-class MemoryBlockArena
+class MemoryBlockArena : public MemoryBlockBase
 {
 public:
-	MemoryBlockArena() = delete;
+	MemoryBlockArena() = default;
 	MemoryBlockArena(const MemoryBlockArena&) = delete;
 	MemoryBlockArena(MemoryBlockArena&&) = delete;
 
-	MemoryBlockArena& operator=(const MemoryBlockArena&) = delete;
-	MemoryBlockArena& operator=(MemoryBlockArena&&) = delete;
-
-	MemoryBlockArena(const u64 size)
+	MemoryBlockArena& operator=(const MemoryBlockArena& other)
 	{
-		this->size = size;
-		ptr = (T*)GetMemoryManager()->Allocate(size);
+		ptr = other.ptr;
+		size = other.size;
+		offset = other.offset;
+		offsetMarker = other.offsetMarker;
+
+		return *this;
 	}
-		
+
+	MemoryBlockArena& operator=(MemoryBlockArena&& other) noexcept
+	{
+		return *this;
+	}
+
+	MemoryBlockArena(u8* address, u64 regionSizeInBytes)
+		: MemoryBlockBase(address, regionSizeInBytes)
+	{
+
+	}
+
 	virtual ~MemoryBlockArena() noexcept
 	{
 		if (ptr)
 		{
-			GetMemoryManager()->Deallocate(ptr, size);
+			//GetMemoryManager()->Deallocate(ptr, size);
 		}
 	}
 
@@ -51,12 +63,18 @@ public:
 
 	void Reset()
 	{
-		offset = 0;
+		offset = offsetMarker;
+	}
+
+	void SetMarker(const u64 marker)
+	{
+		if (offset < size)
+		{
+			offsetMarker = marker;
+		}
 	}
 
 protected:
-	T* ptr = nullptr;
-	u64 size = 0;
-	u64 offset = 0;
+	u64 offsetMarker = 0;
 };
 
