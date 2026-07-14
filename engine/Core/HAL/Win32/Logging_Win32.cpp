@@ -1,10 +1,11 @@
-/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
+/* Copyright 2020 = 2026, Hansson Software. All rights reserved. */
 
 #ifdef MR_PLATFORM_WINDOWS
 #include <Logging/Log.h>
 #include <Application/Application.h>
 #include <HAL/Timer.h>
 #include <Special/EngineConstants.h>
+#include <HAL/Window.h>
 
 #include <Win32/MinimalWin.h>
 #include <debugapi.h>
@@ -132,6 +133,10 @@ void Logger::Shutdown()
     CloseHandle(consoleLog);
 }
 
+static u32 formattedMessagePos = 0, fullFormattedPos = 0;
+constexpr const u32 MAX_CHARS_FOR_COMPLETE_MESSAGE = 1024;
+constexpr const u32 MAX_CHARS_FOR_COMPLETE_MESSAGE_FATAL = 2048;
+
 void Logger::LogStandard(const u16& category, LogSeverity severity, const void* message, ...)
 {
     va_list va;
@@ -139,10 +144,7 @@ void Logger::LogStandard(const u16& category, LogSeverity severity, const void* 
 
     const wchar_t* casted = (wchar_t*)message;
 
-    constexpr const u32 MAX_CHARS_FOR_COMPLETE_MESSAGE = 1024;
-
     wchar_t buf[MAX_CHARS_FOR_COMPLETE_MESSAGE] = {};
-    u32 formattedMessagePos = 0, fullFormattedPos = 0;
 
     if (*casted != L'\0')
     {
@@ -159,23 +161,24 @@ void Logger::LogStandard(const u16& category, LogSeverity severity, const void* 
         FindLogCategory(category), FormatSeverity(severity), formattedMessagePos, buf);
 
     SendToOutputBuffer(buf + formattedMessagePos, fullFormattedPos, severity);
+    formattedMessagePos = 0, fullFormattedPos = 0;
 }
 
 void Logger::LogFatal(const u16& category, LogSeverity severity, const void* message, const void* function, const u32 line, const void* file, ...)
 {
     va_list va;
-    va_start(va, message);
+    va_start(va, file);
 
-    const wchar_t* casted = (wchar_t*)message;
+    const wchar_t* castedMessage = (wchar_t*)message;
+    const wchar_t* castedFunction = (wchar_t*)function;
+    const wchar_t* castedFile = (wchar_t*)file;
 
-    constexpr const u32 MAX_CHARS_FOR_COMPLETE_MESSAGE = 1024;
-
-    wchar_t buf[MAX_CHARS_FOR_COMPLETE_MESSAGE] = {};
+    wchar_t buf[MAX_CHARS_FOR_COMPLETE_MESSAGE_FATAL] = {};
     u32 formattedMessagePos = 0, fullFormattedPos = 0;
 
-    if (*casted != L'\0')
+    if (*castedMessage != L'\0')
     {
-        formattedMessagePos += vswprintf_s(buf, MAX_CHARS_FOR_COMPLETE_MESSAGE / 2, casted, va);
+        formattedMessagePos += vswprintf_s(buf, MAX_CHARS_FOR_COMPLETE_MESSAGE_FATAL / 2, castedMessage, va);
     }
 
     va_end(va);
@@ -183,23 +186,25 @@ void Logger::LogFatal(const u16& category, LogSeverity severity, const void* mes
     SYSTEMTIME st = {};
     GetLocalTime(&st);
 
-    fullFormattedPos = swprintf_s(buf + formattedMessagePos, MAX_CHARS_FOR_COMPLETE_MESSAGE - formattedMessagePos, L"---------- FATAL ERROR ----------\nFunction:%s%02d/%02d/%02d %02d:%02d:%02d][%hs][%hs",
-        st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond,
-        buf);
+    fullFormattedPos = swprintf_s(buf + formattedMessagePos, MAX_CHARS_FOR_COMPLETE_MESSAGE_FATAL - formattedMessagePos, L"========== FATAL ERROR ==========\nMessage: %.*s\n\nWhere: [%s(%d) - %s]\nTime: %02d/%02d/%02d %02d:%02d:%02d",
+        formattedMessagePos, buf, castedFile, line, castedFunction,
+        st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond
+        );
 
     SendToOutputBuffer(buf + formattedMessagePos, fullFormattedPos, severity);
+    formattedMessagePos = 0, fullFormattedPos = 0;
 }
 
 void Logger::SendToOutputBuffer(void* buffer, const u32 count, LogSeverity severity)
 {
     if (wchar_t* casted = (wchar_t*)buffer)
-	{
+    {
         if (count < 0) return;
 
-		if (IsDebuggerPresent())
-		{
-			OutputDebugStringW(casted);
-		}
+        if (IsDebuggerPresent())
+        {
+            OutputDebugStringW(casted);
+        }
 
         if (persistentLog != INVALID_HANDLE_VALUE)
         {
@@ -212,7 +217,7 @@ void Logger::SendToOutputBuffer(void* buffer, const u32 count, LogSeverity sever
             DWORD current = 0;
             if (!WriteFile(persistentLog, narrow, count, &current, nullptr))
             {
-                
+
             }
 
             write += current;
@@ -231,12 +236,29 @@ void Logger::SendToOutputBuffer(void* buffer, const u32 count, LogSeverity sever
             DWORD current = 0;
             if (!WriteConsoleW(consoleLog, casted, count, &current, nullptr))
             {
-                
+
             }
 
             SetConsoleTextAttribute(consoleLog, 0x7);
         }
-	}
+
+
+        if (severity == Fatal)
+        {
+#ifdef MR_DEBUG
+            wchar_t messageBox[512] = {};
+            wcsncpy_s(messageBox, casted - formattedMessagePos, formattedMessagePos);
+
+            HWND window = /*(HWND)GetApplication()->GetMainWindow()->GetNativeHandle()*/nullptr;
+
+            swprintf_s(messageBox + formattedMessagePos + 1, 512u - formattedMessagePos, L"%hs has crashed!", GetApplication()->GetApplicationName()->Chr());
+
+            MessageBoxW(window ? window : nullptr, messageBox, messageBox + formattedMessagePos + 1, MB_OK | MB_ICONERROR);
+#else
+            MessageBeep();
+#endif // MR_DEBUG
+        }
+    }
 }
 
 static constexpr const WORD ConvertToColorCode(LogSeverity severity)
