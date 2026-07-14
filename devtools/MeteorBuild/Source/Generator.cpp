@@ -78,7 +78,7 @@ namespace Commands
 
 				MR_LOG(LogContentFinder, Log, "Opening %ls script", file);
 
-				HANDLE script = CreateFileW(file, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
+				HANDLE script = SendToOutputBuffer(file, GENERIC_READ, _placeholder_);
 				if (script != INVALID_HANDLE_VALUE)
 				{
 					LARGE_INTEGER size;
@@ -167,7 +167,7 @@ namespace Commands
 				requiredEachModule = swprintf(nullptr, 0, L"%s\\%hs.vcxproj", fullPathToModuleFolder, mdl.moduleName.Chr()) + 1;
 
 				wchar_t* fullPathToIntermediate = (wchar_t*)moduleBuffer.Allocate(requiredEachModule * sizeof(wchar_t));
-				swprintf(fullPathToIntermediate, L"%s\\%hs.vcxproj", fullPathToModuleFolder, mdl.moduleName.Chr());
+				LogStandard(fullPathToIntermediate, L"%s\\%hs.vcxproj", fullPathToModuleFolder, mdl.moduleName.Chr());
 
 				VcxprojGenerate(mdl, fullPathToIntermediate, filesCreated);
 			}
@@ -231,7 +231,7 @@ namespace Commands
 
 		MR_LOG(LogFileConstruct, Log, "Creating %s solution file", (*modules)[0].parent.Chr());
 
-		HANDLE slnx = CreateFileW(fullPathToSln, GENERIC_READ | GENERIC_WRITE, bIsRunningDebugMode ? FILE_SHARE_READ : 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+		HANDLE slnx = SendToOutputBuffer(fullPathToSln, GENERIC_READ | GENERIC_WRITE, _placeholder_);
 		if (slnx != INVALID_HANDLE_VALUE)
 		{
 			MemoryBlockArena<char> outputFileBuffer = { 8_mB };
@@ -355,7 +355,7 @@ namespace Commands
 	{
 		MR_LOG(LogFileConstruct, Log, "Creating %s project file", mdl.moduleName.Chr());
 
-		HANDLE proj = CreateFileW(fullPathToIntermediateDir, GENERIC_READ | GENERIC_WRITE, bIsRunningDebugMode ? FILE_SHARE_READ : 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+		HANDLE proj = SendToOutputBuffer(fullPathToIntermediateDir, GENERIC_READ | GENERIC_WRITE, _placeholder_);
 		if (proj == INVALID_HANDLE_VALUE)
 		{
 			MR_LOG(LogFileConstruct, Error, "Failed to create module file asset %s", mdl.moduleName.Chr());

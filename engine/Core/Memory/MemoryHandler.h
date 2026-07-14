@@ -53,13 +53,13 @@ public:
 		T* newRegion = nullptr;
 		if (void* regionWithSelfContained = HAL::OSAlloc(nullptr, newRegionSizeInBytes + sizeof(T)))
 		{
-			newRegion = new(regionWithSelfContained) T;
+			newRegion = new(regionWithSelfContained) T((u8*)regionWithSelfContained, newRegionSizeInBytes);
 
 			// 1. Get projectRegion's nextRegion
 			// 2. Find the nextRegion is nullptr
 			// 3. If yes then set the new value to the nextRegion (where null)
 
-			MemoryBlockBase* last = projectRegion->next;
+			MemoryBlockBase*& last = projectRegion->next;
 			while (last) last = last->next;
 
 			last = newRegion;

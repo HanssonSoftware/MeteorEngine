@@ -24,6 +24,8 @@ namespace HAL
 
 	void ShutdownEssential();
 
+	u32 FatalExit(u32 code);
+
 #ifdef MR_DEBUG
 	void DebugBreak();
 #endif // MR_DEBUG

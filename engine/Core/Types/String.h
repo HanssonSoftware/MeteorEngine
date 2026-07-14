@@ -176,6 +176,8 @@ private:
 	{
 		if (size > SSO_MAX_CHARS)
 		{
+			bIsUsingHeap = true;
+
 			internalBuffers.heapBuffer.capacity = (u32)(size * 1.5f);
 			internalBuffers.heapBuffer.length = size;
 

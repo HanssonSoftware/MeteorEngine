@@ -26,10 +26,6 @@ Application::Application()
 
     SetCurrentState(Application::State::PreStartup);
     GetMemoryManager()->Initialize();
-
-    appName = "Meteor Suite(R) application";
-    appNameNoSpaces = "MeteorSuite(R)app";
-    appCodeName = "MRAPP";
 }
 
 void Application::Init()
@@ -38,20 +34,12 @@ void Application::Init()
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
 #endif // MR_DEBUG
     Logger::Get()->Init();
+    MR_LOG(LogApplication, Fatal, "Initalizing applicationéáűŐPÚфцвапичьтию.жэд");
+
     HAL::InitEssential();
 
     if (!bHideWindow) mainWindow = Window::Create("", 10, 10, 200, 200);
-    MR_LOG(LogApplication, Log, "Restarting application!");
     //LogApplication app;
-
-    do
-    {
-        if constexpr (bIsRunningDebugMode || 4 == 5)
-        {
-
-        }
-    } while (0);
-
 
     // this is hardcoded!
     ModuleManager::Get().LoadModule("vulkan");

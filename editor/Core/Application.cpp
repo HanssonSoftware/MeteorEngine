@@ -27,8 +27,6 @@ void EditorApplication::Init()
 	cli.Check("-maxram");
 	auto a = cli.Get("-maxram");
 
-	int J = 4;
-
 	editorWindow = Window::Create({ "Editor" }, 300, 300, 1600, 900);
 	editorWindow->Show();
 }

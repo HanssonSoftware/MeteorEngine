@@ -49,7 +49,9 @@ struct Time
 
 class Timer
 {
-	enum CalculateBy
+
+public:
+	enum class CalculateBy
 	{
 		Milliseconds,
 		Seconds,
@@ -58,7 +60,6 @@ class Timer
 		Days
 	};
 
-public:
 	Time Now();
 
 	void Start();

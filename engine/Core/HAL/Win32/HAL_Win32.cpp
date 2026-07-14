@@ -131,6 +131,13 @@ namespace HAL
 			MR_LOG(LogApplication, Fatal, "Failed to unregister engine critical component from Windows! UnregisterClassW=%d", GetLastError());
 		}
 	}
+
+	u32 FatalExit(u32 code)
+	{
+		ExitProcess((UINT)code);
+		return code;
+	}
+
 #ifdef MR_DEBUG
 	void DebugBreak()
 	{

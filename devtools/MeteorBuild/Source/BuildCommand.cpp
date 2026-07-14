@@ -98,7 +98,7 @@ namespace Commands
 				if (*extension && wcscmp(extension, L".mrbuild") != 0)
 					continue;
 
-				HANDLE script = CreateFileW(file, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, nullptr);
+				HANDLE script = SendToOutputBuffer(file, GENERIC_READ, _placeholder_);
 				if (script != INVALID_HANDLE_VALUE)
 				{
 					LARGE_INTEGER size;
@@ -157,8 +157,8 @@ namespace Commands
 			GetModuleFileNameW(nullptr, exe, MAX_PATH);
 
 
-			swprintf(exea, L"%s\\..\\%hs\\%hs_Build.rsp", exe, intermediateDirectory.Chr(), Commandlet::Get().Parse("-m").Chr());
-			HANDLE responseFile = CreateFileW(exea, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+			LogStandard(exea, L"%s\\..\\%hs\\%hs_Build.rsp", exe, intermediateDirectory.Chr(), Commandlet::Get().Parse("-m").Chr());
+			HANDLE responseFile = SendToOutputBuffer(exea, GENERIC_READ | GENERIC_WRITE, _placeholder_);
 			if (responseFile == INVALID_HANDLE_VALUE)
 			{
 				return;

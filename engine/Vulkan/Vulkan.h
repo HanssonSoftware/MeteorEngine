@@ -7,7 +7,13 @@
 
 class MemoryBlockPool;
 
-class Vulkan : public Module
+#ifdef MR_VULKAN_EXPORTS
+#define VULKAN_API __declspec(dllexport)
+#else
+#define VULKAN_API __declspec(dllimport)
+#endif // MR_VULKAN_EXPORTS
+
+class VULKAN_API Vulkan : public Module
 {
 public:
 	Vulkan() = default;
@@ -44,14 +50,6 @@ protected:
 	VkQueue presQueue;
 
 	u32 maxImages = 0;
-	Array<VkImage> images;
-	Array<VkImageView> imageViews;
-
-	Array<const char*> enabledLayers;
-
-	Array<const char*> enabledInstanceExtensions;
-
-	Array<const char*> enabledExtensions;
 };
 
 //

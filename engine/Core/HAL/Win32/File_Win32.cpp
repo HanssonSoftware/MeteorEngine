@@ -93,7 +93,7 @@ bool File::Open(const StringView& name, const OpenAs openAs,const Access access,
 	windowsAPIHandle = CreateFileW(path, accessMode, shareMode, nullptr, TranslateToWin(openAs), FILE_ATTRIBUTE_NORMAL, nullptr);
 	if (windowsAPIHandle == INVALID_HANDLE_VALUE)
 	{
-		MR_LOG();
+		//MR_LOG(LogHAL, );
 	}
 
 	LARGE_INTEGER lg;

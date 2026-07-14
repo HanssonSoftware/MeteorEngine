@@ -36,15 +36,15 @@ double Timer::Count(CalculateBy by)
 
 	switch (by)
 	{
-	case Timer::Milliseconds:
+	case Timer::CalculateBy::Milliseconds:
 		break;
-	case Timer::Seconds:
+	case Timer::CalculateBy::Seconds:
 		break;
-	case Timer::Minutes:
+	case Timer::CalculateBy::Minutes:
 		break;
-	case Timer::Hours:
+	case Timer::CalculateBy::Hours:
 		break;
-	case Timer::Days:
+	case Timer::CalculateBy::Days:
 		break;
 	default:
 		break;

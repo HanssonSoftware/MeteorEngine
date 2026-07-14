@@ -66,7 +66,7 @@
     <Link>
       <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>core.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>core.lib;vulkan.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)product;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <FxCompile>
@@ -85,7 +85,7 @@
       <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>core.lib;$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>core.lib;vulkan.lib;$(CoreLibraryDependencies);D3D11.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <ProgramDatabaseFile />

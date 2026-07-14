@@ -9,17 +9,8 @@
 #include <Special/EngineConstants.h>
 //#include <wchar.h>
 
-#ifdef MR_PLATFORM_WINDOWS
-#include "Win32/MinimalWin.h"
-
-
-static HANDLE consoleHandle;
-static HANDLE fileHandle;
-#pragma warning(disable : 6386)
-#endif // MR_PLATFORM_WINDOWS
-
-LOG_ADDCATEGORY(Logging);
-LOG_ADDCATEGORY(LoggingIO);
+static u16 categoryID;
+const char* categories[512] = {};
 
 Logger* Logger::Get()
 {
@@ -41,26 +32,15 @@ Logger::~Logger() noexcept
     Shutdown();
 }
 
-void Logger::LogStandard(LogEntry* category, LogSeverity severity, const char* message, ...)
-{
-    if constexpr (true)
-    {
-
-    }
-}
-
-void Logger::LogFatal(LogEntry* category, LogSeverity severity, const char* message, const u64 time, const char* function, const u32 line, const char* file, ...)
-{
-
-}
-
 bool Logger::PrepareLoggingSystem()
 {
     MemoryBlockArena* logArena = (MemoryBlockArena*)GetMemoryManager()->RequestNewRegion<MemoryBlockArena>("Logger Region", MAX_LOG_ENTRIES * sizeof(LogEntry) + sizeof(Logger));
 
     if (logArena)
     {
-        instance = (Logger*)logArena;
+        instance = (Logger*)logArena->Allocate(sizeof(Logger));
+        logArena->SetMarker(sizeof(Logger));
+
         instance->loggingArena = logArena;
         return true;
     }
@@ -84,7 +64,33 @@ void Logger::LogAssert()
    
     //SendToOutputBuffer(hitMessageBuffer, result);
 }
-//
+
+u16 Logger::AddLogCategory(const char* name)
+{
+    for (u16 i = 0; i < categoryID + 1; i++)
+    {
+        if (!categories[i]) continue;
+
+        if (!strcmp(categories[i], name))
+        {
+            return i;
+        }
+    }
+
+    if (categories[0] != nullptr)
+        categoryID++;
+    else
+        categoryID = 0;
+
+    categories[categoryID] = name;
+    return categoryID;
+}
+
+const char* Logger::FindLogCategory(const u16& name)
+{
+    return categories[name];
+}
+
 //void Logger::SendToOutputBuffer(char* buffer, const u32 count)
 //{
 //#if defined(MR_PLATFORM_WINDOWS) && defined(MR_DEBUG)

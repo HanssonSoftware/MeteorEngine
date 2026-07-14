@@ -23,6 +23,16 @@ class MemoryBlockPool;
 
 struct LogEntry {};
 
+enum LogSeverity : u8
+{
+	Log = 1,
+	Info = Log,
+	Verbose,
+	Warn,
+	Error,
+	Fatal
+};
+
 // * Logger the Core's beloved logging system, use MR_LOG() to log your wants.
 class CORE_API Logger
 {
@@ -32,27 +42,14 @@ class CORE_API Logger
 				  0							0000000		*/
 	struct LogEntry
 	{
-		struct
-		{
-			//u8 
-		} payload;
+		u16 severity : 3;
 
-		//void* payload;
-		u8 flag;
-	};
-
-	enum LogSeverity : u8
-	{
-		Log = 1,
-		Info = Log,
-		Verbose,
-		Warn,
-		Error,
-		Fatal
+		const char* message;
 	};
 
 public:
 	static Logger* Get();
+	static u16 AddLogCategory(const char* name);
 
 	Logger() = default;
 	Logger(Logger* newInstance);
@@ -62,42 +59,45 @@ public:
 
 	virtual ~Logger() noexcept;
 
-	virtual void Init();
+	void Init();
 	virtual void Shutdown();
 
-	void LogStandard(LogEntry* category, LogSeverity severity, const char* message, ...);
-	void LogFatal(LogEntry* category, LogSeverity severity, const char* message, const u64 time, const char* function, const u32 line, const char* file, ...);
+	void LogStandard(const u16& category, LogSeverity severity, const void* message, ...);
+	void LogFatal(const u16& category, LogSeverity severity, const void* message, const void* function, const u32 line, const void* file, ...);
 	void LogAssert();
 
-	void SendToOutputBuffer(void* buffer, const u32 count);
+	void SendToOutputBuffer(void* buffer, const u32 count, LogSeverity severity);
 
 protected:
 	static bool PrepareLoggingSystem();
 
-	bool bIsInitialized = false;
+	const char* FindLogCategory(const u16& name);
 
 	static constexpr inline const char* FormatSeverity(LogSeverity Severity) noexcept
 	{
 		switch (Severity)
 		{
-		case Log:
+		case LogSeverity::Log:
 			return "Log";
-		case Warn:
+		case LogSeverity::Warn:
 			return "Warning";
-		case Error:
+		case LogSeverity::Error:
 			return "Error";
-		case Fatal:
+		case LogSeverity::Fatal:
 			return "Fatal";
-		case Verbose:
+		case LogSeverity::Verbose:
 			return "Verbose";
 		}
 
 		return "???";
 	}
+
 private:
 	MemoryBlockArena* loggingArena;
 
 	static inline Logger* instance = nullptr;
 };
+
+
 
 #include "LogMacros.h"
