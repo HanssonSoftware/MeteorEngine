@@ -44,7 +44,7 @@ StringView Commandline::Get(const StringView& command)
 		}
 		else if (bflagFound && !bflagValueFound)
 		{
-			MR_LOG(LogCommandline, Warn, "%s found but hasn't got any value!", flagFound);
+			MR_LOG(LogCommandline, Warn, "%hs argument requires a value!", flagFound);
 		}
 	}
 

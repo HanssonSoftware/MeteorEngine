@@ -82,6 +82,10 @@ public:
 		return container[container.GetSize() - 1].data;
 	};
 
+	Value* begin() { return &container.Data()->data; }
+	Value* end() { return &container.Data()->data + container.GetSize(); }
+	const Value* begin() const { return &container.Data()->data; }
+	const Value* end() const { return &container.Data()->data + container.GetSize(); }
 protected:
 	Array<InternalContainerForMap> container;
 };

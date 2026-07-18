@@ -7,8 +7,20 @@
 #include "MinimalWin.h"
 #include <stringapiset.h>
 #include <Application/Application.h>
+#include <Types/String.h>
+
+#include <DefaultEngineResources.h>
 
 LOG_ADDCATEGORY(HAL);
+
+static HMODULE engine = nullptr;
+
+static LONG CrashHandler(_EXCEPTION_POINTERS* ExceptionInfo)
+{
+	MessageBoxW(nullptr, L"Engine crashed!", L"", MB_OK);
+
+	return 1;
+}
 
 static LRESULT CALLBACK GlobalWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -16,8 +28,10 @@ static LRESULT CALLBACK GlobalWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM
 	{
 	case WM_DESTROY:
 		GetApplication()->SetCurrentState(Application::State::Shutdown);
-		GetApplication()->Shutdown();
 		return 0;
+	case WM_ERASEBKGND:
+		return 1;
+
 	default:
 		return DefWindowProcW(hwnd, msg, wparam, lparam);
 	}
@@ -35,7 +49,7 @@ namespace HAL
 			return true;
 		}
 
-		MR_LOG(LogHAL, Error, "Conversion error! MultiByteToWideChar[%d:%s]", GetLastError(), LocalizeErrorCode(GetLastError()));
+		MR_LOG(LogHAL, Error, "Conversion error! MultiByteToWideChar[%d:%s]", GetLastError(), (wchar_t*)LocalizeErrorCode(GetLastError()));
 		return false;
 	}
 
@@ -47,13 +61,13 @@ namespace HAL
 			return true;
 		}
 
-		MR_LOG(LogHAL, Error, "Conversion error! WideCharToMultiByte[%d:%s]", GetLastError(), LocalizeErrorCode(GetLastError()));
+		MR_LOG(LogHAL, Error, "Conversion error! WideCharToMultiByte[%d:%s]", GetLastError(), (wchar_t*)LocalizeErrorCode(GetLastError()));
 		return false;
 	}
 
-	String LocalizeErrorCode(i64 code)
+	void* LocalizeErrorCode(i64 code)
 	{
-		wchar_t final[512] = {};
+		thread_local static wchar_t final[512] = {};
 
 		const DWORD count = FormatMessageW(
 			FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
@@ -68,22 +82,19 @@ namespace HAL
 		if (count == 0)
 		{
 			MR_LOG(LogHAL, Error, "Conversion error! WideCharToMultiByte[%d:%s]");
-			return { "" };
+			return nullptr;
 		}
 
-		char end[512] = {};
-		ConvertToNarrow(end, count - 2, final);
-
-		return { end, count - 2 };
+		return final;
 	}
 
 	bool PeekOSMessageQueue()
 	{
 		i32 returnStatement = 0;
 		MSG msg;
-		while ((returnStatement = GetMessageW(&msg, GetActiveWindow(), 0, 0)) != 0)
+		while (PeekMessageW(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
-			if (returnStatement == -1)
+			if (msg.message == WM_QUIT)
 			{
 				return false;
 			}
@@ -95,23 +106,39 @@ namespace HAL
 			}
 		}
 
-		return false;
+		return true;
 	}
 
-	void InitEssential()
+	void InitHAL()
 	{
 		GetApplication()->applicationHandle = GetModuleHandleW(nullptr);
+
+		AddVectoredExceptionHandler(1, CrashHandler);
 
 		const String* codeName = GetApplication()->GetApplicationCodeName();
 
 		wchar_t buffer[256] = {};
 		MultiByteToWideChar(CP_UTF8, 0, (char*)codeName->Chr(), codeName->Length(), buffer, codeName->Length());
 
+		HICON def = (HICON)LoadImageW(
+			engine,
+			MAKEINTRESOURCEW(IDI_LASTRESORT),
+			IMAGE_ICON,
+			0, 0,
+			LR_DEFAULTSIZE | LR_SHARED);
+
+		if (!def)
+		{
+			MR_LOG(LogHAL, Warn, "Unable to querry icons from fallback! LoadImageW=%d", GetLastError());
+		}
+
+
 		WNDCLASSEXW registerData = {};
 		registerData.cbSize = sizeof(WNDCLASSEXW);
-		registerData.hInstance = GetModuleHandleW(nullptr);
+		registerData.hInstance = engine;
 		registerData.lpfnWndProc = GlobalWndProc;
 		registerData.lpszClassName = buffer;
+		registerData.hIcon = registerData.hIconSm = def;
 
 		if (!RegisterClassExW(&registerData))
 		{
@@ -126,16 +153,32 @@ namespace HAL
 		wchar_t buffer[256] = {};
 		MultiByteToWideChar(CP_UTF8, 0, (char*)codeName->Chr(), codeName->Length(), buffer, codeName->Length());
 
-		if (!UnregisterClassW(buffer, GetModuleHandleW(nullptr)))
+		if (!UnregisterClassW(buffer, (HINSTANCE)HAL::GetEngineCore()))
 		{
 			MR_LOG(LogApplication, Fatal, "Failed to unregister engine critical component from Windows! UnregisterClassW=%d", GetLastError());
 		}
+
+		RemoveVectoredExceptionHandler(CrashHandler);
 	}
 
 	u32 FatalExit(u32 code)
 	{
 		ExitProcess((UINT)code);
 		return code;
+	}
+
+	void* GetEngineCore()
+	{
+		if (!engine)
+		{
+			if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCWSTR)&GlobalWndProc, &engine))
+			{
+				MR_LOG(LogHAL, Fatal, "Failed to querry critical resources! GetModuleHandleExW=%d", GetLastError());
+				return nullptr;
+			}
+		}
+
+		return engine;
 	}
 
 #ifdef MR_DEBUG

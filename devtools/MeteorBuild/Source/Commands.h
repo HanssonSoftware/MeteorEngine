@@ -67,7 +67,7 @@ namespace Commands
 	void AddSolution(const Array<Module>* modules);
 
 #ifdef MR_PLATFORM_WINDOWS
-	void DirectorySearch(wchar_t* directory, Array<wchar_t*>& foundFiles, MemoryBlockArena<wchar_t>* arena);
+	void DirectorySearch(wchar_t* directory, Array<wchar_t*>& foundFiles, MemoryBlockArena* arena);
 
 	String GetLastErrorString();
 #else

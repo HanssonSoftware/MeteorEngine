@@ -13,7 +13,7 @@ class MemoryBlockPool;
 #define VULKAN_API __declspec(dllimport)
 #endif // MR_VULKAN_EXPORTS
 
-class VULKAN_API Vulkan : public Module
+class VULKAN_API Vulkan : public IModule
 {
 public:
 	Vulkan() = default;
@@ -21,16 +21,27 @@ public:
 
 	virtual bool StartupModule();
 
+
+
+
 	virtual void ShutdownModule();
 
-	virtual void Update();
+	virtual void Update() override;
 protected:
+
+#ifdef MR_DEBUG
+	VkDebugUtilsMessengerEXT debugDispatcher;
+#endif // MR_DEBUG
+
+	bool CreateSemaphore();
 
 	struct VkFoundDevice
 	{
 		VkPhysicalDevice device;
 		u32 queueFamilyIndex;
-	};
+	} foundDev;
+
+	bool CreateSwapchain(VkFoundDevice& fdev);
 
 	VkFoundDevice SelectBestCardForProject(VkPhysicalDevice* devicesList, u32 count);
 
@@ -42,7 +53,8 @@ protected:
 
 	VkSurfaceKHR surface;
 
-	VkSwapchainKHR swapChain;
+	VkSwapchainKHR swapChain = nullptr;
+	VkExtent2D swapChainExtent;
 
 	VkDevice device;
 
@@ -50,6 +62,14 @@ protected:
 	VkQueue presQueue;
 
 	u32 maxImages = 0;
+
+	VkCommandPool cmdPool;
+	VkCommandBuffer cmdBuffer;
+	VkSemaphore begin, end;
+	VkFence fence;
+
+	VkImageView swapChainImageViews[8];
+	VkImage swapChainImages[8];
 };
 
 //

@@ -4,21 +4,14 @@
 #include <HAL/HAL.h>
 #include <Application/Application.h>
 #include <Special/EngineConstants.h>
-
-#include "Win32/MinimalWin.h"
-
 #ifdef MR_PLATFORM_WINDOWS
+#include <Win32/MinimalWin.h>
 #include <libloaderapi.h>
 #endif // MR_PLATFORM_WINDOWS
-
 #pragma warning(disable : 6387)
 
 LOG_ADDCATEGORY(ModuleManager);
 
-ModuleManager::ModuleManager() noexcept
-{
-
-}
 
 ModuleManager& ModuleManager::Get()
 {
@@ -26,27 +19,24 @@ ModuleManager& ModuleManager::Get()
     return instance;
 }
 
-ModuleManager::~ModuleManager() noexcept
+void ModuleManager::InitializeModules()
 {
-    for (Module*& module : modules)
-    {
-        module->ShutdownModule(); 
-
-#ifdef MR_PLATFORM_WINDOWS   
-        //if (!FreeLibrary(module->library))
-        {
-            MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", L""/**Platform::GetError()*/, module->GetName().Chr());
-            continue;
-        }
-#endif // MR_PLATFORM_WINDOWS
-    }
-
-    //modules.Reset();
 }
 
-typedef Module* (*fv)();
+void ModuleManager::ShutdownModules()
+{
+    for (IModule*& mdl : modules)
+    {
+        if (!mdl)
+            continue;
 
-bool ModuleManager::LoadModule(const StringView& moduleName)
+        mdl->ShutdownModule();
+    }
+}
+
+typedef IModule* (*fv)();
+
+bool ModuleManager::RegisterModule(const StringView& moduleName)
 {
     if (IsModuleLoaded(moduleName))
         return true;
@@ -64,12 +54,13 @@ bool ModuleManager::LoadModule(const StringView& moduleName)
 
         if (moduleInstantiation)
         {
-            Module* newModule = moduleInstantiation();
+            IModule* newModule = moduleInstantiation();
             newModule->name = moduleName;
-            //newModule->library = module;
+            newModule->interface = module;
+            MR_LOG(LogModuleManager, Log, "New module loaded: %hs", moduleName.ptr);
             newModule->StartupModule();
 
-            modules.Add(newModule);
+            modules[(char*)moduleName.ptr] = newModule;
 
             return true;
         }
@@ -81,31 +72,16 @@ bool ModuleManager::LoadModule(const StringView& moduleName)
     return false;
 }
 
-bool ModuleManager::UnloadModule(const String& moduleName)
+bool ModuleManager::UnloadModule(const StringView& moduleName)
 {
-    const uint32_t moduleSize = modules.GetSize();
-    for (uint32_t i = 0; i < moduleSize; i++)
+    for (IModule*& mdl : modules)
     {
-        Module*& module = modules[i];
-        
-        if (module)
+        if (mdl)
         {
-            if (module->GetName() != moduleName)
+            if (mdl->GetName().Chr() != (char*)moduleName.ptr)
                 continue;
 
-            module->ShutdownModule();
-
-#ifdef MR_PLATFORM_WINDOWS
-            //if (!FreeLibrary(module->library))
-            {
-                MR_LOG(LogModuleManager, Error, "FreeLibrary returned: %ls (%ls)", L"" /**Platform::GetError()*/, moduleName.Chr());
-                return false;
-            }
-#else
-            // FIXME: No non-windows implementation for module load!
-#endif // MR_PLATFORM_WINDOWS
-
-            //modules.Pop(i);
+            mdl->ShutdownModule();
         }
 
         return true;
@@ -116,15 +92,26 @@ bool ModuleManager::UnloadModule(const String& moduleName)
 
 bool ModuleManager::IsModuleLoaded(const StringView& moduleName)
 {
-    for (Module*& mdl : modules)
+    for (IModule*& mdl : modules)
     {
         if (!mdl) continue;
 
         if (mdl->GetName().Chr() == (char*)moduleName.ptr)
         {
-            return mdl->moduleState == Module::ModuleState::Enabled;
+            return mdl->moduleState == IModule::ModuleState::Enabled;
         }
     }
 
     return false;
+}
+
+void ModuleManager::UpdateModules(float dt)
+{
+    for (IModule*& module : modules)
+    {
+        if (module->GetModuleState() != IModule::ModuleState::Running)
+            continue;
+
+        module->Update();
+    }
 }

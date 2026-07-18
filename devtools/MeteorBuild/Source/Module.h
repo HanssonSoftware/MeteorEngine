@@ -90,11 +90,11 @@ struct Module
 {
 	Module() = default;
 	~Module() noexcept = default;
-	Module(const Module& old);
-	Module(Module&& old) noexcept;
+	//Module(const Module& old);
+	//Module(Module&& old) noexcept;
 
-	Module& operator=(const Module& old) noexcept;
-	Module& operator=(Module&& old) noexcept;
+	//Module& operator=(const Module& old) noexcept;
+	//Module& operator=(Module&& old) noexcept;
 
 	const char* GetModuleName() const { return nullptr; };
 

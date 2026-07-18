@@ -6,19 +6,19 @@
 
 //* Creates a logging category
 #define LOG_ADDCATEGORY(CategoryName) \
-    const u16 Log##CategoryName = Logger::AddLogCategory(#CategoryName);
+    const u16 Log##CategoryName = Logger::AddLogCategory(#CategoryName)
 
 #define MR_LOG(CategoryName, severity, message, ...)                \
     do                                                              \
     {                                                               \
-        if constexpr (bIsRunningDebugMode || LogSeverity::severity != LogSeverity::Fatal)\
+        if constexpr (bIsRunningDebugMode && LogSeverity::severity != LogSeverity::Fatal)\
         {                                                           \
            _MR_LOG_IMPL_STANDARD(CategoryName, severity, L##message, __VA_ARGS__)\
         }                                                           \
-        else if (LogSeverity::severity == LogSeverity::Fatal)\
+        else if constexpr (LogSeverity::severity == LogSeverity::Fatal)\
         {                                                           \
            _MR_LOG_IMPL_FATAL(CategoryName, severity, L##message, __VA_ARGS__)\
-            HAL::FatalExit(-1);\
+           HAL::FatalExit(-1);\
         }                                                           \
     } while (0);                                                    \
 

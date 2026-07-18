@@ -14,12 +14,12 @@ public:
 	explicit Array(u32 count)
 	{
 		capacity = count;
-		container = (T*)GetMemoryManager()->Allocate(capacity * sizeof(T));
+		container = GetMemoryManager()->Allocate<T>(capacity * sizeof(T));
 	}
 
 	Array()
 	{
-		container = (T*)GetMemoryManager()->Allocate(sizeof(T));
+		container = GetMemoryManager()->Allocate<T>(sizeof(T));
 	};
 
 	~Array()
@@ -42,7 +42,7 @@ public:
 		size = copy.size;
 		if (capacity > 0) 
 		{
-			container = (T*)GetMemoryManager()->Allocate(capacity * sizeof(T), GetMemoryManager()->GetProjectRegion());
+			container = GetMemoryManager()->Allocate<T>(capacity * sizeof(T), GetMemoryManager()->GetProjectRegion());
 
 			for (u32 i = 0; i < size; i++) 
 			{
@@ -71,7 +71,7 @@ public:
 			size = old.size;
 			if (capacity > 0)
 			{
-				container = (T*)GetMemoryManager()->Allocate(capacity * sizeof(T));
+				container = GetMemoryManager()->Allocate<T>(capacity * sizeof(T));
 
 				for (u32 i = 0; i < size; i++)
 				{
@@ -131,7 +131,7 @@ public:
 	{
 		MR_ASSERT(capacity < newCount, "Old array cap is higher than new!");
 
-		T* newBlock = (T*)GetMemoryManager()->Allocate(newCount * sizeof(T), GetMemoryManager()->GetProjectRegion());
+		T* newBlock = GetMemoryManager()->Allocate<T>(newCount * sizeof(T), GetMemoryManager()->GetProjectRegion());
 		for (u32 i = 0; i < size; i++)
 			newBlock[i] = container[i];
 

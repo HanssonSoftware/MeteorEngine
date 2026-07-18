@@ -2,6 +2,7 @@
 
 #ifdef MR_PLATFORM_WINDOWS
 #include <Logging/Log.h>
+#include <Memory/MemoryHandler.h>
 #include <Application/Application.h>
 #include <HAL/Timer.h>
 #include <Special/EngineConstants.h>
@@ -14,8 +15,11 @@
 #include <pathcch.h>
 #include <strsafe.h>
 
+#include <DefaultEngineResources.h>
+
 #pragma comment(lib, "OneCore.Lib")
 #pragma comment(lib, "Pathcch.lib")
+#pragma warning(disable : 6053) // The prior call to 'wcsncpy' might not zero-terminate string 'messageBox'.
 
 static HANDLE persistentLog;
 static HANDLE consoleLog;
@@ -47,14 +51,14 @@ void Logger::Init()
             const bool bIsUsingHeap = appNameLength > 255 ? true : false;
             wchar_t appNameStack[256] = {};
 
-            wchar_t* appName = bIsUsingHeap ? (wchar_t*)GetMemoryManager()->Allocate((appNameLength + 1) * sizeof(wchar_t)) : appNameStack;
+            wchar_t* appName = bIsUsingHeap ? GetMemoryManager()->Allocate<wchar_t>((appNameLength + 1) * sizeof(wchar_t)) : appNameStack;
 
             if (!HAL::ConvertToWide(appName, appNameLength, GetApplication()->GetApplicationNameNoSpaces()->Chr()))
             {
                 MR_LOG(LogInit, Error, "Conversion error occoured!");
 
                 CoTaskMemFree(foundPath);
-                GetMemoryManager()->Deallocate(0);
+                GetMemoryManager()->Deallocate(nullptr);
                 return;
             }
 
@@ -71,7 +75,22 @@ void Logger::Init()
             wcsncat(path, date, 32);
 
             persistentLog = CreateFileW(path, GENERIC_WRITE, FILE_SHARE_READ, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_WRITE_THROUGH | FILE_FLAG_NO_BUFFERING, nullptr);
-            if (persistentLog == INVALID_HANDLE_VALUE)
+            if (persistentLog != INVALID_HANDLE_VALUE)
+            {
+                constexpr const char fileBeginFormatting[] = "Logging started at: %02d/%02d/%02d %02d:%02d:%02d\n";
+                char fileBeginFormatted[64] = {};
+
+                const u32 count = snprintf(fileBeginFormatted, 64, fileBeginFormatting, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
+
+                DWORD toWrite = 0;
+                if (!WriteFile(persistentLog, fileBeginFormatted, (DWORD)count, &toWrite, nullptr))
+                {
+                    int J = GetLastError();
+
+                    int h = GetLastError();
+                }
+            }
+            else
             {
                 wchar_t chars[256] = { L'\0' };
 
@@ -80,42 +99,56 @@ void Logger::Init()
                 MR_LOG(LogInit, Error, "%ls", chars);
             }
 
-            constexpr const char fileBeginFormatting[] = "Logging started at: %02d/%02d/%02d %02d:%02d:%02d\n";
-            char fileBeginFormatted[64] = {};
-
-            const u32 count = snprintf(fileBeginFormatted, 64, fileBeginFormatting, st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond);
-
-            DWORD toWrite = 0;
-            if (!WriteFile(persistentLog, fileBeginFormatted, (DWORD)count, &toWrite, nullptr))
-            {
-                int J = GetLastError();
-
-                int h = GetLastError();
-            }
 
             CoTaskMemFree(foundPath);
         }
     }
 
-    consoleLog = CreateFileW(L"CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
-    if (consoleLog != INVALID_HANDLE_VALUE)
+    if constexpr (bIsRunningDebugMode)
     {
-        SetConsoleCP(CP_UTF8);
-        SetConsoleOutputCP(CP_UTF8);
+        if (!AttachConsole(ATTACH_PARENT_PROCESS))
+            AllocConsole();
 
-        CONSOLE_CURSOR_INFO cf;
-        GetConsoleCursorInfo(consoleLog, &cf);
-        cf.bVisible = false;
+        HWND consoleWindow = GetConsoleWindow();
+        if (consoleWindow)
+        {
+            ShowWindow(consoleWindow, SW_HIDE);
 
-        SetConsoleCursorInfo(consoleLog, &cf);
+            consoleLog = CreateFileW(L"CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
+            if (consoleLog != INVALID_HANDLE_VALUE)
+            {
+                SetConsoleCP(CP_UTF8);
+                SetConsoleOutputCP(CP_UTF8);
 
-        if (!SetStdHandle(STD_OUTPUT_HANDLE, consoleLog))
-            GetApplication()->RequestExit(-1);
+                CONSOLE_CURSOR_INFO cf;
+                GetConsoleCursorInfo(consoleLog, &cf);
+                cf.bVisible = false;
 
-        wchar_t title[128] = {};
+                SetConsoleCursorInfo(consoleLog, &cf);
 
-        swprintf(title, 128, L"%hs - Developer Console", GetApplication()->GetApplicationName()->Chr());
-        SetConsoleTitleW(title);
+                if (!SetStdHandle(STD_OUTPUT_HANDLE, consoleLog))
+                    GetApplication()->RequestExit(-1);
+
+                wchar_t title[128] = {};
+
+                swprintf(title, 128, L"%hs - Developer Console", GetApplication()->GetApplicationName()->Chr());
+                SetConsoleTitleW(title);
+
+                HICON hIcon = (HICON)LoadImageW(
+                    (HINSTANCE)HAL::GetEngineCore(),
+                    MAKEINTRESOURCEW(IDI_LASTRESORT),
+                    IMAGE_ICON,
+                    0, 0,
+                    LR_DEFAULTSIZE | LR_SHARED);
+                if (hIcon)
+                {
+                    SendMessageW(consoleWindow, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+                    SendMessageW(consoleWindow, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+                }
+
+                ShowWindow(consoleWindow, SW_SHOW);
+            }
+        }
     }
 
     loggingInitializationMeasurement.Stop();
@@ -134,7 +167,7 @@ void Logger::Shutdown()
 }
 
 static u32 formattedMessagePos = 0, fullFormattedPos = 0;
-constexpr const u32 MAX_CHARS_FOR_COMPLETE_MESSAGE = 1024;
+constexpr const u32 MAX_CHARS_FOR_COMPLETE_MESSAGE = 2048;
 constexpr const u32 MAX_CHARS_FOR_COMPLETE_MESSAGE_FATAL = 2048;
 
 void Logger::LogStandard(const u16& category, LogSeverity severity, const void* message, ...)
@@ -174,7 +207,6 @@ void Logger::LogFatal(const u16& category, LogSeverity severity, const void* mes
     const wchar_t* castedFile = (wchar_t*)file;
 
     wchar_t buf[MAX_CHARS_FOR_COMPLETE_MESSAGE_FATAL] = {};
-    u32 formattedMessagePos = 0, fullFormattedPos = 0;
 
     if (*castedMessage != L'\0')
     {
@@ -186,7 +218,7 @@ void Logger::LogFatal(const u16& category, LogSeverity severity, const void* mes
     SYSTEMTIME st = {};
     GetLocalTime(&st);
 
-    fullFormattedPos = swprintf_s(buf + formattedMessagePos, MAX_CHARS_FOR_COMPLETE_MESSAGE_FATAL - formattedMessagePos, L"========== FATAL ERROR ==========\nMessage: %.*s\n\nWhere: [%s(%d) - %s]\nTime: %02d/%02d/%02d %02d:%02d:%02d",
+    fullFormattedPos = swprintf_s(buf + formattedMessagePos, MAX_CHARS_FOR_COMPLETE_MESSAGE_FATAL - formattedMessagePos, L"========== FATAL ERROR ==========\nMessage: %.*s\n\nWhere: [%s(%d) - %s]\nTime: %02d/%02d/%02d %02d:%02d:%02d\n",
         formattedMessagePos, buf, castedFile, line, castedFunction,
         st.wYear, st.wMonth, st.wDay, st.wHour, st.wMinute, st.wSecond
         );
@@ -245,17 +277,17 @@ void Logger::SendToOutputBuffer(void* buffer, const u32 count, LogSeverity sever
 
         if (severity == Fatal)
         {
-#ifdef MR_DEBUG
+#if MR_DEBUG
             wchar_t messageBox[512] = {};
-            wcsncpy_s(messageBox, casted - formattedMessagePos, formattedMessagePos);
+            wcsncpy(messageBox, casted - formattedMessagePos, formattedMessagePos);
 
-            HWND window = /*(HWND)GetApplication()->GetMainWindow()->GetNativeHandle()*/nullptr;
+            HWND window = GetApplication()->GetMainWindow() ? (HWND)GetApplication()->GetMainWindow()->GetNativeHandle() : nullptr;
 
-            swprintf_s(messageBox + formattedMessagePos + 1, 512u - formattedMessagePos, L"%hs has crashed!", GetApplication()->GetApplicationName()->Chr());
+            swprintf(messageBox + formattedMessagePos + 1, 512u - formattedMessagePos, L"%hs has crashed!", GetApplication()->GetApplicationName()->Chr());
 
             MessageBoxW(window ? window : nullptr, messageBox, messageBox + formattedMessagePos + 1, MB_OK | MB_ICONERROR);
 #else
-            MessageBeep();
+            MessageBeep(MB_ICONERROR);
 #endif // MR_DEBUG
         }
     }

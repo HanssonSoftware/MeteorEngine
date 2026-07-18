@@ -20,6 +20,7 @@ struct CORE_API Commandline
 
 	StringView Get(const StringView& command);
 
+	const char* const* GetInternal() const { return list; };
 protected:
 	char** list = nullptr;
 

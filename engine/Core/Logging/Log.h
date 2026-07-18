@@ -19,7 +19,6 @@ class MemoryBlockPool;
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
 
-//CREATE_DELEGATE(LoggerInitialize);
 
 struct LogEntry {};
 

@@ -74,7 +74,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_DEBUG;MR_CORE_ENABLED;MR_PLATFORM_WINDOWS;MR_CORE_EXPORTS;_CRT_SECURE_NO_WARNINGS;MR_CORE_EXPORT</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\Core\HAL;$(SolutionDir)Intermediate\;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources\default;$(SolutionDir)engine\Core\HAL;$(SolutionDir)Intermediate\;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)Source\ThirdParty\ImGUI\;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <UseFullPaths>false</UseFullPaths>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -90,7 +90,7 @@
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources\default;$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Shipping|x64'">
@@ -102,7 +102,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);MR_CORE_ENABLED;MR_PLATFORM_WINDOWS;MR_CORE_EXPORTS;_CRT_SECURE_NO_WARNINGS;MR_CORE_EXPORT</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\Core\HAL;$(SolutionDir)Intermediate\;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources\default;$(SolutionDir)engine\Core\HAL;$(SolutionDir)Intermediate\;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate\Apollo\Core;$(VULKAN_SDK)\include;$(ProjectDir)engine\Core\Platform;$(SolutionDir)resources;$(SolutionDir)engine\ThirdParty;$(SolutionDir)engine\ThirdParty\FreeType;$(SolutionDir)engine\ThirdParty\ImGUI;$(SolutionDir)engine;$(SolutionDir)Source\ThirdParty;$(SolutionDir)Source\Platform;$(SolutionDir)Source\Editor;$(SolutionDir)Source\Core;%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
       <UseFullPaths>false</UseFullPaths>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -121,7 +121,7 @@
       <SuppressStartupBanner>false</SuppressStartupBanner>
     </Lib>
     <ResourceCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)resources\default;$(SolutionDir)resources;$(SolutionDir)engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -132,10 +132,10 @@
     <ClCompile Include="engine\Core\HAL\Win32\Logging_Win32.cpp" />
     <ClCompile Include="engine\Core\HAL\Win32\Memory_Win32.cpp" />
     <ClCompile Include="engine\Core\Logging\Log.cpp" />
+    <ClCompile Include="engine\Core\Memory\MemoryBlockArena.cpp" />
     <ClCompile Include="engine\Core\Types\Name.cpp" />
     <ClCompile Include="engine\Core\Types\String.cpp" />
     <ClCompile Include="engine\Core\Module\ModuleManager.cpp" />
-    <ClCompile Include="engine\Core\Module\Module.cpp" />
     <ClCompile Include="engine\Core\Special\LaunchMeteorSuite.h" />
     <ClCompile Include="engine\Core\Memory\MemoryHandler.cpp" />
     <ClCompile Include="engine\Core\Memory\MemoryPackage.cpp" />
@@ -180,6 +180,7 @@
     <ClInclude Include="engine\Core\HAL\Window.h" />
     <ClInclude Include="engine\Core\HAL\Paths.h" />
     <ClInclude Include="engine\Core\HAL\Timer.h" />
+    <ClInclude Include="resources\default\DefaultEngineResources.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="engine\Engine.mrbuild" />
@@ -192,6 +193,12 @@
     <BuildMacro Include="ProductDir">
       <Value>$(ProductDir)</Value>
     </BuildMacro>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="resources\default\enginedefault.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\default\DefaultEngineResources.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -2,19 +2,19 @@
 
 #include "BuildSystem.h"
 #include <Logging/Log.h>
-#include <Commandlet.h>
+#include <HAL/Commandline.h>
 #include <HAL/HAL.h>
 
 #include <CommandRegistry.h>
+#include <Application/Application.h>
+
+LOG_ADDCATEGORY(CommandlineDispatcher);
 
 void BuildSystem::CallRequiredMode()
 {
-	if (Commandlet::Get().GetArgs()[1] != nullptr)
+	if (GetApplication()->GetCommandline()->GetInternal()[1] != nullptr)
 	{
-		char commandBuffer[128] = {};
-		HAL::ConvertToNarrow(commandBuffer, wcslen(Commandlet::Get().GetArgs()[1]), Commandlet::Get().GetArgs()[1]);
-
-		CommandRegistry::Get().CallFunctionOnCommand(commandBuffer);
+		CommandRegistry::Get().CallFunctionOnCommand(GetApplication()->GetCommandline()->GetInternal()[1]);
 	}
 	else
 	{
@@ -24,13 +24,13 @@ void BuildSystem::CallRequiredMode()
 
 void BuildSystem::PrintHelp()
 {
-	if (Commandlet::Get().GetCount() < 1)
+	if (GetApplication()->GetCommandline()->GetInternal()[1] != nullptr)
 	{
 
 	}
 
 	constexpr const char helpMsg[] = "No parameters in input!\n";
-	MR_LOG(LogTemp, Log, "%s", helpMsg);
+	//MR_LOG(LogTemp, Log, "%hs", helpMsg);
 	
 	const CommandInformation* commands = &CommandRegistry::Get().GetCommandsList();
 	for (int i = 0; i < CommandRegistry::Get().GetCommandsListCount(); i++)

@@ -2,8 +2,9 @@
 
 #pragma once
 #include "MemoryBlockBase.h"
-#include "MemoryHandler.h"
 #include <HAL/DataTypes.h>
+
+class MemoryHandler;
 
 class MemoryBlockArena : public MemoryBlockBase
 {
@@ -33,46 +34,15 @@ public:
 
 	}
 
-	virtual ~MemoryBlockArena() noexcept
-	{
-		if (ptr)
-		{
-			//GetMemoryManager()->Deallocate(ptr, size);
-		}
-	}
+	virtual ~MemoryBlockArena() noexcept;
 
-	virtual void* Allocate(const u64 bytes)
-	{
-		const u64 rounded = MemoryHandler::RoundToMemoryAlignment(bytes);
-
-		if (ptr && (u64)(ptr + offset + rounded) <= (u64)(ptr + size))
-		{
-			void* result = ptr + offset;
-
-			offset += rounded;
-			return result;
-		}
-
-		return nullptr;
-	}
+	virtual void* Allocate(const u64 bytes);
 	
-	virtual void* Exhaust()
-	{
-		return Allocate(size - offset);
-	}
+	virtual void* Exhaust();
 
-	void Reset()
-	{
-		offset = offsetMarker;
-	}
+	void Reset();
 
-	void SetMarker(const u64 marker)
-	{
-		if (offset < size)
-		{
-			offsetMarker = marker;
-		}
-	}
+	void SetMarker(const u64 marker);
 
 protected:
 	u64 offsetMarker = 0;

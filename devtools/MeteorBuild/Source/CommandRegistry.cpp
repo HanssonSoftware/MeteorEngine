@@ -20,7 +20,7 @@ bool CommandRegistry::CallFunctionOnCommand(const char* functionName) const
 	{
 		if (strcmp(commands[i].command, functionName) == 0)
 		{
-			MR_LOG(LogCommandRegistry, Log, "Calling %s parameter\'s function!", functionName);
+			MR_LOG(LogCommandRegistry, Log, "Calling %hs parameter\'s function!", functionName);
 
 			commands[i].function();
 			return true;

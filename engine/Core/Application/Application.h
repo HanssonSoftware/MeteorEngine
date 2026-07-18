@@ -3,8 +3,7 @@
 #pragma once
 #include <cstdint>
 #include <Types/Delegate.h>
-//#include <Types/StringView.h>
-
+#include <Types/String.h>
 #include "Logging/Log.h"
 #include <HAL/Commandline.h>
 #include <HAL/HAL.h>
@@ -23,7 +22,7 @@ LOG_ADDCATEGORY(Application);
 
 struct CORE_API Application
 {
-	friend void HAL::InitEssential();
+	friend void HAL::InitHAL();
 
 	enum class State : i8 
 	{ 
@@ -49,7 +48,7 @@ struct CORE_API Application
 
 	virtual void Init();
 
-	virtual void Run();
+	virtual void Run(float dt);
 
 	virtual void Shutdown();
 
@@ -73,8 +72,6 @@ struct CORE_API Application
 
 	Commandline* GetCommandline() { return &cli; };
 
-	void ApplicationLoopFunction();
-
 protected:
 	State currentState = { State::None };
 
@@ -87,11 +84,20 @@ protected:
 	//* Useful for directories
 	String appCodeName;
 
+	struct
+	{
+		String windowName;
+
+		u32 x;
+		u32 y;
+	} windowDefs;
+
 	Commandline cli;
 
 	void* applicationHandle;
 
-	Window* mainWindow;
+private:
+	Window* mainWindow = nullptr;
 };
 
 template<typename T = Application>

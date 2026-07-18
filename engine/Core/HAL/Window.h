@@ -15,6 +15,8 @@ class CORE_API Window
 public:
 	static Window* Create(const StringView& name, const u32 sx, const u32 sy, const u32 px, const u32 py);
 
+	Window() noexcept = default;
+	
 	void Show();
 
 	void Hide();
@@ -28,7 +30,6 @@ public:
 	void* GetNativeHandle() const { return windowsAPIHandle; };
 protected:
 
-	Window() noexcept = default;
 	Window(const StringView& name, const u32 x, const u32 y)
 		: windowName(name)
 	{
@@ -43,8 +44,6 @@ protected:
 	{
 
 	}
-
-	bool CallOSInsider();
 
 	void* windowsAPIHandle = nullptr;
 

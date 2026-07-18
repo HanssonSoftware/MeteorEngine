@@ -139,7 +139,7 @@
       <PreprocessorDefinitions>MR_DEBUG;_CONSOLE;MR_PLATFORM_WINDOWS;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\Core\HAL;$(ProjectDir)Source\;$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir)Source;$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\Core;$(SolutionDir)engine\Core\HAL;$(ProjectDir)Source\;$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir)Source;$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessToFile>false</PreprocessToFile>
     </ClCompile>
     <Link>
@@ -179,7 +179,7 @@
     </ResourceCompile>
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)engine\Core\HAL;$(ProjectDir)Source\;$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir);$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)engine\Core;$(SolutionDir)engine\Core\HAL;$(ProjectDir)Source\;$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir);$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS</PreprocessorDefinitions>
     </ClCompile>
     <Link>

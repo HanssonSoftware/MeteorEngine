@@ -21,11 +21,11 @@ constexpr String::String()
 }
 
 String::~String() noexcept
-{/*
-	if (bIsUsingHeap && internalBuffers.heapBuffer.ptr)
-		GetMemoryManager()->Deallocate(internalBuffers.heapBuffer.ptr, internalBuffers.heapBuffer.capacity);*/
-
-	NullOut();
+{
+	if (!SitsOnStack())
+	{
+		GetMemoryManager()->Deallocate(internalBuffers.heapBuffer.ptr);
+	}
 }
 
 constexpr String::String(const char* Input)
@@ -34,53 +34,29 @@ constexpr String::String(const char* Input)
 	StringCopy(Input, target);
 }
 
-String::String(int Input)
-{
-	//swprintf(internalBuffers.stackBuffer.ptr, SSO_MAX_CHARS, L"%d", Input);
-}
-
-String::String(u32 Input)
-{
-	//sprintf(internalBuffers.stackBuffer.ptr, SSO_MAX_CHARS, L"%ud", Input);
-
-}
-
-String::String(float Input)
-{
-	//sprintf(internalBuffers.stackBuffer.ptr, SSO_MAX_CHARS, L"%f", Input);
-}
 
 String::String(String&& other) noexcept
 {
-	NullOut();
+	internalBuffers = other.internalBuffers;
 
-	bIsUsingHeap = other.bIsUsingHeap;
-
-	if (bIsUsingHeap)
+	if (!other.SitsOnStack())
 	{
-		internalBuffers.heapBuffer.capacity = other.internalBuffers.heapBuffer.capacity;
-		internalBuffers.heapBuffer.length = other.internalBuffers.heapBuffer.length;
+		other.internalBuffers.heapBuffer.capacity = 0;
+		other.internalBuffers.heapBuffer.length = 0;
 	}
 	else
 	{
-		internalBuffers.stackBuffer.length = other.internalBuffers.stackBuffer.length;
+		other.internalBuffers.stackBuffer.length = 0;
 	}
-
-	char* determined = DetermineLocation(Length());
-	memmove(determined, other.Data(), Length());
-
 }
 
 String::String(const String& other)
 {
-	NullOut();
-
-	bIsUsingHeap = other.bIsUsingHeap;
-	if (bIsUsingHeap)
+	if (!other.SitsOnStack())
 	{
 		internalBuffers.heapBuffer.capacity = other.internalBuffers.heapBuffer.capacity;
 		internalBuffers.heapBuffer.length = other.internalBuffers.heapBuffer.length;
-		internalBuffers.heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(internalBuffers.heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
+		internalBuffers.heapBuffer.ptr = GetMemoryManager()->Allocate<char>(internalBuffers.heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
 
 		memset(internalBuffers.heapBuffer.ptr, 0, internalBuffers.heapBuffer.capacity);
 		strncpy(internalBuffers.heapBuffer.ptr, other.internalBuffers.heapBuffer.ptr, internalBuffers.heapBuffer.length);
@@ -96,23 +72,19 @@ String::String(const String& other)
 
 String::String(const char* Input, u32 length)
 {
-	NullOut();
-
 	if (!Input || *Input == '\0' || length <= 0)
 		return;
 
-	char* direct = DetermineLocation(length);
+	char* direct = GetRecommendedBufferBySize(length);
 	strncpy(direct, Input, length);
 }
 
 String::String(const StringView& str)
 {
-	NullOut();
-
 	if (!str.ptr || *str.ptr == '\0' || str.size <= 0)
 		return;
 
-	char* direct = DetermineLocation(str.size);
+	char* direct = GetRecommendedBufferBySize(str.size);
 	strncpy(direct, (char*)str.ptr, str.size);
 }
 
@@ -124,9 +96,9 @@ String String::operator+(const String& Other)
 	//const uint32_t thisSize = LENGTH(thisData);
 	//const uint32_t otherSize = LENGTH(otherData);
 
-	//this->bIsUsingHeap = thisSize + otherSize > SSO_MAX_CHARS ? true : false;
+	//this->SitsOnStack() = thisSize + otherSize > SSO_MAX_CHARS ? true : false;
 
-	//if (this->bIsUsingHeap)
+	//if (this->SitsOnStack())
 	//{
 	//	ScopedPtr<char> newBuffer = (char*)GetMemoryManager()->Allocate(thisSize + otherSize + 1u);
 	//	memcpy(newBuffer.Get(), thisData, thisSize);
@@ -160,7 +132,7 @@ String String::Format(const char* format, ...)
 	const int sizeForVA = vsnprintf(nullptr, 0, format, a);
 
 	char fixedFormattingBuffer[256 + 1] = {'\0'};
-	char* formattedBuffer = sizeForVA <= 256 ? fixedFormattingBuffer : (char*)GetMemoryManager()->Allocate(sizeForVA + 1, GetMemoryManager()->GetProjectRegion());
+	char* formattedBuffer = sizeForVA <= 256 ? fixedFormattingBuffer : GetMemoryManager()->Allocate<char>(sizeForVA + 1, GetMemoryManager()->GetProjectRegion());
 
 	const int result = vsnprintf(formattedBuffer, sizeForVA + 1, format, a);
 	va_end(a);
@@ -171,47 +143,34 @@ String String::Format(const char* format, ...)
 	return stringized;
 }
 
-void String::NullOut()
+constexpr char* String::GetRecommendedBufferBySize(u32 size)
 {
-	// Advanced memory cleanup method required!
-
-	bIsUsingHeap = false;
-
-	internalBuffers.heapBuffer.ptr = nullptr;
-	internalBuffers.heapBuffer.capacity = 0;
-	internalBuffers.heapBuffer.length = 0;
-
-	memset(internalBuffers.stackBuffer.ptr, 0, SSO_MAX_CHARS + 1);
-	internalBuffers.stackBuffer.length = 0;
-}
-
-char* String::DetermineLocation(u32 size)
-{
-	bIsUsingHeap = size > SSO_MAX_CHARS;
-	if (bIsUsingHeap)
+	if (size > SSO_MAX_CHARS)
 	{
-		internalBuffers.heapBuffer.capacity = size * 2;
-		internalBuffers.heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(internalBuffers.heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
+		internalBuffers.heapBuffer.capacity = (u32)(size * 1.5f);
 		internalBuffers.heapBuffer.length = size;
 
-		memset(internalBuffers.heapBuffer.ptr, 0, internalBuffers.heapBuffer.capacity);
+		internalBuffers.heapBuffer.ptr = GetMemoryManager()->Allocate<char>(internalBuffers.heapBuffer.capacity);
 		return internalBuffers.heapBuffer.ptr;
 	}
+	else
+	{
+		internalBuffers.stackBuffer.length = size;
+		return internalBuffers.stackBuffer.ptr;
+	}
 
-	internalBuffers.stackBuffer.length = size;
-	return internalBuffers.stackBuffer.ptr;
+	return nullptr;
 }
 
 String& String::operator=(const String& other)
 {
 	if (this != &other)
 	{
-		bIsUsingHeap = other.bIsUsingHeap;
-		if (bIsUsingHeap)
+		if (!other.SitsOnStack())
 		{
 			internalBuffers.heapBuffer.capacity = other.internalBuffers.heapBuffer.capacity;
 			internalBuffers.heapBuffer.length = other.internalBuffers.heapBuffer.length;
-			internalBuffers.heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(internalBuffers.heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
+			internalBuffers.heapBuffer.ptr = GetMemoryManager()->Allocate<char>(internalBuffers.heapBuffer.capacity, GetMemoryManager()->GetProjectRegion());
 
 			memset(internalBuffers.heapBuffer.ptr, 0, internalBuffers.heapBuffer.capacity);
 			strncpy(internalBuffers.heapBuffer.ptr, other.internalBuffers.heapBuffer.ptr, internalBuffers.heapBuffer.length);
@@ -243,8 +202,7 @@ String& String::operator=(const StringView& other)
 	if (strcmp(Chr(), (char*)other.ptr) == 0)
 		return *this;
 
-
-	char* target = DetermineLocation(other.size);
+	char* target = GetRecommendedBufferBySize(other.size);
 	strncpy(target, (char*)other.ptr, other.size);
 
 	return *this;
@@ -252,6 +210,8 @@ String& String::operator=(const StringView& other)
 
 String& String::operator+=(const String& other)
 {
+	MR_ASSERT(false, "Broken function do not use!");
+
 	if (other.IsEmpty())
 		return *this;
 
@@ -259,14 +219,14 @@ String& String::operator+=(const String& other)
 	const u32 otherLen = other.Length();
 	const u32 newLen = thisLen + otherLen;
 
-	const char* otherData = other.bIsUsingHeap ? other.internalBuffers.heapBuffer.ptr : other.internalBuffers.stackBuffer.ptr;
+	const char* otherData = other.SitsOnStack() ? other.internalBuffers.heapBuffer.ptr : other.internalBuffers.stackBuffer.ptr;
 
-	if (bIsUsingHeap)
+	if (!SitsOnStack())
 	{
 		if (internalBuffers.heapBuffer.capacity <= newLen)
 		{
 			const u32 newCap = newLen * 2;
-			char* newPtr = (char*)GetMemoryManager()->Allocate(newCap, GetMemoryManager()->GetProjectRegion());
+			char* newPtr = GetMemoryManager()->Allocate<char>(newCap, GetMemoryManager()->GetProjectRegion());
 			memset(newPtr, 0, newCap);
 
 			if (internalBuffers.heapBuffer.ptr && thisLen > 0)
@@ -299,7 +259,7 @@ String& String::operator+=(const String& other)
 		else
 		{
 			const uint32_t newCap = newLen * 2;
-			char* newPtr = (char*)GetMemoryManager()->Allocate(newCap * sizeof(char), GetMemoryManager()->GetProjectRegion());
+			char* newPtr = GetMemoryManager()->Allocate<char>(newCap * sizeof(char), GetMemoryManager()->GetProjectRegion());
 			memset(newPtr, 0, newCap);
 
 			if (thisLen > 0)
@@ -311,9 +271,10 @@ String& String::operator+=(const String& other)
 			internalBuffers.heapBuffer.capacity = newCap;
 			internalBuffers.heapBuffer.length = newLen;
 
-			bIsUsingHeap = true;
+			//SitsOnStack() = true;
 		}
 	}
 
 	return *this;
 }
+

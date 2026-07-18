@@ -2,13 +2,13 @@
 
 #include "Commands.h"
 #include <Logging/Log.h>
-#include <Commandlet.h>
+#include <HAL/Commandline.h>
 #include <Memory/MemoryBlockArena.h>
 
 #include "CommandRegistry.h"
 #include "Module.h"
 
-#include "MinimalWin.h"
+#include "Win32/MinimalWin.h"
 #include <Shlwapi.h>
 #include <PathCch.h>
 
@@ -56,25 +56,25 @@ namespace Commands
 		LARGE_INTEGER startTime, endTime, frequency;
 		QueryPerformanceCounter(&startTime);
 
-		const String sourceDirectory = Commandlet::Get().Parse("-s");
-		const String intermediateDirectory = Commandlet::Get().Parse("-i");
-		const String configuration = Commandlet::Get().Parse("-c");
-		const String productDirectory = Commandlet::Get().Parse("-p");
+		//const String sourceDirectory = Commandlet::Get().Parse("-s");
+		//const String intermediateDirectory = Commandlet::Get().Parse("-i");
+		//const String configuration = Commandlet::Get().Parse("-c");
+		//const String productDirectory = Commandlet::Get().Parse("-p");
 
 		// Arena allocates bytes, so equal size will be allocated!
 		// WChar: 32 MB (Char / 2)
 		// Char: 32 MB
 
 #ifdef MR_PLATFORM_WINDOWS
-		static MemoryBlockArena<wchar_t> arena = { 64 * 1024 * 1024 };
+		//static MemoryBlockArena<wchar_t> arena = { 64 * 1024 * 1024 };
 #else
-		static MemoryBlockArena<char> arena = { 64 * 1024 * 1024 };
+		//static MemoryBlockArena<char> arena = { 64 * 1024 * 1024 };
 #endif // MR_PLATFORM_WINDOWS
 
-		if (sourceDirectory && intermediateDirectory)
+		//if (sourceDirectory && intermediateDirectory)
 		{
-			wchar_t* sourceDirectoryW = (wchar_t*)arena.Allocate(sourceDirectory.Length() * sizeof(wchar_t));
-			if (!MultiByteToWideChar(CP_UTF8, 0, sourceDirectory, sourceDirectory.Length(), sourceDirectoryW, sourceDirectory.Length()))
+			//wchar_t* sourceDirectoryW = (wchar_t*)arena.Allocate(sourceDirectory.Length() * sizeof(wchar_t));
+			//if (!MultiByteToWideChar(CP_UTF8, 0, sourceDirectory, sourceDirectory.Length(), sourceDirectoryW, sourceDirectory.Length()))
 			{
 				MR_LOG(LogCommands, Error, "%s", *GetLastErrorString());
 				return;
@@ -83,13 +83,13 @@ namespace Commands
 			// Collect files in folder
 
 			Array<wchar_t*> files;
-			DirectorySearch(sourceDirectoryW, files, &arena);
+			//DirectorySearch(sourceDirectoryW, files, &arena);
 
 			if (files.GetSize() < 0)
 				return;
 
 			// Read scripts
-			MemoryBlockArena<char> currentReadFile = { 8 * 1024 * 1024 };
+			//MemoryBlockArena<char> currentReadFile = { 8 * 1024 * 1024 };
 
 			Array<Module> modules;
 			for (auto& file : files)
@@ -98,8 +98,8 @@ namespace Commands
 				if (*extension && wcscmp(extension, L".mrbuild") != 0)
 					continue;
 
-				HANDLE script = SendToOutputBuffer(file, GENERIC_READ, _placeholder_);
-				if (script != INVALID_HANDLE_VALUE)
+				//HANDLE script = SendToOutputBuffer(file, GENERIC_READ, _placeholder_);
+				/*if (script != INVALID_HANDLE_VALUE)
 				{
 					LARGE_INTEGER size;
 					GetFileSizeEx(script, &size);
@@ -132,7 +132,7 @@ namespace Commands
 				else
 				{
 					MR_LOG(LogCommands, Error, "%s", *GetLastErrorString());
-				}
+				}*/
 			}
 
 			// Rank each module by significance
@@ -146,7 +146,7 @@ namespace Commands
 
 			// Get thread count and start compiling
 
-			bool bIsMultiThreadEnabled = Commandlet::Get().Check("-mt");
+			//bool bIsMultiThreadEnabled = Commandlet::Get().Check("-mt");
 
 #ifdef MR_PLATFORM_WINDOWS
 			SYSTEM_INFO syi = {};
@@ -157,52 +157,52 @@ namespace Commands
 			GetModuleFileNameW(nullptr, exe, MAX_PATH);
 
 
-			LogStandard(exea, L"%s\\..\\%hs\\%hs_Build.rsp", exe, intermediateDirectory.Chr(), Commandlet::Get().Parse("-m").Chr());
-			HANDLE responseFile = SendToOutputBuffer(exea, GENERIC_READ | GENERIC_WRITE, _placeholder_);
-			if (responseFile == INVALID_HANDLE_VALUE)
+			//LogStandard(exea, L"%s\\..\\%hs\\%hs_Build.rsp", exe, intermediateDirectory.Chr(), Commandlet::Get().Parse("-m").Chr());
+			//HANDLE responseFile = SendToOutputBuffer(exea, GENERIC_READ | GENERIC_WRITE, _placeholder_);
+			//if (responseFile == INVALID_HANDLE_VALUE)
 			{
 				return;
 			}
 
-			MemoryBlockArena<char> buffer = { 1_mB };
-			char* responseBuffer = (char*)buffer.Exhaust();
+			//MemoryBlockArena<char> buffer = { 1_mB };
+			//char* responseBuffer = (char*)buffer.Exhaust();
 
-			const String currentModuleCompile = Commandlet::Get().Parse("-m");
+			//const String currentModuleCompile = Commandlet::Get().Parse("-m");
 
 			char moduleNameUpper[64] = {};
-			for (u32 i = 0; i < currentModuleCompile.Length(); i++)
-				moduleNameUpper[i] = toupper(currentModuleCompile.Chr()[i]);
+			//for (u32 i = 0; i < currentModuleCompile.Length(); i++)
+				//moduleNameUpper[i] = toupper(currentModuleCompile.Chr()[i]);
 
-			const u32 debugLevel = GetDebugLevel(Commandlet::Get().Parse("-c").Chr());
+			//const u32 debugLevel = GetDebugLevel(Commandlet::Get().Parse("-c").Chr());
 
-			const u32 count = (u32)sprintf(responseBuffer, "-std=c++17 -O%d %s %s -DMR_%s_EXPORT -shared -o %s.dll\n", debugLevel, debugLevel < 3 ? "-g" : "-flto", debugLevel < 3 ? "-DMR_DEBUG" : "", moduleNameUpper, currentModuleCompile.Chr());
+			//const u32 count = (u32)sprintf(responseBuffer, "-std=c++17 -O%d %s %s -DMR_%s_EXPORT -shared -o %s.dll\n", debugLevel, debugLevel < 3 ? "-g" : "-flto", debugLevel < 3 ? "-DMR_DEBUG" : "", moduleNameUpper, currentModuleCompile.Chr());
 
 			DWORD written = 0;
-			if (!WriteFile(responseFile, responseBuffer, count, &written, nullptr))
+			//if (!WriteFile(responseFile, responseBuffer, count, &written, nullptr))
 			{
 				MR_LOG(LogBuild, Error, "WriteFile failed with: %s", GetLastErrorString().Chr());
 				return;
 			}
 
-			MemoryBlockArena<char> concatArena = { 512_kB };
-			char* concatBuffer = (char*)concatArena.Exhaust();
+			//MemoryBlockArena<char> concatArena = { 512_kB };
+			//char* concatBuffer = (char*)concatArena.Exhaust();
 
 			u32 offset = 0;
-			for (const wchar_t* file : files)
-				offset += snprintf(concatBuffer + offset, 512_kB - offset, "%ls\n", file);
+			/*for (const wchar_t* file : files)
+				offset += snprintf(concatBuffer + offset, 512_kB - offset, "%ls\n", file);*/
 
-			if (!WriteFile(responseFile, concatBuffer, offset, &written, nullptr))
+			//if (!WriteFile(responseFile, concatBuffer, offset, &written, nullptr))
 			{
 				MR_LOG(LogBuild, Error, "WriteFile failed with: %s", GetLastErrorString().Chr());
 				return;
 			}
 
 
-			if (bIsMultiThreadEnabled)
+			//if (bIsMultiThreadEnabled)
 			{
 
 			}
-			else
+			//else
 			{
 				PROCESS_INFORMATION pi2 = {};
 				STARTUPINFOW si2 = { sizeof(STARTUPINFOW) };
@@ -222,7 +222,7 @@ namespace Commands
 				CloseHandle(pi2.hProcess);
 				CloseHandle(pi2.hThread);
 
-				CloseHandle(responseFile);
+				//CloseHandle(responseFile);
 				DeleteFileW(exea);
 			}
 

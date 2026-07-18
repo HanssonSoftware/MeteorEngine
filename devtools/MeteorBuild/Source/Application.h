@@ -17,7 +17,7 @@ public:
 
 	virtual void Init() override;
 
-	virtual void Run() override;
+	virtual void Run(float dt) override;
 
 	virtual void Shutdown() override;
 

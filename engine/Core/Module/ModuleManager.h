@@ -1,25 +1,31 @@
 /* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
-#include <Types/Array.h>
+#include <Types/Map.h>
 #include <Types/String.h>
 #include "Module.h"
 
 class ModuleManager
 {
-	ModuleManager() noexcept;
+	ModuleManager() noexcept = default;
 public:
 	static ModuleManager& Get();
 
-	virtual bool LoadModule(const StringView& moduleName);
+	virtual void InitializeModules();
+	
+	virtual void ShutdownModules();
 
-	virtual bool UnloadModule(const String& moduleName);
+	virtual bool RegisterModule(const StringView& moduleName);
+
+	virtual bool UnloadModule(const StringView& moduleName);
 
 	virtual bool IsModuleLoaded(const StringView& moduleName);
-protected:
-	virtual ~ModuleManager() noexcept;
 
-	Array<Module*> modules;
+	virtual void UpdateModules(float dt);
+protected:
+	virtual ~ModuleManager() noexcept = default;
+
+	Map<const char*, IModule*> modules;
 
 private:
 	static ModuleManager* object; // This must be an extensible class!

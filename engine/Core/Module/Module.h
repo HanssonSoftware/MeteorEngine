@@ -4,7 +4,7 @@
 #include <Types/String.h>
 //#include <type_traits>
 
-#include "HAL/Win32/MinimalWin.h"
+//#include "HAL/Win32/MinimalWin.h"
 // #include <CoreProxy.h>
 
 #ifdef MR_CORE_EXPORTS
@@ -13,7 +13,7 @@
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
 
-class CORE_API Module
+class CORE_API IModule
 {
 	friend class ModuleManager;
 protected:
@@ -29,14 +29,14 @@ protected:
 	};
 
 public:
-	Module() = default;
-	virtual ~Module() noexcept = default;
+	IModule() = default;
+	virtual ~IModule() noexcept = default;
 
-	Module(const Module&) = delete;
-	Module(Module&&) = delete;
+	IModule(const IModule&) = delete;
+	IModule(IModule&&) = delete;
 	
-	Module& operator=(const Module&) = delete;
-	Module& operator=(Module&&) = delete;
+	IModule& operator=(const IModule&) = delete;
+	IModule& operator=(IModule&&) = delete;
 
 	virtual bool StartupModule() = 0;
 
@@ -52,10 +52,13 @@ protected:
 	ModuleState moduleState = ModuleState::None;
 
 	String name;
+
+	void* interface;
 };
 
 #define IMPLEMENT_MODULE(ModuleClass)																		 \
-	extern "C" __declspec(dllexport) Module* InitialiseModule()												 \
-	{									\
-		return new ModuleClass();																			 \
+	extern "C" __declspec(dllexport) IModule* InitialiseModule()												 \
+	{																										 \
+		ModuleClass* emptyModuleInstance = GetMemoryManager()->Allocate<ModuleClass>(sizeof(ModuleClass));	 \
+		return emptyModuleInstance;																			 \
 	}

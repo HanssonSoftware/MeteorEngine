@@ -4,18 +4,15 @@
 #include <HAL/Window.h>
 #include <HAL/HAL.h>
 #include <Logging/Log.h>
+#include <Memory/MemoryHandler.h>
 #include <Application/Application.h>
 
 #include "MinimalWin.h"
+#include <dwmapi.h>
+
+#pragma comment(lib, "Dwmapi.lib")
 
 LOG_ADDCATEGORY(Windowing);
-
-bool Window::CallOSInsider()
-{
-
-
-	return true;
-}
 
 Window* Window::Create(const StringView& name, const u32 sx, const u32 sy, const u32 px, const u32 py)
 {
@@ -44,11 +41,19 @@ Window* Window::Create(const StringView& name, const u32 sx, const u32 sy, const
 	wchar_t windowName[256] = {};
 	HAL::ConvertToWide(windowName, name.size, (char*)name.ptr);
 
-	HWND winHandle = ::CreateWindowExW(WS_EX_ACCEPTFILES, className, windowName, WS_OVERLAPPEDWINDOW, sx, sy, px, py, nullptr, nullptr, GetModuleHandleW(nullptr), nullptr);
+	HWND winHandle = ::CreateWindowExW(WS_EX_ACCEPTFILES, className, windowName, WS_OVERLAPPEDWINDOW, sx, sy, px, py, nullptr, nullptr, (HINSTANCE)HAL::GetEngineCore(), nullptr);
 
-	MR_LOG(LogWindowing, Log, "%d", GetLastError());
+	static constexpr const COLORREF darkColor = 0x00151515;
 
-	Window* newWindowHandle = (Window*)GetMemoryManager()->Allocate(sizeof(Window), GetMemoryManager()->GetProjectRegion());
+	DwmSetWindowAttribute(
+		winHandle,
+		DWMWA_USE_IMMERSIVE_DARK_MODE,
+		&darkColor,
+		sizeof(darkColor)
+	);
+
+
+	Window* newWindowHandle = GetMemoryManager()->Allocate<Window>(sizeof(Window), GetMemoryManager()->GetProjectRegion());
 	newWindowHandle->windowName = name;
 	newWindowHandle->x = sx;
 	newWindowHandle->y = sy;

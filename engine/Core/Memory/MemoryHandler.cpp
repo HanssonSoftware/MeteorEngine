@@ -1,23 +1,17 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #include "MemoryHandler.h"
-#include <Logging/Log.h>
-#include <new>
-#include <HAL/Memory.h>
 #include <Memory/MemoryBlockBase.h>
-#include <Memory/MemoryBlockPool.h>
-
-#include "Win32/MinimalWin.h"
-
 #include "MemoryBlockPool.h"
 
 #ifdef MR_PLATFORM_WINDOWS
+#include "Win32/MinimalWin.h"
 #include <memoryapi.h>
 #endif // MR_PLATFORM_WINDOWS
 
-LOG_ADDCATEGORY(Memory);
-
 static MemoryHandler instance;
+
+LOG_ADDCATEGORY(Memory);
 
 MemoryHandler* GetMemoryManager()
 {
@@ -29,16 +23,13 @@ MemoryHandler::~MemoryHandler() noexcept
     if (engineRegion && projectRegion)
     {
         MemoryBlockBase* lastRegion = projectRegion->next;
-        while (lastRegion)
+        while (!lastRegion)
         {
             lastRegion = lastRegion->next;
-            HAL::OSDealloc(lastRegion, lastRegion->size);
-
-            lastRegion = nullptr;
         }
 
         HAL::OSDealloc(engineRegion, engineRegion->size);
-        HAL::OSDealloc(projectRegion, projectRegion->size);
+        // HAL::OSDealloc(projectRegion, projectRegion->size);
     }
 }
 
@@ -74,25 +65,6 @@ bool MemoryHandler::Initialize()
     projectRegion = new((u8*)startingAddress + engineSize) MemoryBlockPool((u8*)startingAddress + sizeof(MemoryBlockPool) + engineSize, projectSize);
 
     return engineRegion && projectRegion;
-}
-
-void* MemoryHandler::Allocate(const u64 byte, MemoryRegion* whichRegion)
-{
-    MR_ASSERT(projectRegion, "Tried accessing to an invalid address, which has not been initialised yet!");
-
-    const u64 rounded = RoundToMemoryAlignment(byte);
-
-    if (whichRegion->offset + rounded > whichRegion->size)
-        return nullptr;
-
-    void* allocated = whichRegion->ptr + whichRegion->offset;
-    if (!allocated)
-        return nullptr;
-
-    memset(allocated, 0, rounded);
-    whichRegion->offset += rounded;
-
-    return allocated;
 }
 
 void MemoryHandler::Deallocate(u32 id)

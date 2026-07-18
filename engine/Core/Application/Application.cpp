@@ -12,6 +12,7 @@
 #endif // MR_DEBUG
 
 #include <Module/ModuleManager.h>
+#include <Timer.h>
 
 static inline Application* appFramework = nullptr;
 
@@ -30,28 +31,33 @@ Application::Application()
 
 void Application::Init()
 {
+    SetCurrentState(Application::State::Startup);
+
 #ifdef MR_DEBUG
     _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
 #endif // MR_DEBUG
     Logger::Get()->Init();
-    MR_LOG(LogApplication, Fatal, "Initalizing applicationéáűŐPÚфцвапичьтию.жэд");
+    MR_LOG(LogApplication, Log, "Initalizing application");
 
-    HAL::InitEssential();
+    HAL::InitHAL();
 
-    if (!bHideWindow) mainWindow = Window::Create("", 10, 10, 200, 200);
-    //LogApplication app;
+    if (!bHideWindow) mainWindow = Window::Create(windowDefs.windowName.Chr(), 10, 10, windowDefs.x, windowDefs.y);
 
     // this is hardcoded!
-    ModuleManager::Get().LoadModule("vulkan");
+
+    if (mainWindow) mainWindow->Show();
 }
 
-void Application::Run()
+void Application::Run(float dt)
 {
-    // physics, audio, rendering?? etc.
+    ModuleManager::Get().UpdateModules(dt);
+    // physics, audio, rendering ( done :) )?? etc.
 }
 
 void Application::Shutdown()
 {
+    ModuleManager::Get().ShutdownModules();
+
     if (currentState == State::Running)
     {
         MR_LOG(LogApplication, Log, "Restarting application!");
@@ -85,31 +91,24 @@ void Application::RequestExit(u32 code)
 
 }
 
-void Application::ApplicationLoopFunction()
-{
-    if (mainWindow) mainWindow->Show();
-
-    while (GetCurrentState() == State::Running)
-    {
-        if (HAL::PeekOSMessageQueue())
-        {
-            appFramework->Run();
-        }
-    }
-}
-
 extern "C" LIBRARY_OUT int LaunchApplication(Application* instance, int argc, char** argv)
 {	
     instance->GetCommandline()->Init(argc, argv);
-
-    instance->SetCurrentState(Application::State::Startup);
     instance->Init();
 
     if (instance->GetCurrentState() == Application::State::Dead)
         return -1;
 
     instance->SetCurrentState(Application::State::Running);
-    instance->ApplicationLoopFunction();
+    while (instance->GetCurrentState() == Application::State::Running)
+    {
+        if (!HAL::PeekOSMessageQueue())
+            break;
+
+        appFramework->Run(-662);
+    }
+
+    instance->Shutdown();
 
     return 0; 
 }

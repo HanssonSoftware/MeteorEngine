@@ -2,14 +2,13 @@
 
 #pragma once
 #include "Commands.h"
-#include <Commandlet.h>
+#include <HAL/Commandline.h>
 
-#include "MinimalWin.h"
+#include "Win32/MinimalWin.h"
 #include <shlwapi.h>
 #include <pathcch.h>
 
 //#include <strsafe.h>
-#include <Platform.h>
 
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "Pathcch.lib")
@@ -19,11 +18,14 @@ LOG_ADDCATEGORY(Commands);
 namespace Commands
 {
 #ifdef MR_PLATFORM_WINDOWS
-	void DirectorySearch(wchar_t* directory, Array<wchar_t*>& foundFiles, MemoryBlockArena<wchar_t>* arena)
+	//void DirectorySearch(wchar_t* directory, Array<wchar_t*>& foundFiles, MemoryBlockArena<wchar_t>* arena)
 #else
 	void DirectorySearch(char* directory, Array<char*>& foundFiles, MemoryBlockArena<char>* arena)
 #endif // MR_PLATFORM_WINDOWS
-	{ 
+
+
+#if 0
+	{
 		MR_ASSERT(directory != nullptr, "Directory cannot be invalid!");
 
 		if (PathIsRelativeW(directory))
@@ -35,7 +37,7 @@ namespace Commands
 
 			const u32 combinedDirectorySize = (u32)wcslen(exeLocation) + (u32)wcslen(directory);
 			wchar_t* newDirectory = (wchar_t*)arena->Allocate((combinedDirectorySize + 10) * sizeof(wchar_t));
-			
+
 			PathCchCombine(newDirectory, combinedDirectorySize, exeLocation, directory);
 			directory = newDirectory;
 		}
@@ -82,6 +84,8 @@ namespace Commands
 
 		FindClose(fileHandle);
 	}
+#endif // 0
+
 
 	String GetLastErrorString()
 	{
@@ -95,7 +99,7 @@ namespace Commands
 			char fixedTwo[512] = {};
 			if (!WideCharToMultiByte(CP_UTF8, 0, fixed, returned, fixedTwo, returned * sizeof(wchar_t), nullptr, nullptr))
 			{
-				MR_LOG(LogTemp, Error, "Conversion error! %d", ::GetLastError());
+				//MR_LOG(LogTemp, Error, "Conversion error! %d", ::GetLastError());
 				return "";
 			}
 

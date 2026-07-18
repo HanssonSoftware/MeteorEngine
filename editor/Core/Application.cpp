@@ -14,10 +14,13 @@
 EditorApplication::EditorApplication() 
 	: Application()
 {
-	appName = { "Meteor Editor fdg" };
+	appName = { "Meteor Editor" };
 	appNameNoSpaces = "MeteorEditor";
 	appCodeName = { "Satellite" };
 
+	windowDefs = { appName, 640, 480 };
+
+	int J = 53;
 }
 
 void EditorApplication::Init()
@@ -26,14 +29,12 @@ void EditorApplication::Init()
 
 	cli.Check("-maxram");
 	auto a = cli.Get("-maxram");
-
-	editorWindow = Window::Create({ "Editor" }, 300, 300, 1600, 900);
-	editorWindow->Show();
+	ModuleManager::Get().RegisterModule("vulkan");
 }
 
-void EditorApplication::Run()
+void EditorApplication::Run(float dt)
 {	
-	Application::Run();
+	Application::Run(dt);
 
 	int J = 35;
 }

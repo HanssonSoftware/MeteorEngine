@@ -3,7 +3,6 @@
 #pragma once
 #include <string>
 #include "StringView.h"
-#include <Memory/MemoryHandler.h>
 #include <HAL/DataTypes.h>
 
 #ifdef MR_CORE_EXPORTS
@@ -18,20 +17,9 @@ class CORE_API String
 public:
 	constexpr String();
 
-	//String() noexcept
-	//{
-	//	NullOut();
-	//}
-
 	~String() noexcept;
 
 	constexpr String(const char* Input);
-
-	explicit String(int Input);
-
-	explicit String(float Input);
-
-	explicit String(u32 Input);
 
 	String(const String& other);
 
@@ -51,22 +39,22 @@ public:
 
 	bool operator==(const String& Other) const
 	{
-		return strcmp(bIsUsingHeap ? internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr, Other.bIsUsingHeap ? Other.internalBuffers.heapBuffer.ptr : Other.internalBuffers.stackBuffer.ptr) == 0;
+		return strcmp(!SitsOnStack() ? internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr, !Other.SitsOnStack() ? Other.internalBuffers.heapBuffer.ptr : Other.internalBuffers.stackBuffer.ptr) == 0;
 	}
 
 	bool operator==(const char* Other) const
 	{
-		return strcmp(bIsUsingHeap ? internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr, Other) == 0;
+		return strcmp(!SitsOnStack() ? internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr, Other) == 0;
 	}
 		
 	bool operator!=(const String& other) const
 	{
-		return strcmp(bIsUsingHeap ? internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr, other.bIsUsingHeap ? other.internalBuffers.heapBuffer.ptr : other.internalBuffers.stackBuffer.ptr) != 0;
+		return strcmp(!SitsOnStack() ? internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr, !other.SitsOnStack() ? other.internalBuffers.heapBuffer.ptr : other.internalBuffers.stackBuffer.ptr) != 0;
 	}
 
 	bool operator!() const
 	{
-		return bIsUsingHeap ? !internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr[0] != '\0';
+		return !SitsOnStack() ? !internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr[0] != '\0';
 	}
 
 	explicit operator bool() const
@@ -77,58 +65,40 @@ public:
 	String& operator+=(const String& other);
 
 	String& operator+=(const char* other);
-	
-	const char* operator*() const
-	{
-		return bIsUsingHeap ? internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr;
-	}
 
 	operator const char*() const
 	{
-		return bIsUsingHeap ? internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr;
+		return !SitsOnStack() ? internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr;
 	}
 
 	const char* Chr() const
 	{
-		return bIsUsingHeap ? internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr;
+		return !SitsOnStack() ? internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr;
 	}
 
 	bool IsEmpty() const noexcept
 	{
-		return bIsUsingHeap ? 
+		return !SitsOnStack() ? 
 			internalBuffers.heapBuffer.length == 0 || internalBuffers.heapBuffer.ptr == nullptr : 
 			internalBuffers.stackBuffer.length == 0 || internalBuffers.stackBuffer.ptr[0] == '\0';
 	}
 
-	//int ToInt() const noexcept
-	//{
-	//	return strtol(bIsUsingHeap ? internalBuffers.heapBuffer.ptr : internalBuffers.internalBuffers.stackBuffer.ptr, nullptr, 10);
-	//}
-
-	//float ToFloat() const noexcept
-	//{
-	//	return strtof(bIsUsingHeap ? internalBuffers.heapBuffer.ptr : internalBuffers.internalBuffers.stackBuffer.ptr, nullptr);
-	//}
-
 	const u32 Length() const noexcept
 	{
-		return bIsUsingHeap ? (u32)internalBuffers.heapBuffer.length : (u32)internalBuffers.stackBuffer.length;
+		return !SitsOnStack() ? (u32)internalBuffers.heapBuffer.length : (u32)internalBuffers.stackBuffer.length;
 	}
 	
 	// * 
 	static String Format(const char* format, ...);
 
-	char* Data() { return bIsUsingHeap ? internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr; };
+	char* Data() { return !SitsOnStack() ? internalBuffers.heapBuffer.ptr : internalBuffers.stackBuffer.ptr; };
 
 	const char* begin() const { return Chr(); };
 	const char* end() const { return Chr() + Length(); };
 
+	bool SitsOnStack() const { return internalBuffers.stackBuffer.length < SSO_MAX_CHARS ? true : false; };
+
 private:
-
-	void NullOut();
-
-	char* DetermineLocation(u32 size);
-
 	static constexpr u32 SSO_MAX_CHARS = (sizeof(char*) + sizeof(u32) * 2) - sizeof(u8);
 	
 	union CORE_API memoryLayout
@@ -158,8 +128,6 @@ private:
 
 	} internalBuffers;
 
-	bool bIsUsingHeap = false;
-
 	constexpr inline u32 Count(const char* toCount)
 	{
 		u32 count = 0;
@@ -172,26 +140,5 @@ private:
 		return count;
 	};
 
-	constexpr inline char* GetRecommendedBufferBySize(const u32 size)
-	{
-		if (size > SSO_MAX_CHARS)
-		{
-			bIsUsingHeap = true;
-
-			internalBuffers.heapBuffer.capacity = (u32)(size * 1.5f);
-			internalBuffers.heapBuffer.length = size;
-
-			internalBuffers.heapBuffer.ptr = (char*)GetMemoryManager()->Allocate(internalBuffers.heapBuffer.capacity);
-			return internalBuffers.heapBuffer.ptr;
-		}
-		else
-		{
-			internalBuffers.stackBuffer.length = size;
-			return internalBuffers.stackBuffer.ptr;
-		}
-
-		return nullptr;
-	}
+	constexpr char* GetRecommendedBufferBySize(const u32 size);
 };
-
-//String operator+(const String& OtherA, const String& OtherB);

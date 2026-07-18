@@ -7,6 +7,7 @@
 
 #include <Application/Application.h>
 #include <Special/EngineConstants.h>
+#include <Memory/MemoryHandler.h>
 //#include <wchar.h>
 
 static u16 categoryID;
@@ -34,7 +35,7 @@ Logger::~Logger() noexcept
 
 bool Logger::PrepareLoggingSystem()
 {
-    MemoryBlockArena* logArena = (MemoryBlockArena*)GetMemoryManager()->RequestNewRegion<MemoryBlockArena>("Logger Region", MAX_LOG_ENTRIES * sizeof(LogEntry) + sizeof(Logger));
+    MemoryBlockArena* logArena = GetMemoryManager()->RequestNewRegion<MemoryBlockArena>("Logger Region", MAX_LOG_ENTRIES * sizeof(LogEntry) + sizeof(Logger));
 
     if (logArena)
     {
@@ -48,8 +49,7 @@ bool Logger::PrepareLoggingSystem()
     return false;
 }
 
-void Logger::LogAssert()
-{
+
 #ifdef MR_PLATFORM_WINDOWS
     //static constexpr const wchar_t title[] = WIDE_ENGINE_NAME_SPACE L" - Assertion error";
     //wchar_t fixed[bIsRunningDebugMode ? 256 : 128] = { L'\0' };
@@ -63,7 +63,6 @@ void Logger::LogAssert()
     //const u32 result = (u32)snprintf(hitMessageBuffer, bIsRunningDebugMode ? 2048 : 1024, "*** AN ASSERT WAS HIT! *** [%s][%s:%u]\n", Info->assertStatement, Info->assertLocationInFile, Info->assertLineInFile);
    
     //SendToOutputBuffer(hitMessageBuffer, result);
-}
 
 u16 Logger::AddLogCategory(const char* name)
 {

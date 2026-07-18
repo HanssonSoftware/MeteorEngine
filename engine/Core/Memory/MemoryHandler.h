@@ -1,10 +1,11 @@
 ﻿/* Copyright 2020 - 2026, Hansson Software. All rights reserved. */
 
 #pragma once
+#include <Logging/Log.h>
+#include <new>
 #include <HAL/DataTypes.h>
 #include <HAL/Memory.h>
 #include <Types/StringView.h>
-#include "MemoryPackage.h"
 #include "MemoryBlockPool.h"
 
 class MemoryBlockBase;
@@ -44,8 +45,46 @@ public:
 
 	virtual bool Initialize();
 
-	virtual void* Allocate(const u64 byte, MemoryRegion* whichRegion = GetMemoryManager()->GetProjectRegion());
+	template <typename T>
+	T* Allocate(const u64 byte)
+	{
+		const u64 rounded = RoundToMemoryAlignment(byte);
+
+		if (projectRegion->offset + rounded > projectRegion->size)
+			return nullptr;
+
+		void* allocated = projectRegion->ptr + projectRegion->offset;
+		if (!allocated)
+			return nullptr;
+
+		T* constructed = new (allocated) T();
+		projectRegion->offset += rounded;
+
+		return constructed;
+	}
+
+	template <typename T>
+	T* Allocate(const u64 byte, MemoryRegion* whichRegion)
+	{
+		const u64 rounded = RoundToMemoryAlignment(byte);
+
+		if (whichRegion->offset + rounded > whichRegion->size)
+			return nullptr;
+
+		void* allocated = whichRegion->ptr + whichRegion->offset;
+		if (!allocated)
+			return nullptr;
+
+		T* constructed = new (allocated) T();
+		whichRegion->offset += rounded;
+
+		return constructed;
+	}
+
 	virtual void Deallocate(u32 id);
+
+	//* DECOY FUNCTION, THIS DOES NOTHING!!
+	virtual void Deallocate(void* id) {};
 
 	template<typename T = MemoryBlockBase>
 	T* RequestNewRegion(const StringView& regionName, const u64 newRegionSizeInBytes)

@@ -2,7 +2,8 @@
 
 #pragma once
 #include <HAL/DataTypes.h>
-#include <Types/String.h>
+
+class String;
 
 #ifdef MR_CORE_EXPORTS
 #define CORE_API __declspec(dllexport)
@@ -16,15 +17,17 @@ namespace HAL
 
 	CORE_API bool ConvertToNarrow(char* targetBuffer, const u32 size, const wchar_t* convertibleBuffer);
 
-	CORE_API String LocalizeErrorCode(i64 code);
+	void* LocalizeErrorCode(i64 code);
 
 	bool PeekOSMessageQueue();
 
-	void InitEssential();
+	void InitHAL();
 
 	void ShutdownEssential();
 
-	u32 FatalExit(u32 code);
+	CORE_API u32 FatalExit(u32 code);
+
+	CORE_API void* GetEngineCore();
 
 #ifdef MR_DEBUG
 	void DebugBreak();
