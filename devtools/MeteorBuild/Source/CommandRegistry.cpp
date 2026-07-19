@@ -5,7 +5,7 @@
 
 LOG_ADDCATEGORY(CommandRegistry);
 
-void CommandRegistry::RegisterCommand(const char* name, const char* descriptive, CommandInformationFunctionSignature func)
+constexpr void CommandRegistry::RegisterCommand(const char* name, const char* descriptive, CommandInformationFunctionSignature func)
 {
 	if (count > MAX_COMMANDS)
 		return;

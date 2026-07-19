@@ -5,10 +5,10 @@
 #include <Logging/LogMacros.h> 
 
 #include "BuildSystem.h"
+#include "BuildSystemAPI.h"
 
 LOG_ADDCATEGORY(BuildSystemApplication);
 
-#define BUILDSYSTEM_API __declspec(dllexport)
 
 struct BUILDSYSTEM_API BuildSystemApplication : public Application
 {

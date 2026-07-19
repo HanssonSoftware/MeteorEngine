@@ -2,10 +2,11 @@
 
 #pragma once
 #include <Types/Map.h>
+#include <BuildSystemAPI.h>
 
 typedef void (*CommandInformationFunctionSignature)();
 
-struct CommandInformation
+struct BUILDSYSTEM_API CommandInformation
 {
 	const char* command = nullptr;
 	const char* description = nullptr;
@@ -14,7 +15,7 @@ struct CommandInformation
 };
 
 
-class CommandRegistry
+class BUILDSYSTEM_API CommandRegistry
 {
 public:
 	static CommandRegistry& Get()
@@ -23,7 +24,7 @@ public:
 		return instance;
 	}
 
-	void RegisterCommand(const char* name, const char* descriptive, CommandInformationFunctionSignature func);
+	constexpr void RegisterCommand(const char* name, const char* descriptive, CommandInformationFunctionSignature func);
 	bool CallFunctionOnCommand(const char* functionName) const;
 
 	const CommandInformation& GetCommandsList() const { return *commands; };
@@ -35,9 +36,12 @@ protected:
 	u32 count = 0;
 };
 
-struct CommandMacroAuxiliary
+struct BUILDSYSTEM_API CommandMacroAuxiliary
 {
-	CommandMacroAuxiliary(const char* name, const char* descriptive, CommandInformationFunctionSignature func)
+	constexpr CommandMacroAuxiliary() = default;
+	~CommandMacroAuxiliary() noexcept = default;
+
+	constexpr CommandMacroAuxiliary(const char* name, const char* descriptive, CommandInformationFunctionSignature func)
 	{
 		CommandRegistry::Get().RegisterCommand(name, descriptive, func);
 	}

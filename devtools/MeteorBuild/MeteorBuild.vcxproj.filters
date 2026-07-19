@@ -104,6 +104,9 @@
     <ClInclude Include="Source\VisualStudio\Boilerplates.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\BuildSystemAPI.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="MeteorBuild.aps" />

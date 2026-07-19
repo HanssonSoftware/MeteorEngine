@@ -136,7 +136,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>MR_DEBUG;_CONSOLE;MR_PLATFORM_WINDOWS;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MR_BUILDSYSTEM_EXPORT;MR_DEBUG;_CONSOLE;MR_PLATFORM_WINDOWS;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)engine\Core;$(SolutionDir)engine\Core\HAL;$(ProjectDir)Source\;$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir)Source;$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -180,7 +180,7 @@
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)engine\Core;$(SolutionDir)engine\Core\HAL;$(ProjectDir)Source\;$(SolutionDir)Intermediate\Apollo\Core;$(ProjectDir);$(SolutionDir)engine\Core\Platform;$(SolutionDir)engine;$(SolutionDir)resources;$(SolutionDir)engine\Core;$(SolutionDir)Intermediate;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MR_BUILDSYSTEM_EXPORT;_UNICODE;UNICODE;%(PreprocessorDefinitions);MR_PLATFORM_WINDOWS;_CRT_SECURE_NO_WARNINGS;_CRT_NON_CONFORMING_SWPRINTFS</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(CoreLibraryDependencies);core.lib</AdditionalDependencies>
@@ -197,6 +197,7 @@
     <ClCompile Include="Source\Application.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\BuildSystemAPI.h" />
     <ClInclude Include="Source\Module.h" />
     <ClInclude Include="Source\CommandRegistry.h" />
     <ClInclude Include="Source\BuildSystem.h" />
