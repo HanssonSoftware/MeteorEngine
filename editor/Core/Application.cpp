@@ -10,6 +10,7 @@
 
 #include <Types/Array.h>
 #include <Memory/MemoryBlockArena.h>
+#include <Module/ModuleManager.h>
 
 EditorApplication::EditorApplication() 
 	: Application()

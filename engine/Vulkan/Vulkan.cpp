@@ -398,7 +398,7 @@ bool Vulkan::StartupModule()
         return false;
     }
 
-    constexpr VkFenceCreateInfo fenceInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO };
+    constexpr VkFenceCreateInfo fenceInfo = { VK_STRUCTURE_TYPE_FENCE_CREATE_INFO, nullptr, VK_FENCE_CREATE_SIGNALED_BIT};
 
     const VkResult result8 = vkCreateFence(device, &fenceInfo, nullptr, &fence);
     if (result8 != VK_SUCCESS)

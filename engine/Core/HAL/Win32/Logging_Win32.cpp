@@ -112,7 +112,6 @@ void Logger::Init()
         HWND consoleWindow = GetConsoleWindow();
         if (consoleWindow)
         {
-            ShowWindow(consoleWindow, SW_HIDE);
 
             consoleLog = CreateFileW(L"CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
             if (consoleLog != INVALID_HANDLE_VALUE)
@@ -145,8 +144,6 @@ void Logger::Init()
                     SendMessageW(consoleWindow, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
                     SendMessageW(consoleWindow, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
                 }
-
-                ShowWindow(consoleWindow, SW_SHOW);
             }
         }
     }

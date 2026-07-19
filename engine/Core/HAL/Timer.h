@@ -3,7 +3,13 @@
 #pragma once
 #include <HAL/DataTypes.h>
 
-struct Time
+#ifdef MR_CORE_EXPORT
+#define CORE_API __declspec(dllexport)
+#else
+#define CORE_API __declspec(dllimport)
+#endif // MR_CORE_EXPORTS
+
+struct CORE_API Time
 {
 	Time(u16 years, u8 months, u8 days,u8 hours, u8 minutes,u8 seconds,u16 mills)
 		: year(years), month(months), day(days), hour(hours), minute(minutes), second(seconds), mill(mills)
@@ -47,7 +53,7 @@ struct Time
 	u16 mill;
 };
 
-class Timer
+class CORE_API Timer
 {
 
 public:

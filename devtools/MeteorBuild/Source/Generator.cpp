@@ -3,9 +3,11 @@
 #include "Commands.h"
 #include "CommandRegistry.h"
 #include "VisualStudio/Boilerplates.h"
+#include <Memory/MemoryBlockArena.h>
 
 #include <HAL/Commandline.h>
 #include <Application/Application.h>
+#include <HAL/Timer.h>
 #include "Win32/MinimalWin.h"
 
 #include <shellapi.h>
@@ -18,10 +20,7 @@
 #pragma comment(lib, "Shlwapi.lib")
 #pragma comment(lib, "Shell32.lib")
 
-LOG_ADDCATEGORY(Commands);
-LOG_ADDCATEGORY(Build);
-LOG_ADDCATEGORY(ContentFinder);
-LOG_ADDCATEGORY(FileConstruct);
+LOG_ADDCATEGORY(Factory);
 
 namespace Commands
 {
@@ -31,9 +30,42 @@ namespace Commands
 
 	void Generate_Cmd()
 	{
-//		LARGE_INTEGER startTime, endTime, frequency;
-//		QueryPerformanceCounter(&startTime);
-//
+		Timer time;
+		time.Start();
+
+		MemoryBlockArena* generatorSink = GetMemoryManager()->RequestNewRegion<MemoryBlockArena>("GeneratorSink", 24_mB);
+		if (!generatorSink) return;
+
+		const Commandline* cli = GetApplication()->GetCommandline();
+
+		const StringView sourceDirectoryFromParameter = cli->Get("-s"); // ..\\engine
+
+		wchar_t* path = (wchar_t*)generatorSink->Allocate(512_kB);
+		DWORD exeLocationCount = GetModuleFileNameW(nullptr, path, DWORD(512_kB / 2u));
+
+		for (wchar_t* p = &path[exeLocationCount]; *p != L'\\'; p--)
+			*p = L'\0';
+
+
+		PathCchRemoveFileSpec(path, exeLocationCount);
+		exeLocationCount = wcslen(path);
+		path[exeLocationCount] = L'\\';
+
+		exeLocationCount += MultiByteToWideChar(CP_UTF8, 0, (char*)sourceDirectoryFromParameter.ptr, sourceDirectoryFromParameter.size,
+			&path[exeLocationCount], sourceDirectoryFromParameter.size);
+		if (GetLastError())
+		{
+			MR_LOG(LogFactory, Fatal, "Failed to convert! MultiByteToWideChar=%d", GetLastError());
+			return;
+		}
+
+
+		path[exeLocationCount] = L'\0';
+		PathCchCanonicalize(path, exeLocationCount, path);
+
+		//PathCchCombine(&path[exeLocationCount], exeLocationCount + )
+		path[exeLocationCount] = L'\0';
+		
 //		const String sourceDirectory = Commandline::Get().Parse("-s");
 //		const String intermediateDirectory = Commandline::Get().Parse("-i");
 //
@@ -199,7 +231,7 @@ namespace Commands
 		//const String path = Commandline::Get().Check("-sln") ? Commandline::Get().Parse("-sln") : Commandline::Get().Parse("-s");
 		//if (path.IsEmpty())
 		{
-			MR_LOG(LogFileConstruct, Error, "Failed to find source/sln parameter!");
+			//MR_LOG(LogFileConstruct, Error, "Failed to find source/sln parameter!");
 			return;
 		}
 
@@ -255,7 +287,7 @@ namespace Commands
 
 			//if (PathCchCombine(pathToProductName, sumOfPaths + 16, intermediateDirectoryW, codeName) != S_OK)
 			{
-				MR_LOG(LogFileConstruct, Fatal, "PathCchCombine error!");
+				//MR_LOG(LogFileConstruct, Fatal, "PathCchCombine error!");
 				return;
 			}
 

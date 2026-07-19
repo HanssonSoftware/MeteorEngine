@@ -6,7 +6,13 @@
 
 class MemoryHandler;
 
-class MemoryBlockArena : public MemoryBlockBase
+#ifdef MR_CORE_EXPORT
+#define CORE_API __declspec(dllexport)
+#else
+#define CORE_API __declspec(dllimport)
+#endif // MR_CORE_EXPORTS
+
+class CORE_API MemoryBlockArena : public MemoryBlockBase
 {
 public:
 	MemoryBlockArena() = default;
@@ -25,6 +31,8 @@ public:
 
 	MemoryBlockArena& operator=(MemoryBlockArena&& other) noexcept
 	{
+		int J =  3;
+
 		return *this;
 	}
 

@@ -26,7 +26,7 @@ bool Commandline::Check(const StringView& command)
 	return false;
 }
 
-StringView Commandline::Get(const StringView& command)
+StringView Commandline::Get(const StringView& command) const
 {
 	MR_ASSERT(count > 0 && list != nullptr, "Command check happened too early!");
 

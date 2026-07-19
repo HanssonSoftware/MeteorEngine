@@ -18,7 +18,7 @@ struct CORE_API Commandline
 
 	bool Check(const StringView& command);
 
-	StringView Get(const StringView& command);
+	StringView Get(const StringView& command) const;
 
 	const char* const* GetInternal() const { return list; };
 protected:

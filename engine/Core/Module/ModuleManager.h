@@ -5,7 +5,13 @@
 #include <Types/String.h>
 #include "Module.h"
 
-class ModuleManager
+#ifdef MR_CORE_EXPORT
+#define CORE_API __declspec(dllexport)
+#else
+#define CORE_API __declspec(dllimport)
+#endif // MR_CORE_EXPORTS
+
+class CORE_API ModuleManager
 {
 	ModuleManager() noexcept = default;
 public:
