@@ -13,7 +13,8 @@ LOG_ADDCATEGORY(HResultChecks);
 #define HRCHECK_UNDER(x, fate) \
 	if (FAILED(x)) \
 	{			   \
-		MR_LOG(LogHResultChecks, fate, "HRESULT failed with: (%d)  %s", (u32)::GetLastError(), *Commands::GetLastErrorString()); \
+		MR_LOG(LogHResultChecks, fate, "%s=%d", L#x,(u32)::GetLastError()); \
+		return;\
 	}
 
 
@@ -60,16 +61,14 @@ struct FoundUnit
 
 namespace Commands
 {
-	void Build_Cmd();
+	bool Build_Cmd();
 
-	void Generate_Cmd();
+	bool Generate_Cmd();
 
 	void AddSolution(const Array<Module>* modules);
 
 #ifdef MR_PLATFORM_WINDOWS
-	void DirectorySearch(wchar_t* directory, Array<wchar_t*>& foundFiles, MemoryBlockArena* arena);
-
-	String GetLastErrorString();
+	void DirectorySearch(wchar_t* inPath, u32& MAX, Array<wchar_t*>& foundFiles);
 #else
 	void DirectorySearch(char* directory, Array<char*>& foundFiles, MemoryBlockArena<char>* arena);
 #endif // MR_PLATFORM_WINDOWS

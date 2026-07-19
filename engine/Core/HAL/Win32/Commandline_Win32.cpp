@@ -48,7 +48,7 @@ StringView Commandline::Get(const StringView& command) const
 		}
 	}
 
-	return { "" };
+	return { nullptr, 0 };
 }
 
 #endif // MR_PLATFORM_WINDOWS

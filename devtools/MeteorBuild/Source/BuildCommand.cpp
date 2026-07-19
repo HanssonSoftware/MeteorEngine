@@ -36,7 +36,7 @@ namespace Commands
 		};
 	};
 
-	void Build_Cmd()
+	bool Build_Cmd()
 	{
 #ifdef MR_PLATFORM_WINDOWS
 		PROCESS_INFORMATION pi = {};
@@ -46,15 +46,12 @@ namespace Commands
 		if (!CreateProcessW(nullptr, clangCall, nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS, nullptr, nullptr, &si, &pi))
 		{
 			MR_LOG(LogValidator, Fatal, "Check clang++ is installed, or added as environment variable!");
-			return;
+			return false;
 		}
 
 		CloseHandle(pi.hProcess);
 		CloseHandle(pi.hThread);
 #endif // MR_PLATFORM_WINDOWS
-
-		LARGE_INTEGER startTime, endTime, frequency;
-		QueryPerformanceCounter(&startTime);
 
 		//const String sourceDirectory = Commandlet::Get().Parse("-s");
 		//const String intermediateDirectory = Commandlet::Get().Parse("-i");
@@ -76,8 +73,8 @@ namespace Commands
 			//wchar_t* sourceDirectoryW = (wchar_t*)arena.Allocate(sourceDirectory.Length() * sizeof(wchar_t));
 			//if (!MultiByteToWideChar(CP_UTF8, 0, sourceDirectory, sourceDirectory.Length(), sourceDirectoryW, sourceDirectory.Length()))
 			{
-				MR_LOG(LogCommands, Error, "%s", *GetLastErrorString());
-				return;
+				//MR_LOG(LogCommands, Error, "%s", *GetLastErrorString());
+				return false;
 			}
 
 			// Collect files in folder
@@ -86,7 +83,7 @@ namespace Commands
 			//DirectorySearch(sourceDirectoryW, files, &arena);
 
 			if (files.GetSize() < 0)
-				return;
+				return false;
 
 			// Read scripts
 			//MemoryBlockArena<char> currentReadFile = { 8 * 1024 * 1024 };
@@ -161,7 +158,7 @@ namespace Commands
 			//HANDLE responseFile = SendToOutputBuffer(exea, GENERIC_READ | GENERIC_WRITE, _placeholder_);
 			//if (responseFile == INVALID_HANDLE_VALUE)
 			{
-				return;
+				return false;
 			}
 
 			//MemoryBlockArena<char> buffer = { 1_mB };
@@ -180,8 +177,8 @@ namespace Commands
 			DWORD written = 0;
 			//if (!WriteFile(responseFile, responseBuffer, count, &written, nullptr))
 			{
-				MR_LOG(LogBuild, Error, "WriteFile failed with: %s", GetLastErrorString().Chr());
-				return;
+				//MR_LOG(LogBuild, Error, "WriteFile failed with: %s", GetLastErrorString().Chr());
+				return false;
 			}
 
 			//MemoryBlockArena<char> concatArena = { 512_kB };
@@ -193,8 +190,8 @@ namespace Commands
 
 			//if (!WriteFile(responseFile, concatBuffer, offset, &written, nullptr))
 			{
-				MR_LOG(LogBuild, Error, "WriteFile failed with: %s", GetLastErrorString().Chr());
-				return;
+				//MR_LOG(LogBuild, Error, "WriteFile failed with: %s", GetLastErrorString().Chr());
+				return false;
 			}
 
 
@@ -214,7 +211,7 @@ namespace Commands
 				if (!CreateProcessW(nullptr, clangCall, nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS, nullptr, nullptr, &si2, &pi2))
 				{
 					MR_LOG(LogValidator, Fatal, "Error occoured while compiling source: %s", "VARIABLE NAME");
-					return;
+					return false;
 				}
 
 				WaitForSingleObject(pi2.hProcess, INFINITE);
@@ -228,10 +225,5 @@ namespace Commands
 
 #endif // MR_PLATFORM_WINDOWS
 		}
-
-		QueryPerformanceCounter(&endTime);
-		QueryPerformanceFrequency(&frequency);
-
-		MR_LOG(LogCommands, Log, "Build command ran in %.4f seconds!", (endTime.QuadPart - startTime.QuadPart) / frequency.QuadPart);
 	}
 }

@@ -2,6 +2,7 @@
 
 #include "CommandRegistry.h"
 #include <cstring>
+#include <Timer.h>
 
 LOG_ADDCATEGORY(CommandRegistry);
 
@@ -22,7 +23,14 @@ bool CommandRegistry::CallFunctionOnCommand(const char* functionName) const
 		{
 			MR_LOG(LogCommandRegistry, Log, "Calling %hs parameter\'s function!", functionName);
 
-			commands[i].function();
+			Timer benchmark;
+			benchmark.Start();
+			if (!commands[i].function())
+				return false;
+			
+			benchmark.Stop();
+
+			MR_LOG(LogCommandRegistry, Log, "%hs function ran about: %4.f seconds!", functionName, benchmark.Count(Timer::CalculateBy::Seconds));
 			return true;
 		}
 	}

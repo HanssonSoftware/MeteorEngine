@@ -28,43 +28,42 @@ namespace Commands
 
 	void VcxprojGenerate(Module& mdl, const wchar_t* fullPathToIntermediateDir, u32& createdFilesCount);
 
-	void Generate_Cmd()
+	bool Generate_Cmd()
 	{
-		Timer time;
-		time.Start();
+		constexpr u64 maxChars = 24_mB / sizeof(wchar_t);
 
-		MemoryBlockArena* generatorSink = GetMemoryManager()->RequestNewRegion<MemoryBlockArena>("GeneratorSink", 24_mB);
-		if (!generatorSink) return;
+		wchar_t* allocated = GetMemoryManager()->Allocate<wchar_t>(24_mB);
+		if (!allocated)
+			return false;
 
 		const Commandline* cli = GetApplication()->GetCommandline();
 
 		const StringView sourceDirectoryFromParameter = cli->Get("-s"); // ..\\engine
+		if (!sourceDirectoryFromParameter.ptr)
+		{
+			MR_LOG(LogFactory, Error, "Source directory parameter missing!");
+			return false;
+		}
 
-		wchar_t* path = (wchar_t*)generatorSink->Allocate(512_kB);
-		DWORD exeLocationCount = GetModuleFileNameW(nullptr, path, DWORD(512_kB / 2u));
+		u32 exeLocationCount = (DWORD)GetModuleFileNameW(nullptr, allocated, maxChars);
 
-		for (wchar_t* p = &path[exeLocationCount]; *p != L'\\'; p--)
+		for (wchar_t* p = &allocated[exeLocationCount]; *p != L'\\'; p--)
 			*p = L'\0';
 
-
-		PathCchRemoveFileSpec(path, exeLocationCount);
-		exeLocationCount = wcslen(path);
-		path[exeLocationCount] = L'\\';
+		exeLocationCount = (u32)wcslen(allocated);
 
 		exeLocationCount += MultiByteToWideChar(CP_UTF8, 0, (char*)sourceDirectoryFromParameter.ptr, sourceDirectoryFromParameter.size,
-			&path[exeLocationCount], sourceDirectoryFromParameter.size);
+			&allocated[exeLocationCount], maxChars - exeLocationCount);
 		if (GetLastError())
 		{
 			MR_LOG(LogFactory, Fatal, "Failed to convert! MultiByteToWideChar=%d", GetLastError());
-			return;
+			return false;
 		}
 
-
-		path[exeLocationCount] = L'\0';
-		PathCchCanonicalize(path, exeLocationCount, path);
-
+		Array<wchar_t*> files;
+		DirectorySearch(allocated, exeLocationCount, files);
 		//PathCchCombine(&path[exeLocationCount], exeLocationCount + )
-		path[exeLocationCount] = L'\0';
+		allocated[exeLocationCount] = L'\0';
 		
 //		const String sourceDirectory = Commandline::Get().Parse("-s");
 //		const String intermediateDirectory = Commandline::Get().Parse("-i");
@@ -224,6 +223,8 @@ namespace Commands
 		//QueryPerformanceFrequency(&frequency);
 
 		//MR_LOG(LogCommands, Log, "Generate command ran in %.3f seconds", ((double)endTime.QuadPart - (double)startTime.QuadPart) / (double)frequency.QuadPart);
+	
+		return true;
 	}
 
 	void AddSolution(const Array<Module>* modules)

@@ -4,7 +4,7 @@
 #include <Types/Map.h>
 #include <BuildSystemAPI.h>
 
-typedef void (*CommandInformationFunctionSignature)();
+typedef bool (*CommandInformationFunctionSignature)();
 
 struct BUILDSYSTEM_API CommandInformation
 {
