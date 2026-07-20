@@ -61,11 +61,7 @@ protected:
 	{
 		void* windowsAPIHandle = nullptr;
 
-        struct
-        {
-            u32 linuxHandle;
-            u32 DUMMY_PADDING;
-        };
+        u64 linuxHandle;
 	};
 
     u64 fileSize = 0;

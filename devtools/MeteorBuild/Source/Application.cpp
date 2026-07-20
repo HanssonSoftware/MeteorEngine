@@ -26,6 +26,7 @@ void BuildSystemApplication::Init()
 	Application::Init();
 
 	GetBuildSystem().CallRequiredMode();
+	SetCurrentState(Application::State::Shutdown);
 }
 
 void BuildSystemApplication::Run(float dt)

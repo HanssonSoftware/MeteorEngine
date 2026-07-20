@@ -16,7 +16,7 @@ struct CORE_API Commandline
 {
 	void Init(int argc, char** argv);
 
-	bool Check(const StringView& command);
+	bool Check(const StringView& command) const;
 
 	StringView Get(const StringView& command) const;
 

@@ -131,7 +131,7 @@ public:
 	{
 		MR_ASSERT(capacity < newCount, "Old array cap is higher than new!");
 
-		T* newBlock = GetMemoryManager()->Allocate<T>(newCount * sizeof(T), GetMemoryManager()->GetProjectRegion());
+		T* newBlock = GetMemoryManager()->Allocate<T>(newCount * sizeof(T));
 		for (u32 i = 0; i < size; i++)
 			newBlock[i] = container[i];
 

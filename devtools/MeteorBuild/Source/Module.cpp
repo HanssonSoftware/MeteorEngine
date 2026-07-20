@@ -33,110 +33,43 @@ namespace Processing
 }
 
 
-//Module::Module(const Module& old)
-//	: moduleName(old.moduleName)
-//	, parent(old.parent)
-//	, commands(old.commands)
-//	, files(old.files)
-//{
-//
-//}
-//
-//Module::Module(Module&& old) noexcept
-//{
-//	moduleName = std::move(old.moduleName);
-//	parent = std::move(old.parent);
-//	commands = std::move(old.commands);
-//	files = std::move(old.files);
-//}
-//
-//Module& Module::operator=(const Module& old) noexcept
-//{
-//	moduleName = old.moduleName;
-//	parent = old.parent;
-//	commands = old.commands;
-//	files = old.files;
-//	return *this;
-//}
-//
-//Module& Module::operator=(Module&& old) noexcept
-//{
-//	moduleName = old.moduleName;
-//	parent = old.parent;
-//	commands = old.commands;
-//	files = old.files;
-//
-//	old.moduleName = "";
-//	old.parent = "";
-//	return *this;
-//}
-
-Module Module::MakeModuleFromBuffer(const char* buffer)
+Module::Module(const Module& old)
+	: moduleName(old.moduleName)
+	, parent(old.parent)
+	, commands(old.commands)
+	, files(old.files)
 {
-	Module instance;
 
-	const StringView header = Processing::GetWord(buffer);
-	//if (!strncmp(header.ptr, "Module", header.size))
-	{
-		//instance.moduleName = Processing::GetQuotedWord(buffer);
-
-		if (Processing::ExpectedCharacter(buffer, ':'))
-		{
-			buffer++; // :
-
-			//instance.parent = Processing::GetQuotedWord(buffer);
-
-			buffer++;
-			if (Processing::ExpectedCharacter(buffer, '{'))
-			{
-				buffer++;
-
-				const char* last = buffer;
-				while (*buffer)
-				{
-					const String command = String(Processing::GetWord(buffer));
-					
-					//constexpr u64 b = "Dependencies"_h;
-
-					switch (Hash(command))
-					{
-					case 5786862590791793456:  // IncludePath
-					case 11138787046201537241: // IncludePaths
-						Processing::EnterBlock(buffer, command, &instance);
-						break;
-
-					case 14686587794296974560: // Dependencies 
-						Processing::EnterBlock(buffer, command, &instance);
-						break;
-
-					default:
-						Processing::SkipBlock(buffer);
-						break;
-					}
-
-					if (last == buffer)
-					{
-						MR_LOG(LogProcessing, Error, "Parser stuck!");
-						break;
-					}
-					else
-					{
-						last = buffer;
-					}
-				}
-			}
-		}
-		else
-		{
-			//MR_LOG(LogProcessing, Error, "Module has no parent! %s", *instance.moduleName);
-		}
-	}
-	//else
-	{
-		MR_LOG(LogProcessing, Fatal, "Failed to parse script header word! %s", header.ptr);
-	}
-
-	return instance;
 }
+
+Module::Module(Module&& old) noexcept
+{
+	moduleName = std::move(old.moduleName);
+	parent = std::move(old.parent);
+	commands = std::move(old.commands);
+	files = std::move(old.files);
+}
+
+Module& Module::operator=(const Module& old) noexcept
+{
+	moduleName = old.moduleName;
+	parent = old.parent;
+	commands = old.commands;
+	files = old.files;
+	return *this;
+}
+
+Module& Module::operator=(Module&& old) noexcept
+{
+	moduleName = old.moduleName;
+	parent = old.parent;
+	commands = old.commands;
+	files = old.files;
+
+	old.moduleName = "";
+	old.parent = "";
+	return *this;
+}
+
 
 	

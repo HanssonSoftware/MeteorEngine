@@ -5,7 +5,7 @@
 		<DisplayString Condition="!bIsUsingHeap">{{ptr={stackBuffer.ptr} size={stackBuffer.length}}}</DisplayString>
 		<Expand>
 			<Item Name="Using">bIsUsingHeap</Item>
-			<Item Name="Length">bIsUsingHeap ? (heapBuffer.length): (stackBuffer.length) </Item>
+			<Item Name="Length">!SitsOnStack() ? heapBuffer.length : stackBuffer.length</Item>
 			<Item Name="Capacity" IncludeView="bIsUsingHeap">(heapBuffer.capacity)</Item>
 			<ArrayItems>
 				<Size>bIsUsingHeap ? (heapBuffer.length) : (stackBuffer.length)</Size>

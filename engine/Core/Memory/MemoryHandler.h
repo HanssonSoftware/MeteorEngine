@@ -92,7 +92,7 @@ public:
 		T* newRegion = nullptr;
 		if (void* regionWithSelfContained = HAL::OSAlloc(nullptr, newRegionSizeInBytes + sizeof(T)))
 		{
-			newRegion = new(regionWithSelfContained) T((u8*)regionWithSelfContained, newRegionSizeInBytes);
+			newRegion = new(regionWithSelfContained) T((u8*)regionWithSelfContained + sizeof(T), newRegionSizeInBytes);
 
 			// 1. Get projectRegion's nextRegion
 			// 2. Find the nextRegion is nullptr

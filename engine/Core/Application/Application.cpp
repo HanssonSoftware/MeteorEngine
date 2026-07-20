@@ -98,6 +98,8 @@ extern "C" LIBRARY_OUT int LaunchApplication(Application* instance, int argc, ch
 
     if (instance->GetCurrentState() == Application::State::Dead)
         return -1;
+    else if (instance->GetCurrentState() == Application::State::Shutdown)
+        return 0;
 
     instance->SetCurrentState(Application::State::Running);
     while (instance->GetCurrentState() == Application::State::Running)

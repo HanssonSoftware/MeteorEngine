@@ -17,23 +17,45 @@ LOG_ADDCATEGORY(Factory);
 
 namespace Commands
 {
-	void DirectorySearch(wchar_t* inPath, u32& inCount, Array<wchar_t*>& foundFiles)
+	void DirectorySearch(wchar_t* inPath, u32& inCount, MemoryBlockArena*& currentArena, Array<wchar_t*>& foundFiles)
 	{
-		wchar_t* pushedInPath = inPath + inCount + 2;
+		wchar_t* pushedInPath = (wchar_t*)currentArena->Allocate((inCount + 5) * sizeof(wchar_t));
 
 		HRESULT A = PathCchCombine(pushedInPath, inCount, inPath, L"*");
 		u32 pushedInSize = wcslen(pushedInPath);
 
 		WIN32_FIND_DATAW found = {};
-		HANDLE inProgressSearchHandle = FindFirstFileW(pushedInPath, &found);
+		HANDLE inProgressSearchHandle = FindFirstFileExW(pushedInPath, FindExInfoBasic, &found, FindExSearchNameMatch, nullptr, FIND_FIRST_EX_LARGE_FETCH);
 
-		PathCchRemoveFileSpec(pushedInPath, pushedInSize);
-		pushedInSize = wcslen(pushedInPath);
+		pushedInPath[pushedInSize-1] = L'\0';
+		pushedInSize--;
 
 		if (inProgressSearchHandle != INVALID_HANDLE_VALUE)
 		{
 			do
 			{
+				if (found.cFileName[0] == L'.')
+					continue;
+				
+				if (found.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+				{
+					u32 pushedAgainSize = pushedInSize + wcslen(found.cFileName) +5;
+					wchar_t* pushedAgainPath = (wchar_t*)currentArena->Allocate(pushedAgainSize * sizeof(wchar_t));
+
+					HRESULT C = PathCchCombine(pushedAgainPath, pushedAgainSize, pushedInPath, found.cFileName);
+
+					DirectorySearch(pushedAgainPath, pushedAgainSize, currentArena, foundFiles);
+				}
+				else if (found.dwFileAttributes & FILE_ATTRIBUTE_ARCHIVE)
+				{
+					u32 pushedAgainSize = pushedInSize + wcslen(found.cFileName) + 2;
+					wchar_t* pushedAgainPath = (wchar_t*)currentArena->Allocate(pushedAgainSize * sizeof(wchar_t));
+
+					HRESULT C = PathCchCombine(pushedAgainPath, pushedAgainSize, pushedInPath, found.cFileName);
+
+					MR_LOG(LogFactory, Log, "Found file: %s", pushedAgainPath);
+					foundFiles.Add(pushedAgainPath);
+				}
 
 			} while (FindNextFileW(inProgressSearchHandle, &found));
 
@@ -42,6 +64,78 @@ namespace Commands
 
 		int J = 53;
 	}
+
+
+	Module MakeModuleFromBuffer(const char* buffer)
+	{
+		Module instance;
+
+		const StringView header = Processing::GetWord(buffer);
+		if (!strncmp((char*)header.ptr, "Module", header.size))
+		{
+			const StringView moduleName = Processing::GetQuotedWord(buffer);
+			instance.SetModuleName(moduleName);
+
+			if (Processing::ExpectedCharacter(buffer, ':'))
+			{
+				buffer++; // :
+
+				const StringView parent = Processing::GetQuotedWord(buffer);
+				instance.SetParent(parent);
+
+				buffer++;
+				if (Processing::ExpectedCharacter(buffer, '{'))
+				{
+					buffer++;
+
+					const char* last = buffer;
+					while (*buffer)
+					{
+						const String command = String(Processing::GetWord(buffer));
+
+						//constexpr u64 b = "Dependencies"_h;
+
+						switch (Hash(command))
+						{
+						case 5786862590791793456:  // IncludePath
+						case 11138787046201537241: // IncludePaths
+							Processing::EnterBlock(buffer, command, &instance);
+							break;
+
+						case 14686587794296974560: // Dependencies 
+							Processing::EnterBlock(buffer, command, &instance);
+							break;
+
+						default:
+							Processing::SkipBlock(buffer);
+							break;
+						}
+
+						if (last == buffer)
+						{
+							//MR_LOG(LogProcessing, Error, "Parser stuck!");
+							break;
+						}
+						else
+						{
+							last = buffer;
+						}
+					}
+				}
+			}
+			else
+			{
+				//MR_LOG(LogProcessing, Error, "Module has no parent! %s", *instance.moduleName);
+			}
+		}
+		//else
+		{
+			//MR_LOG(LogProcessing, Fatal, "Failed to parse script header word! %s", header.ptr);
+		}
+
+		return instance;
+	}
+
 
 		//
 

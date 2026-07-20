@@ -90,13 +90,17 @@ struct Module
 {
 	Module() = default;
 	~Module() noexcept = default;
-	//Module(const Module& old);
-	//Module(Module&& old) noexcept;
+	Module(const Module& old);
+	Module(Module&& old) noexcept;
 
-	//Module& operator=(const Module& old) noexcept;
-	//Module& operator=(Module&& old) noexcept;
+	Module& operator=(const Module& old) noexcept;
+	Module& operator=(Module&& old) noexcept;
 
-	const char* GetModuleName() const { return nullptr; };
+	const String GetModuleName() const { return moduleName; };
+	void SetModuleName(const String& newName) { moduleName = newName; };
+
+	const String GetParent() const { return parent; };
+	void SetParent(const String& newName) { parent = newName; };
 
 	char guid[48] = {};
 #ifdef MR_PLATFORM_WINDOWS
@@ -106,8 +110,8 @@ struct Module
 #endif // MR_PLATFORM_WINDOWS
 	Map<const char*, Array<const char*>> commands;
 
-	static Module MakeModuleFromBuffer(const char* buffer);
-
 protected:
-	
+	String moduleName;
+
+	String parent;
 };

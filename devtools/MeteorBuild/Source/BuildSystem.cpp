@@ -20,6 +20,7 @@ void BuildSystem::CallRequiredMode()
 	{
 		PrintHelp();
 	}
+
 }
 
 void BuildSystem::PrintHelp()

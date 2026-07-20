@@ -13,7 +13,7 @@ void Commandline::Init(int argc, char** argv)
 	list = argv;
 }
 
-bool Commandline::Check(const StringView& command)
+bool Commandline::Check(const StringView& command) const
 {
 	MR_ASSERT(count > 0 && list != nullptr, "Command check happened too early");
 

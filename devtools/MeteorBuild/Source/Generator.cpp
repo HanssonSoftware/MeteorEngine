@@ -8,6 +8,7 @@
 #include <HAL/Commandline.h>
 #include <Application/Application.h>
 #include <HAL/Timer.h>
+#include <HAL/File.h>
 #include "Win32/MinimalWin.h"
 
 #include <shellapi.h>
@@ -30,9 +31,9 @@ namespace Commands
 
 	bool Generate_Cmd()
 	{
-		constexpr u64 maxChars = 24_mB / sizeof(wchar_t);
+		constexpr u64 maxChars = 16_mB / sizeof(wchar_t);
 
-		wchar_t* allocated = GetMemoryManager()->Allocate<wchar_t>(24_mB);
+		wchar_t* allocated = GetMemoryManager()->Allocate<wchar_t>(16_mB);
 		if (!allocated)
 			return false;
 
@@ -60,13 +61,48 @@ namespace Commands
 			return false;
 		}
 
+		MemoryBlockArena* discoveryArena = GetMemoryManager()->RequestNewRegion<MemoryBlockArena>("discoveryArena", 16_mB * sizeof(wchar_t));
 		Array<wchar_t*> files;
-		DirectorySearch(allocated, exeLocationCount, files);
-		//PathCchCombine(&path[exeLocationCount], exeLocationCount + )
-		allocated[exeLocationCount] = L'\0';
+		DirectorySearch(allocated, exeLocationCount, discoveryArena, files);
 		
-//		const String sourceDirectory = Commandline::Get().Parse("-s");
-//		const String intermediateDirectory = Commandline::Get().Parse("-i");
+		Array<Module> modules;
+		MemoryBlockArena* processingArena = GetMemoryManager()->RequestNewRegion<MemoryBlockArena>("processingArena", 8_mB * sizeof(wchar_t));
+		for (wchar_t* file : files)
+		{
+			if (wcscmp(PathFindExtensionW(file), L".mrbuild"))
+				continue;
+
+			HANDLE scriptFile = CreateFileW(file, GENERIC_READ, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+			if (scriptFile != INVALID_HANDLE_VALUE)
+			{
+				LARGE_INTEGER lg;
+				GetFileSizeEx(scriptFile, &lg);
+
+				char* buffer = (char*)processingArena->Allocate(lg.QuadPart);
+
+				DWORD read = 0;
+				if (!ReadFile(scriptFile, buffer, lg.QuadPart, &read, nullptr))
+				{
+					CloseHandle(scriptFile);
+					continue;
+				}
+
+				Module instance = MakeModuleFromBuffer(buffer);
+				
+
+				modules.Add(instance);
+				CloseHandle(scriptFile);
+			}
+		}
+
+		if (modules.GetSize() == 0)
+		{
+			MR_LOG(LogFactory, Error, "No modules created!");
+			return false;
+		}
+
+		const StringView intermediateDirectory = cli->Get("-i");
+		
 //
 //		// Arena allocates bytes, so equal size will be allocated!
 //		// WChar: 32 MB (Char / 2)

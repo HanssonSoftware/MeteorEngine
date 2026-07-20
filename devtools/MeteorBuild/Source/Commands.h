@@ -67,8 +67,10 @@ namespace Commands
 
 	void AddSolution(const Array<Module>* modules);
 
+	Module MakeModuleFromBuffer(const char* buffer);
+
 #ifdef MR_PLATFORM_WINDOWS
-	void DirectorySearch(wchar_t* inPath, u32& MAX, Array<wchar_t*>& foundFiles);
+	void DirectorySearch(wchar_t* inPath, u32& MAX, MemoryBlockArena*& currentArena, Array<wchar_t*>& foundFiles);
 #else
 	void DirectorySearch(char* directory, Array<char*>& foundFiles, MemoryBlockArena<char>* arena);
 #endif // MR_PLATFORM_WINDOWS

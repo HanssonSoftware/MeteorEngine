@@ -25,7 +25,7 @@ public:
 
 	String(const char* string, u32 length);
 
-	explicit String(const StringView& str);
+	String(const StringView& str);
 
 	String(String&& other) noexcept;
 
