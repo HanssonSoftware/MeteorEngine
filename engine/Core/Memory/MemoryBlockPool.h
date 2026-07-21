@@ -13,6 +13,11 @@
 class CORE_API MemoryBlockPool : public MemoryBlockBase
 {
 	friend class MemoryHandler;
+
+	struct FreeNode
+	{
+		FreeNode* next = nullptr;
+	};
 public:
 	MemoryBlockPool() = default;
 	virtual ~MemoryBlockPool() noexcept = default;
@@ -27,13 +32,46 @@ public:
 	MemoryBlockPool(u8* address, u64 regionSizeInBytes)
 		: MemoryBlockBase(address, regionSizeInBytes)
 	{
-		u64 converted = Round(regionSizeInBytes);
-		converted /= 8;
+		u32 countOfMaxNodes = regionSizeInBytes / 8;
 
-		int J = 43;
+		u64 countOfMaxNodesBytes = countOfMaxNodes * sizeof(FreeNode);
+
+		FreeNode* current = nextNode = (FreeNode*)address;
+		u64 actual = 0;
+		while (countOfMaxNodesBytes > (actual + sizeof(FreeNode)))
+		{
+			FreeNode* next = (FreeNode*)(address + actual + sizeof(FreeNode));
+			current->next = next;
+
+			current = next;
+			actual += sizeof(FreeNode);
+		}
+	}
+	
+	//* Allocate from pool, byte param has no use!
+	virtual void* Allocate(const u64 byte = 0) override
+	{
+		if (!nextNode)
+			return nullptr;
+
+		FreeNode* found = nextNode;
+		nextNode = nextNode->next;
+
+		return found;
+	}
+
+	virtual void Deallocate(void* location) override
+	{
+		if (!location)
+			return;
+
+		FreeNode* found = nextNode;
+		nextNode = nextNode->next;
 	}
 
 protected:
 	constexpr inline u64 Round(u64 value) { return (value + 7) & ~7; };
+
+	FreeNode* nextNode;
 };
 

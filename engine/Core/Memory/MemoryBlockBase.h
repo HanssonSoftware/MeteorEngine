@@ -23,6 +23,9 @@ public:
 
 	}
 
+	virtual void* Allocate(const u64 byte) = 0;
+	virtual void Deallocate(void*) = 0;
+
 protected:
 	u8* ptr = nullptr;
 
