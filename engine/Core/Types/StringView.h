@@ -52,8 +52,8 @@ struct CORE_API StringView
 	constexpr const u8* begin() const { return ptr; };
 	constexpr const u8* end() const { return ptr + size; };
 
-	operator bool() const
+	explicit operator bool() const
 	{
-		return ptr != nullptr;
+		return ptr != nullptr && size > 0;
 	}
 };

@@ -66,6 +66,9 @@
     <ClCompile Include="engine\Core\Memory\MemoryBlockArena.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="engine\Core\Memory\MemoryBlockRegion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Application\Application.h">
@@ -177,6 +180,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resources\default\DefaultEngineResources.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Core\Memory\MemoryBlockRegion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

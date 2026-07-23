@@ -50,11 +50,40 @@ class Map
 
 public:
 	Map() = default;
-	~Map() = default;
-	Map(const Map&) = default;
-	Map(Map&&) = default;
-	Map& operator=(const Map&) = default;
-	Map& operator=(Map&&) = default;
+	~Map()
+	{
+		container.Clear();
+	}
+
+	Map(const Map& other)
+	{
+		container = other.container;
+	};
+
+	Map(Map&& other)
+	{
+		container = std::move(other.container);
+	};
+
+	Map& operator=(const Map& other)
+	{
+		if (*this != other)
+		{
+			container = other.container;
+		}
+
+		return *this;
+	}
+
+	Map& operator=(Map&& other)
+	{
+		if (*this != other)
+		{
+			container = std::move(other.container);
+		}
+
+		return *this;
+	}
 
 	Value& operator[](Key Input)
 	{
@@ -86,6 +115,11 @@ public:
 	Value* end() { return &container.Data()->data + container.GetSize(); }
 	const Value* begin() const { return &container.Data()->data; }
 	const Value* end() const { return &container.Data()->data + container.GetSize(); }
+
+	bool operator!=(const Map& other)
+	{
+		return container != other.container;
+	}
 protected:
 	Array<InternalContainerForMap> container;
 };

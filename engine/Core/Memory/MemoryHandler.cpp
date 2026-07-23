@@ -11,7 +11,6 @@
 
 static MemoryHandler instance;
 
-LOG_ADDCATEGORY(Memory);
 
 MemoryHandler* GetMemoryManager()
 {
@@ -47,7 +46,7 @@ bool MemoryHandler::Initialize()
 #endif // MR_PLATFORM_WINDOWS
 
     constexpr const u64 fixed512MB = 512_mB;
-    constexpr const u64 regionHeaderSize = (2 * sizeof(MemoryBlockPool));
+    constexpr const u64 regionHeaderSize = (2 * sizeof(MemoryBlockRegion));
 
     void* startingAddress = HAL::OSAlloc(nullptr, fixed512MB + regionHeaderSize);
     if (!startingAddress)
@@ -61,8 +60,8 @@ bool MemoryHandler::Initialize()
     constexpr u64 engineSize = fixed512MB / 3ull;
     constexpr u64 projectSize = fixed512MB - engineSize;
 
-    engineRegion = new(startingAddress) MemoryBlockPool((u8*)startingAddress + sizeof(MemoryBlockPool), engineSize);
-    projectRegion = new((u8*)startingAddress + engineSize) MemoryBlockPool((u8*)startingAddress + sizeof(MemoryBlockPool) + engineSize, projectSize);
+    engineRegion = new(startingAddress) MemoryBlockRegion((u8*)startingAddress + sizeof(MemoryBlockRegion), engineSize);
+    projectRegion = new((u8*)startingAddress + engineSize) MemoryBlockRegion((u8*)startingAddress + sizeof(MemoryBlockRegion) + engineSize, projectSize);
 
     return engineRegion && projectRegion;
 }
@@ -76,4 +75,12 @@ void MemoryHandler::Deallocate(u32 id)
 
     //memset(location, 0, byte);
     //VirtualFree(location, byte, MEM_DECOMMIT);
+}
+
+void MemoryHandler::Deallocate(void* id)
+{
+    if (projectRegion && id)
+    {
+        projectRegion->Deallocate(id);
+    }
 }

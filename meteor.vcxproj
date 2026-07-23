@@ -81,7 +81,7 @@
       <PrecompiledHeaderFile>stdafx.h;Windows.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>NotSet</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
@@ -109,7 +109,7 @@
       <PrecompiledHeaderFile>stdafx.h;Windows.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>NotSet</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -142,6 +142,7 @@
     <ClCompile Include="engine\Core\HAL\Win32\Window_Win32.cpp" />
     <ClCompile Include="engine\Core\HAL\Win32\Paths_Win32.cpp" />
     <ClCompile Include="engine\Core\HAL\Win32\Timer_Win32.cpp" />
+    <ClCompile Include="engine\Core\Memory\MemoryBlockRegion.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Core\Memory\MemoryBlockBase.h" />
@@ -180,6 +181,7 @@
     <ClInclude Include="engine\Core\HAL\Window.h" />
     <ClInclude Include="engine\Core\HAL\Paths.h" />
     <ClInclude Include="engine\Core\HAL\Timer.h" />
+    <ClInclude Include="engine\Core\Memory\MemoryBlockRegion.h" />
     <ClInclude Include="resources\default\DefaultEngineResources.h" />
   </ItemGroup>
   <ItemGroup>

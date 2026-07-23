@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{e75c5354-0747-4518-9e9b-b4fdff214314}</ProjectGuid>
+    <ProjectGuid>{01BDCE17-E3A3-4E34-B0C1-784D10482554}</ProjectGuid>
     <RootNamespace>MeteorBuild</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>

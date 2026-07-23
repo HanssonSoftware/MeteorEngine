@@ -74,8 +74,8 @@ void Application::Shutdown()
 #ifdef MR_PLATFORM_WINDOWS
 
 #endif // MR_PLATFORM_WINDOWS
-
-        Logger::Get()->Shutdown();
+        if (Logger* log = Logger::Get())
+            log->Shutdown();
 
         //GetMemoryManager()->Shutdown();
     }

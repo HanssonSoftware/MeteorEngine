@@ -23,8 +23,8 @@ public:
 
 	}
 
-	virtual void* Allocate(const u64 byte) = 0;
-	virtual void Deallocate(void*) = 0;
+	virtual void* Allocate(const u64 byte) { return nullptr; };
+	virtual void Deallocate(void*) {};
 
 protected:
 	u8* ptr = nullptr;

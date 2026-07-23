@@ -16,7 +16,7 @@ EditorApplication::EditorApplication()
 	: Application()
 {
 	appName = { "Meteor Editor" };
-	appNameNoSpaces = "MeteorEditor";
+	appNameNoSpaces = "MeteorEditor fdxghbydfgb";
 	appCodeName = { "Satellite" };
 
 	windowDefs = { appName, 640, 480 };

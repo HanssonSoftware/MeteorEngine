@@ -6,7 +6,7 @@
 
 //* Creates a logging category
 #define LOG_ADDCATEGORY(CategoryName) \
-    const u16 Log##CategoryName = Logger::AddLogCategory(#CategoryName)
+    static const u16 Log##CategoryName = Logger::AddLogCategory(#CategoryName)
 
 #define MR_LOG(CategoryName, severity, message, ...)                \
     do                                                              \

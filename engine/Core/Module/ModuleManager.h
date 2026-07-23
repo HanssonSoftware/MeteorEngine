@@ -11,23 +11,23 @@
 #define CORE_API __declspec(dllimport)
 #endif // MR_CORE_EXPORTS
 
-class CORE_API ModuleManager
+class ModuleManager
 {
 	ModuleManager() noexcept = default;
 public:
-	static ModuleManager& Get();
+	CORE_API static ModuleManager& Get();
 
-	virtual void InitializeModules();
-	
-	virtual void ShutdownModules();
+	CORE_API virtual void InitializeModules();
 
-	virtual bool RegisterModule(const StringView& moduleName);
+	CORE_API virtual void ShutdownModules();
 
-	virtual bool UnloadModule(const StringView& moduleName);
+	CORE_API virtual bool RegisterModule(const StringView& moduleName);
 
-	virtual bool IsModuleLoaded(const StringView& moduleName);
+	CORE_API virtual bool UnloadModule(const StringView& moduleName);
 
-	virtual void UpdateModules(float dt);
+	CORE_API virtual bool IsModuleLoaded(const StringView& moduleName);
+
+	CORE_API virtual void UpdateModules(float dt);
 protected:
 	virtual ~ModuleManager() noexcept = default;
 

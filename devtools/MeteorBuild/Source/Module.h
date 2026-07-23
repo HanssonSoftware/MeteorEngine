@@ -89,7 +89,7 @@ namespace Processing
 struct Module
 {
 	Module() = default;
-	~Module() noexcept = default;
+	~Module() noexcept;
 	Module(const Module& old);
 	Module(Module&& old) noexcept;
 

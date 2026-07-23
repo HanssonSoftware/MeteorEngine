@@ -116,7 +116,7 @@ private:
 		{
 			char ptr[SSO_MAX_CHARS] = {};
 
-			u8 length;
+			i8 length;
 
 		} stackBuffer;
 

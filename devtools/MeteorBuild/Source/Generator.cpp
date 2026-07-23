@@ -31,16 +31,16 @@ namespace Commands
 
 	bool Generate_Cmd()
 	{
-		constexpr u64 maxChars = 16_mB / sizeof(wchar_t);
+		constexpr u64 maxChars = 1_mB / sizeof(wchar_t);
 
-		wchar_t* allocated = GetMemoryManager()->Allocate<wchar_t>(16_mB);
+		wchar_t* allocated = GetMemoryManager()->Allocate<wchar_t>(1_mB);
 		if (!allocated)
 			return false;
 
 		const Commandline* cli = GetApplication()->GetCommandline();
 
 		const StringView sourceDirectoryFromParameter = cli->Get("-s"); // ..\\engine
-		if (!sourceDirectoryFromParameter.ptr)
+		if (!sourceDirectoryFromParameter)
 		{
 			MR_LOG(LogFactory, Error, "Source directory parameter missing!");
 			return false;
@@ -53,7 +53,7 @@ namespace Commands
 
 		exeLocationCount = (u32)wcslen(allocated);
 
-		exeLocationCount += MultiByteToWideChar(CP_UTF8, 0, (char*)sourceDirectoryFromParameter.ptr, sourceDirectoryFromParameter.size,
+		u32 exeLocationCountPlusConverted = exeLocationCount += MultiByteToWideChar(CP_UTF8, 0, (char*)sourceDirectoryFromParameter.ptr, sourceDirectoryFromParameter.size,
 			&allocated[exeLocationCount], maxChars - exeLocationCount);
 		if (GetLastError())
 		{
@@ -101,8 +101,49 @@ namespace Commands
 			return false;
 		}
 
-		const StringView intermediateDirectory = cli->Get("-i");
 		
+		wchar_t* intermediateDirectory = GetMemoryManager()->Allocate<wchar_t>(256_kB);
+		u32 intermediateCount = exeLocationCount;
+
+		wmemcpy(intermediateDirectory, allocated, intermediateCount);
+		intermediateCount = (u32)wcslen(intermediateDirectory);
+
+		for (wchar_t* p = &intermediateDirectory[intermediateCount]; *p != L'\\'; p--)
+			*p = L'\0';
+
+		intermediateCount = wcslen(intermediateDirectory);
+
+		constexpr const wchar_t* Intermediate = L"intermediate\\";
+		if (FAILED(PathCchCombine(&intermediateDirectory[intermediateCount], intermediateCount + wcslen(Intermediate), intermediateDirectory, Intermediate)))
+		{
+			MR_LOG(LogFactory, Fatal, "PathCchCombine=%d", GetLastError());
+			return false;
+		}
+
+		const String* appCodeName = GetApplication()->GetApplicationCodeName();
+		wchar_t* convertedAppName = GetMemoryManager()->Allocate<wchar_t>(appCodeName->Length() * sizeof(wchar_t));
+
+		if (!MultiByteToWideChar(CP_UTF8, 0, appCodeName->Chr(), appCodeName->Length(), convertedAppName, appCodeName->Length()))
+		{
+			MR_LOG(LogFactory, Fatal, "MultiByteToWideChar=%d", GetLastError());
+			return false;
+		}
+
+
+		u32 intermediateCountFinal = (u32)wcslen(&intermediateDirectory[intermediateCount]);
+		if (FAILED(PathCchCombine(&intermediateDirectory[intermediateCountFinal + appCodeName->Length()], intermediateCountFinal + appCodeName->Length() + 5, &intermediateDirectory[intermediateCount], convertedAppName)))
+		{
+			MR_LOG(LogFactory, Fatal, "PathCchCombine=%d", GetLastError());
+			return false;
+		}
+		
+		intermediateCount = (u32)wcslen(&intermediateDirectory[intermediateCountFinal + appCodeName->Length()]);
+
+		if (SHCreateDirectoryExW(nullptr, &intermediateDirectory[intermediateCountFinal + appCodeName->Length()], nullptr) != ERROR_ALREADY_EXISTS)
+		{
+			MR_LOG(LogFactory, Fatal, "SHCreateDirectoryExW=%d", GetLastError());
+			return false;
+		}
 //
 //		// Arena allocates bytes, so equal size will be allocated!
 //		// WChar: 32 MB (Char / 2)

@@ -33,6 +33,10 @@ namespace Processing
 }
 
 
+Module::~Module() noexcept
+{
+}
+
 Module::Module(const Module& old)
 	: moduleName(old.moduleName)
 	, parent(old.parent)
@@ -61,10 +65,10 @@ Module& Module::operator=(const Module& old) noexcept
 
 Module& Module::operator=(Module&& old) noexcept
 {
-	moduleName = old.moduleName;
-	parent = old.parent;
-	commands = old.commands;
-	files = old.files;
+	moduleName = std::move(old.moduleName);
+	parent = std::move(old.parent);
+	commands = std::move(old.commands);
+	files = std::move(old.files);
 
 	old.moduleName = "";
 	old.parent = "";

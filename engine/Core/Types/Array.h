@@ -29,7 +29,7 @@ public:
 			container[i].~T();
 		}
 
-		//GetMemoryManager()->Deallocate(container, capacity * sizeof(T));
+		GetMemoryManager()->Deallocate(container);
 
 		container = nullptr;
 		capacity = 1;
@@ -63,7 +63,7 @@ public:
 
 	Array& operator=(const Array<T>& old)
 	{
-		if (*this != old)
+		if (this != &old)
 		{
 			Clear();
 
@@ -87,7 +87,7 @@ public:
 	{
 		if (*this != old)
 		{
-			Clear();
+			//Clear();
 
 			container = old.container;
 			capacity = old.capacity;
@@ -151,7 +151,7 @@ public:
 				container[i].~T();
 			}
 
-			GetMemoryManager()->Deallocate(5);
+			GetMemoryManager()->Deallocate(container);
 			container = nullptr;
 		}
 

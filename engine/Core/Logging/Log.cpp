@@ -40,6 +40,8 @@ bool Logger::PrepareLoggingSystem()
     if (logArena)
     {
         instance = (Logger*)logArena->Allocate(sizeof(Logger));
+        new (instance) Logger();
+
         logArena->SetMarker(sizeof(Logger));
 
         instance->loggingArena = logArena;

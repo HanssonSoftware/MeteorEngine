@@ -6,7 +6,7 @@
 #include <HAL/DataTypes.h>
 #include <HAL/Memory.h>
 #include <Types/StringView.h>
-#include "MemoryBlockPool.h"
+#include "MemoryBlockRegion.h"
 
 class MemoryBlockBase;
 
@@ -38,8 +38,6 @@ class CORE_API MemoryHandler
 {
 	friend class Logger;
 public:
-	typedef MemoryBlockPool MemoryRegion;
-
 	MemoryHandler() = default;
 	virtual ~MemoryHandler() noexcept;
 
@@ -64,7 +62,7 @@ public:
 	}
 
 	template <typename T>
-	T* Allocate(const u64 byte, MemoryRegion* whichRegion)
+	T* Allocate(const u64 byte, MemoryBlockBase* whichRegion)
 	{
 		const u64 rounded = RoundToMemoryAlignment(byte);
 
@@ -83,8 +81,7 @@ public:
 
 	virtual void Deallocate(u32 id);
 
-	//* DECOY FUNCTION, THIS DOES NOTHING!!
-	virtual void Deallocate(void* id) {};
+	virtual void Deallocate(void* id);
 
 	template<typename T = MemoryBlockBase>
 	T* RequestNewRegion(const StringView& regionName, const u64 newRegionSizeInBytes)
@@ -124,12 +121,12 @@ public:
 		return byte;
 	}
 
-	MemoryBlockPool* GetEngineRegion() const { return engineRegion; };
-	MemoryBlockPool* GetProjectRegion() const { return projectRegion; };
+	MemoryBlockRegion* GetEngineRegion() const { return engineRegion; };
+	MemoryBlockRegion* GetProjectRegion() const { return projectRegion; };
 
 protected:
-	MemoryBlockPool* engineRegion = nullptr;
-	MemoryBlockPool* projectRegion = nullptr;
+	MemoryBlockRegion* engineRegion = nullptr;
+	MemoryBlockRegion* projectRegion = nullptr;
 };
 
 constexpr u64 operator""_kB(u64 val)

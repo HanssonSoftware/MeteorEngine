@@ -1,25 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
 	<Type Name="String">
-		<DisplayString Condition="bIsUsingHeap">{{ptr={heapBuffer.ptr} size={heapBuffer.length} cap={heapBuffer.capacity}}}</DisplayString>
-		<DisplayString Condition="!bIsUsingHeap">{{ptr={stackBuffer.ptr} size={stackBuffer.length}}}</DisplayString>
+		<DisplayString Condition="internalBuffers.stackBuffer.length == 0">
+			[HEAP] {&amp;internalBuffers.heapBuffer.ptr[0], [internalBuffers.heapBuffer.length]s8}; {internalBuffers.heapBuffer.length}
+		</DisplayString>
+		<DisplayString Condition="internalBuffers.stackBuffer.length != 0">
+			[STACK] {&amp;internalBuffers.stackBuffer.ptr[0], [internalBuffers.stackBuffer.length]s8}; {internalBuffers.stackBuffer.length} 
+		</DisplayString>
+		<DisplayString>
+			[EMPTY]
+		</DisplayString>
 		<Expand>
-			<Item Name="Using">bIsUsingHeap</Item>
-			<Item Name="Length">!SitsOnStack() ? heapBuffer.length : stackBuffer.length</Item>
-			<Item Name="Capacity" IncludeView="bIsUsingHeap">(heapBuffer.capacity)</Item>
-			<ArrayItems>
-				<Size>bIsUsingHeap ? (heapBuffer.length) : (stackBuffer.length)</Size>
-				<ValuePointer>bIsUsingHeap ? (heapBuffer.ptr) : (stackBuffer.ptr)</ValuePointer>
+			<Item Name="[Length]" Condition="internalBuffers.stackBuffer.length &gt; SSO_MAX_CHARS">
+				internalBuffers.heapBuffer.length
+			</Item>
+			<Item Name="[Capacity]" Condition="internalBuffers.stackBuffer.length &gt; SSO_MAX_CHARS">
+				internalBuffers.heapBuffer.capacity
+			</Item>
+
+			<ArrayItems Condition="internalBuffers.stackBuffer.length &gt; SSO_MAX_CHARS">
+				<Size>internalBuffers.heapBuffer.length</Size>
+				<ValuePointer>internalBuffers.heapBuffer.ptr</ValuePointer>
 			</ArrayItems>
 		</Expand>
 	</Type>
 	
 	<Type Name="Array&lt;*&gt;">
-		<DisplayString>{{ptr={container} size={size} cap={capacity}}}</DisplayString>
+		<DisplayString>{{container={container} size={size} cap={capacity}}}</DisplayString>
 		<Expand>
 			<ArrayItems>
-				<Size>last - begin</Size>
-				<ValuePointer>begin</ValuePointer>
+				<Size>size</Size>
+				<Size>capacity</Size>
+				<ValuePointer>container</ValuePointer>
 			</ArrayItems>
 		</Expand>
 	</Type>

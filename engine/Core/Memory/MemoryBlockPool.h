@@ -32,7 +32,7 @@ public:
 	MemoryBlockPool(u8* address, u64 regionSizeInBytes)
 		: MemoryBlockBase(address, regionSizeInBytes)
 	{
-		u32 countOfMaxNodes = regionSizeInBytes / 8;
+		u32 countOfMaxNodes = (u32)(regionSizeInBytes / 8);
 
 		u64 countOfMaxNodesBytes = countOfMaxNodes * sizeof(FreeNode);
 
