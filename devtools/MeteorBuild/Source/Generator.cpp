@@ -27,7 +27,7 @@ namespace Commands
 {
 	ADD_NEW_BUILD_COMMAND("-make", "Generates project files", Generate_Cmd);
 
-	void VcxprojGenerate(Module& mdl, const wchar_t* fullPathToIntermediateDir, u32& createdFilesCount);
+	void VcxprojGenerate(const Module* mdl, const wchar_t* fullPathToIntermediateDir, u32& createdFilesCount);
 
 	bool Generate_Cmd()
 	{
@@ -89,10 +89,25 @@ namespace Commands
 
 				Module instance = MakeModuleFromBuffer(buffer);
 				
+				u32 pathForModuleSize = wcslen(file);
+				wchar_t* pathForModule = (wchar_t*)processingArena->Allocate((pathForModuleSize + 64) * sizeof(wchar_t));
+				wmemcpy(pathForModule, file, pathForModuleSize);
+
+				for (wchar_t* p = &pathForModule[pathForModuleSize]; *p != L'\\'; p--)
+					*p = L'\0';
+
+				for (wchar_t* p = &pathForModule[pathForModuleSize]; !iswalpha(*p); p--)
+					*p = L'\0';
+
+				pathForModuleSize = (u32)wcslen(pathForModule);
+
+				DirectorySearch(pathForModule, pathForModuleSize, processingArena, instance.files);
 
 				modules.Add(instance);
 				CloseHandle(scriptFile);
 			}
+			
+			processingArena->Reset();
 		}
 
 		if (modules.GetSize() == 0)
@@ -144,7 +159,48 @@ namespace Commands
 			MR_LOG(LogFactory, Fatal, "SHCreateDirectoryExW=%d", GetLastError());
 			return false;
 		}
-//
+
+		MemoryBlockArena* moduleNames = GetMemoryManager()->RequestNewRegion<MemoryBlockArena>("", 256_kB);
+		u32 pointer = 0;
+
+		for (const Module& mdl : modules)
+		{
+			const String& moduleName = mdl.GetModuleName();
+			wchar_t* absoluteToIntermediate = (wchar_t*)moduleNames->Allocate(intermediateCount * sizeof(wchar_t));
+			wmemcpy(absoluteToIntermediate, &intermediateDirectory[intermediateCountFinal + appCodeName->Length()], intermediateCount);
+
+			// D:\Meteor-Engine\intermediate\Apollo  + \\moduleName.Chr() = convertibleModuleName
+
+			wchar_t* convertibleModuleName = (wchar_t*)moduleNames->Allocate((moduleName.Length() + 8u) * sizeof(wchar_t));
+
+			if (!MultiByteToWideChar(CP_UTF8, 0, moduleName.Chr(), moduleName.Length(), convertibleModuleName, moduleName.Length()))
+			{
+				MR_LOG(LogFactory, Fatal, "(%hs) MultiByteToWideChar=%d", moduleName.Chr(), GetLastError());
+				return false;
+			}
+
+			wchar_t* finalPath = (wchar_t*)moduleNames->Allocate((intermediateCount + moduleName.Length() + 8u) * sizeof(wchar_t));
+			if (FAILED(PathCchCombine(finalPath, intermediateCount + moduleName.Length() + 8u, absoluteToIntermediate, convertibleModuleName)))
+			{
+				MR_LOG(LogFactory, Fatal, "(%hs) PathCchCombine=%d", moduleName.Chr(), GetLastError());
+				return false;
+			}
+
+			if (SHCreateDirectoryExW(nullptr, finalPath, nullptr) != ERROR_ALREADY_EXISTS)
+			{
+				MR_LOG(LogFactory, Fatal, "(%hs) SHCreateDirectoryExW=%d", moduleName.Chr(), GetLastError());
+				return false;
+			}
+
+			u32 created = 0;
+			VcxprojGenerate(&mdl, finalPath, created);
+
+			moduleNames->Reset();
+		}
+
+
+
+
 //		// Arena allocates bytes, so equal size will be allocated!
 //		// WChar: 32 MB (Char / 2)
 //		// Char: 32 MB
@@ -461,9 +517,11 @@ namespace Commands
 		//}
 	}
 
-	void VcxprojGenerate(Module& mdl, const wchar_t* fullPathToIntermediateDir, u32& createdFilesCount)
+	void VcxprojGenerate(const Module* mdl, const wchar_t* fullPathToIntermediateDir, u32& createdFilesCount)
 	{
-		//MR_LOG(LogFileConstruct, Log, "Creating %s project file", mdl.moduleName.Chr());
+		MR_LOG(LogFactory, Log, "Creating %hs project file", mdl->GetModuleName().Chr());
+		
+		static MemoryBlockArena* arena = GetMemoryManager()->RequestNewRegion<MemoryBlockArena>("", );
 
 		//HANDLE proj = SendToOutputBuffer(fullPathToIntermediateDir, GENERIC_READ | GENERIC_WRITE, _placeholder_);
 		//if (proj == INVALID_HANDLE_VALUE)

@@ -19,9 +19,10 @@ namespace Commands
 {
 	void DirectorySearch(wchar_t* inPath, u32& inCount, MemoryBlockArena*& currentArena, Array<wchar_t*>& foundFiles)
 	{
-		wchar_t* pushedInPath = (wchar_t*)currentArena->Allocate((inCount + 5) * sizeof(wchar_t));
+		wchar_t* pushedInPath = (wchar_t*)currentArena->Allocate((inCount + 8) * sizeof(wchar_t));
+		wmemcpy(pushedInPath, inPath, inCount);
 
-		HRESULT A = PathCchCombine(pushedInPath, inCount, inPath, L"*");
+		wcscat(pushedInPath, L"\\*");
 		u32 pushedInSize = wcslen(pushedInPath);
 
 		WIN32_FIND_DATAW found = {};

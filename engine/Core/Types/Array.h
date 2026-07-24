@@ -135,7 +135,7 @@ public:
 		for (u32 i = 0; i < size; i++)
 			newBlock[i] = container[i];
 
-		//GetMemoryManager()->Deallocate(container, capacity * sizeof(T));
+		GetMemoryManager()->Deallocate(container);
 
 		container = newBlock;
 		capacity = newCount;
@@ -165,7 +165,7 @@ public:
 	u32 GetSize() const { return size; }
 	u32 GetCapacity() const { return capacity; }
 
-	explicit operator bool() const { return size > 0; }
+	explicit operator bool() const { return size > 0 && container != nullptr; }
 
 	bool operator!=(const Array<T>& other)
 	{
